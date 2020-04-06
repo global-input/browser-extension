@@ -43,7 +43,7 @@ export const MobileIntegrationContainer = ({globalInputApp,children,toSettings,t
     const ExtensionFooter=()=>(        
             <div style={styles.appContainer.footer}>
                 <a href="#" onClick={evt=>{toSettings();return false;}}>Settings</a>
-                <a href="https://github.com/global-input/chrome-extension" target="_blank">Source Code On GitHub</a>
+                <a href="https://github.com/global-input/browser-extension" target="_blank">Source Code On GitHub</a>
             </div>
         );
 
