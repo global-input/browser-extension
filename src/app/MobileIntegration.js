@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useGlobalInputApp } from 'global-input-react';
+import { useGlobalInputApp } from 'global-input-react'; ////global-input-react////
 
 import * as appSettings from './appSettings';
 import { MobileIntegrationContainer, MessageContainer} from './app-layout';
