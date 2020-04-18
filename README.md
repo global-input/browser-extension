@@ -13,12 +13,20 @@ You can install this extension on [Chrome Web Store](https://chrome.google.com/w
 
 Alternatively, you may install it from its source code, which is this repository.  Download the source code and run:
 
+
 ```
-git clone git@github.com:global-input/browser-extension.git
+git clone https://github.com/global-input/browser-extension.git
 cd browser-extension
+npm install
 npm run build
 ```
 This will build the React.js application into its build folder.
 
 Then, go to the extensions window (type the URL  ```chrome://extensions``` on your Chrome or ```about://debugging``` on your Firefox), and click on the "Load unpacked" button there, and then navigate to the ```build```  folder when the file dialogue box appears, and follow the instruction there for installing the extension.
+
+You may also load it as a React.js web application rather installing it into your browser as an extension:
+
+```
+npm start
+```
 
