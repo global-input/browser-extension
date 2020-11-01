@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMobile } from './utils';
 
-import { AppContainer } from './app-layout';
+import { BasicLayout } from './app-layout';
 import * as appSettings from './utils';
 
 export enum PAGES {
@@ -49,9 +49,10 @@ const MainPage: React.FC<Props> = ({ setPage, domain }) => {
 
 
 
-    return (<AppContainer title="Global Input App" domain={domain}>
+    return (
+    <BasicLayout title="Global Input App" domain={domain} mobile={mobile}>
         <mobile.ConnectQR />
-    </AppContainer>);
+    </BasicLayout>);
 }
 
 

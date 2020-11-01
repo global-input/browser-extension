@@ -14,8 +14,8 @@ const EncryptContent:React.FC<Props> = ({content, showOnComputer})=>{
             action:"input",
             dataType:"form",
             form:{
-                title:"Content To Encrypt",
-                fields:[{...FIELDS.content,value:content},FIELDS.back]
+                title:"Mobile Encryption",
+                fields:[{...FIELDS.content,value:content},FIELDS.info,FIELDS.back]
             }
     });
 
@@ -27,6 +27,7 @@ const EncryptContent:React.FC<Props> = ({content, showOnComputer})=>{
                         }
                         else{
                             setErrorMessage("Failed to encrypt");
+                            mobile.sendValue(FIELDS.info.id, {style:{color:"red"}, content:"Failed to Encrypt!"});
                         }
                         break;
                 case FIELDS.back.id:
@@ -48,6 +49,11 @@ const FIELDS={
         label :"Content",
         type: 'encrypt',
         value:''},
+    info:{
+        id:"info",
+        type:"info",
+        value:"",
+    },
     back:{
         id:"backToContent",
         label:"Back",

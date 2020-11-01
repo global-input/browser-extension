@@ -2,30 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useMobile } from '../utils';
 import { InputWithCopy, TextButton, MessageContainer, FormContainer } from '../app-layout';
 
-const FIELDS = {
-    info: {
-        type: "info",
-        value: 'Please operate on your computer (in the browser extension window) to copy the encrypted content into your clipboard. You can do so by pressing the "Copy" button there.'
-    },
-    loadOnMobile: {
-        id: "loadIntoMobile",
-        label: "Load Into Mobile",
-        type: "button",
-        viewId: "row1"
-    },
-    finish: {
-        id: "finish",
-        label: "Finish",
-        type: "button",
-        viewId: "row1"
-    },
-};
+
 interface Props {
     content: string;
-    toFinish: () => void;
-
+    finish: () => void;
+    contentOnComputer:(content:string)=>void;
 }
-const ShowOnComputer: React.FC<Props> = ({ content, toFinish }) => {
+const ShowOnComputer: React.FC<Props> = ({ content, contentOnComputer, finish }) => {
     const mobile = useMobile({
                 action: "input",
                 dataType: "form",
@@ -51,11 +34,37 @@ const ShowOnComputer: React.FC<Props> = ({ content, toFinish }) => {
                 label="Encrypted Content"
                 type={"textarea"}
                 value={content} />
-            <TextButton onClick={toFinish} label='Finsih' />
+            <TextButton onClick={finish} label='Finish' />
         </FormContainer>
     );
 
 
+};
+
+
+const FIELDS = {
+    info: {
+        type: "info",
+        value: 'Please operate on your computer (in the browser extension window) to copy the encrypted content into your clipboard. You can do so by pressing the "Copy" button there.'
+    },
+    contentOnComputer:{
+        id:"contentOnComputer",
+        label:"back",
+        type:"button",
+        viewId: "row1"
+    },
+    loadOnMobile: {
+        id: "loadIntoMobile",
+        label: "Load Into Mobile",
+        type: "button",
+        viewId: "row1"
+    },
+    finish: {
+        id: "finish",
+        label: "Finish",
+        type: "button",
+        viewId: "row1"
+    },
 };
 
 export default ShowOnComputer;

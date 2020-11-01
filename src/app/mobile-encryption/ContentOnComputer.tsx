@@ -22,7 +22,7 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,sta
                 fields: Object.values(FIELDS)
             }
     });
-    const onChange = useCallback((value: string) => {
+    const onContentChange = useCallback((value: string) => {
         setErrorMessage('');
         setContent(value);
     }, []);
@@ -32,6 +32,7 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,sta
        }
        else{
            setErrorMessage('Content missing!');
+           mobile.sendValue(FIELDS.info.id,'Please provide content to encrypt. You can  press "Use Mobile" button to use your mobile to provide the content.')
        }
     };
     mobile.setOnchange(({ field }) => {
@@ -42,6 +43,8 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,sta
             case FIELDS.contentOnMobile.id:
                 contentOnMobile(content);
                 break;
+            case FIELDS.startEncrypt.id:
+                onEncrypt();
             default:
         }
     });
@@ -52,7 +55,7 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,sta
             <mobile.ConnectQR />
 
             <InputWithLabel label="Content to decrypt" id="content"
-                onChange={onChange}
+                onChange={onContentChange}
                 type="textarea"
                 value={content} />
             <DisplayErrorMessage errorMessage={errorMessage} />
@@ -66,17 +69,16 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,sta
     );
 
 
+
 };
 
 
 const FIELDS = {
     info: {
+        id:"info",
         type: 'info',
-        value: 'Please operate on your computer (in the extension window) to provide the content you would like to encrypt.',
-    },
-    info2: {
-        type: 'info',
-        value: 'If you would like to use your mobile to provide content to encrypt, press the "Content on Mobile" button below.'
+        value: ['Please operate on your computer (in the extension window) to provide the content you would like to encrypt.',
+                'If you would like to use your mobile to provide content, press the "Use Mobile" button.']
     },
     cancel: {
         id: "cancel",
@@ -87,13 +89,13 @@ const FIELDS = {
     contentOnMobile: {
         id: "contentOnMobile",
         type: "button",
-        label: "Content on Mobile",
+        label: "Use Mobile",
         viewId: "row1"
     },
     startEncrypt: {
-        id: "contentOnMobile",
+        id: "startEncrypt",
         type: "button",
-        label: "Content on Mobile",
+        label: "Encrypt",
         viewId: "row1"
     }
 }

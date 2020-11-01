@@ -40,6 +40,7 @@ const MobileEncryption:React.FC<MobileEncryptionProps> = ({domain,back})=>{
         setPage(PAGES.CONTENT_ON_MOBILE);
     }
 
+
     switch(page){
             case PAGES.CONTENT_ON_COMPUTER:
                     return(<ContentOnComputer initialContent={content} cancel={back} contentOnMobile={contentOnMobile} startEncrypt={startEncrypt}/>);
@@ -47,6 +48,8 @@ const MobileEncryption:React.FC<MobileEncryptionProps> = ({domain,back})=>{
                     return (<ContentOnMobile initialContent={content} cancel={back} contentOnComputer={contentOnComputer} startEncrypt={startEncrypt}/>);
             case PAGES.START_ENCRYPT:
                     return (<EncryptContent content={content} showOnComputer={showOnComputer} />);
+            case PAGES.SHOW_ON_COMPUTER:
+                    return (<ShowOnComputer content={content} contentOnComputer={contentOnComputer} finish={back}/>)
             case PAGES.SHOW_ON_MOBILE:
 
 

@@ -1,6 +1,6 @@
 
 import { useGlobalInputApp, generateRandomString, encrypt, decrypt } from 'global-input-react';
-import { InitData, ConnectOptions, FormField } from 'global-input-react'; //types
+import { InitData, ConnectOptions, FormField,GlobalInputData } from 'global-input-react'; //types
 ////main////
 
 import {setCacheFields,getCacheFields,clearCacheFields,getURL,getAPIKey} from './storage';
@@ -77,7 +77,7 @@ const loadCacheFields = (domain: string, key: string): FormField[] => {
 
 
 
-export type { FormField };
+export type { FormField,GlobalInputData};
 
 export {
     useMobile,

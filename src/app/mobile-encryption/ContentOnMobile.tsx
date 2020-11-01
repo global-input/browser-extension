@@ -6,7 +6,7 @@ interface PROPS {
     initialContent:string;
     contentOnComputer:  (content:string) => void;
     startEncrypt: (content:string) => void;
-    cancel:(content:string) => void;
+    cancel:() => void;
 }
 
 const ContentOnMobile:React.FC<PROPS> = ({initialContent,contentOnComputer,cancel,startEncrypt})=>{
@@ -17,7 +17,7 @@ const ContentOnMobile:React.FC<PROPS> = ({initialContent,contentOnComputer,cance
                         dataType:"form",
                         form:{
                             title:"Content To Encrypt",
-                            fields:[{...FIELDS.content,value:initialContent},FIELDS.back,FIELDS.encrypt]
+                            fields:[{...FIELDS.content,value:initialContent},FIELDS.info,FIELDS.back,FIELDS.cancel,FIELDS.encrypt]
                         }
     });
 
@@ -27,6 +27,7 @@ const ContentOnMobile:React.FC<PROPS> = ({initialContent,contentOnComputer,cance
          }
          else{
            setErrorMessage('Content missing!');
+           mobile.sendValue(FIELDS.info.id, {style:{color:"red"}, content:"Content required!"});
          }
     };
     const back=()=>{
@@ -41,6 +42,9 @@ const ContentOnMobile:React.FC<PROPS> = ({initialContent,contentOnComputer,cance
                         setErrorMessage('');
                         setContent(field.value as string);
                         break;
+                   case FIELDS.cancel.id:
+                       cancel();
+                       break;
                   case FIELDS.encrypt.id:
                         onEncrypt();
                         break;
@@ -65,6 +69,7 @@ const ContentOnMobile:React.FC<PROPS> = ({initialContent,contentOnComputer,cance
             <DisplayErrorMessage errorMessage={errorMessage}/>
                             <FormFooter>
             <TextButton onClick={back} label='Back'/>
+            <TextButton onClick={cancel} label='Cancel'/>
             <TextButton onClick={onEncrypt} label='Send To Mobile'/>
 
             </FormFooter>
@@ -85,12 +90,23 @@ const FIELDS={
         id:"contentOnMobile",
         type:'text',
         nLines:5,
-        value: 'null',
+        value: '',
+    },
+    info:{
+        id:"info",
+        type:"info",
+        value:''
     },
     back:{
         id:'backToComposeOnComputer',
         type:'button',
-        label:'back',
+        label:'Back',
+        viewId:"row1"
+    },
+    cancel:{
+        id:'cancel',
+        type:'button',
+        label:'Cancel',
         viewId:"row1"
     },
     encrypt:{
