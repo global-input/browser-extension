@@ -3,10 +3,10 @@ import InputWithCopy from './input-with-copy';
 import InputWithLabel from './input-with-label';
 import TextButton from './text-button';
 import styles from './styles';
-import {FormField} from 'global-input-react';
+import {FormField} from '../utils';
 import {RadioButton,CheckboxButton,SelectItems} from './selectable';
 
-export {InputWithLabel,TextButton,RadioButton,CheckboxButton,SelectItems};
+export {InputWithLabel,InputWithCopy,TextButton,RadioButton,CheckboxButton,SelectItems};
 interface AppTitleProps{
     children:React.ReactNode
 }
@@ -24,7 +24,7 @@ export const LoadingCircle = () => (<svg xmlns="http://www.w3.org/2000/svg" widt
 </svg>);
 
 
-interface MessageProps{    
+interface MessageProps{
     title:string;
     children:React.ReactNode;
 }
@@ -51,8 +51,8 @@ export const AppContainer = ({children,domain,title}:FormContainerProps)=>{
                 <div style={styles.form.fields}>
                         {children}
                 </div>
-                
-        
+
+
         </div>);
 
 };
@@ -62,14 +62,14 @@ export const FormContainer: React.FC<FormContainerProps> = ({children,domain,tit
                 <div style={styles.domain}>{domain}</div>
                 <div style={styles.form.fields}>
                         {children}
-                </div>                        
+                </div>
         </div>);
 };
 
 interface DisplayInputCopyFieldProps{
     field:FormField;
     hideValue:boolean;
-    onChange?: (value:string,id?:string) =>void; 
+    onChange?: (value:string,id?:string) =>void;
     onCopied:()=>void;
 }
 
@@ -77,7 +77,7 @@ export const DisplayInputCopyField = ({field,hideValue,onChange,onCopied}:Displa
     var fieldType="text";
     if(field.nLines && field.nLines>1){
         fieldType="textarea";
-    }          
+    }
     if(hideValue){
       fieldType="password";
     }
@@ -85,10 +85,10 @@ export const DisplayInputCopyField = ({field,hideValue,onChange,onCopied}:Displa
     if(!value){
          value='';
     }
-    return(       
+    return(
         <InputWithCopy label={field.label} id={field.id} type={fieldType}
-           value={value}  onCopied={onCopied} 
-           onChange={onChange}/>    
+           value={value}  onCopied={onCopied}
+           onChange={onChange}/>
       );
 };
 
@@ -96,7 +96,7 @@ export const DisplayInputCopyField = ({field,hideValue,onChange,onCopied}:Displa
 interface DisplayErrorMessageProps{
     errorMessage:string|object;
 }
-export const DisplayErrorMessage:React.FC<DisplayErrorMessageProps>=({errorMessage})=>{    
+export const DisplayErrorMessage:React.FC<DisplayErrorMessageProps>=({errorMessage})=>{
     if(!errorMessage){
         return null;
     }
@@ -105,10 +105,10 @@ export const DisplayErrorMessage:React.FC<DisplayErrorMessageProps>=({errorMessa
         if(typeof message === 'object'){
             message=JSON.stringify(errorMessage);
         }
-        
+
         return(
         <div style={styles.appContainer.errorMessage}>
-                        {message} 
+                        {message}
         </div>
         );
     }
@@ -122,4 +122,3 @@ export const FormFooter:React.FC=({children})=>(
         {children}
     </div>
 );
-

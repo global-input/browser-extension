@@ -1,36 +1,32 @@
 import React from 'react';
-import {useGlobalInputApp } from 'global-input-react'; ////global-input-react////
-import {AppContainer} from './app-layout';
+import { useMobile } from './utils';
 
+import { AppContainer } from './app-layout';
+import * as appSettings from './utils';
 
 export enum PAGES {
     LOADING,
     DISPLAY_CACHED_FORM,
-    HOME,
+    MAIN_PAGE,
     TRANSFER_FORM_DATA,
     ENCRYPTION,
     DECRYPTION,
-    PAGE_CONTROL
+    PAGE_CONTROL,
 }
 
-interface HomeProps {
+interface Props {
     domain: string;
     setPage: (page: PAGES) => void;
 }
-const Home: React.FC<HomeProps> = ({ setPage, domain }) => {
-
-    const mobile = useGlobalInputApp({
-        initData: {
+const MainPage: React.FC<Props> = ({ setPage, domain }) => {
+    const mobile = useMobile({
             action: "input",
             dataType: "form",
             form: {
                 title: "Please Select",
                 fields: Object.values(FIELDS)
             }
-        }
-
-
-    });
+        });
 
     mobile.setOnchange(({ field }) => {
         switch (field.id) {
@@ -49,7 +45,8 @@ const Home: React.FC<HomeProps> = ({ setPage, domain }) => {
             default:
         }
     });
-    development.debugMobile(mobile); ////dev-test
+
+
 
 
     return (<AppContainer title="Global Input App" domain={domain}>
@@ -85,3 +82,4 @@ const FIELDS = {
     }
 };
 
+export default MainPage;

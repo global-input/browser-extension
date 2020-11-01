@@ -1,76 +1,100 @@
-import React,{useCallback, useState} from 'react';
-import {useGlobalInputApp} from 'global-input-react';
-import {InputWithLabel,FormContainer,DisplayErrorMessage,
-    TextButton, FormFooter,MessageContainer} from '../app-layout';
+import React, { useCallback, useState } from 'react';
+import { useMobile } from '../utils';
+import {
+    InputWithLabel, FormContainer, DisplayErrorMessage,
+    TextButton, FormFooter, MessageContainer
+} from '../app-layout';
 
 interface PROPS {
-    back:()=>void;
+    initialContent:string;
+    contentOnMobile:  (content:string) => void;
+    startEncrypt: (content:string) => void;
+    cancel:()=>void;
 }
-const ContentOnComputer:React.FC<PROPS> = ({back})=>{
-    const [errorMessage, setErrorMessage]=useState<string>('');
-    const [content, setContent] = useState('');
-    const mobile=useGlobalInputApp({initData:{
-        action: "input",
-        dataType: "form",
-        form:{
-            title:"Waiting for Content",
-            fields:Object.values(FIELDS)
-        }
-    }});
-    const onChange=useCallback((value:string)=>{
+const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,startEncrypt,cancel }) => {
+    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [content, setContent] = useState(initialContent);
+    const mobile = useMobile({
+            action: "input",
+            dataType: "form",
+            form: {
+                title: "Waiting for Content",
+                fields: Object.values(FIELDS)
+            }
+    });
+    const onChange = useCallback((value: string) => {
         setErrorMessage('');
         setContent(value);
-    },[]);
-    mobile.setOnchange(({field})=>{
-        switch(field.id){
-            case FIELDS.back.id:
-                    back();
-                    break;
+    }, []);
+    const onEncrypt = ()=>{
+        if(content.trim().length){
+            startEncrypt(content.trim());
+       }
+       else{
+           setErrorMessage('Content missing!');
+       }
+    };
+    mobile.setOnchange(({ field }) => {
+        switch (field.id) {
+            case FIELDS.cancel.id:
+                cancel();
+                break;
+            case FIELDS.contentOnMobile.id:
+                contentOnMobile(content);
+                break;
             default:
         }
     });
 
-    return(
-        <FormContainer title="Mobile Decryption">              
-        <mobile.ConnectQR />
+
+    return (
+        <FormContainer title="Mobile Decryption">
+            <mobile.ConnectQR />
 
             <InputWithLabel label="Content to decrypt" id="content"
                 onChange={onChange}
                 type="textarea"
-                value={content}/>   
-            <DisplayErrorMessage errorMessage={errorMessage}/>
+                value={content} />
+            <DisplayErrorMessage errorMessage={errorMessage} />
             <FormFooter>
-                <TextButton onClick={()=>{                
-                    
-                }
-                } label='Back'/>
-                <TextButton onClick={()=>{}} label='Send To Mobile'/>
+                <TextButton onClick={cancel} label='Cancel' />
+                <TextButton onClick={onEncrypt} label='Send To Mobile' />
             </FormFooter>
             <MessageContainer title="this is a test">Please provide the content in the text box above that you would like to encrypt . Then, press the "Send To Mobile" button to send it to your mobile for encryption.
-            </MessageContainer>            
+            </MessageContainer>
         </FormContainer>
-         );
+    );
 
 
 };
 
 
-const FIELDS={
-    back:{
-        id:"backToHome",
-        type:"button",
-        label:"Back",        
-        viewId:"row1"
-    },
-    info:{
-        type:'info',
+const FIELDS = {
+    info: {
+        type: 'info',
         value: 'Please operate on your computer (in the extension window) to provide the content you would like to encrypt.',
     },
-    toMobile:{
-        id:"ComposeOnMobile",
-        type:"button",            
-        label:"Use Mobile",
-        viewId:"row1"
+    info2: {
+        type: 'info',
+        value: 'If you would like to use your mobile to provide content to encrypt, press the "Content on Mobile" button below.'
+    },
+    cancel: {
+        id: "cancel",
+        type: "button",
+        label: "Cancel",
+        viewId: "row1"
+    },
+    contentOnMobile: {
+        id: "contentOnMobile",
+        type: "button",
+        label: "Content on Mobile",
+        viewId: "row1"
+    },
+    startEncrypt: {
+        id: "contentOnMobile",
+        type: "button",
+        label: "Content on Mobile",
+        viewId: "row1"
     }
 }
 
