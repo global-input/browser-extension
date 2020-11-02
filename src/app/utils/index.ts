@@ -9,7 +9,7 @@ import {setCacheFields,getCacheFields,clearCacheFields,getURL,getAPIKey} from '.
 const getOption = () => {
     const option: ConnectOptions = {
     };
-    const url = getURL();
+    const url = getURL();////can use your own
     if (url) {
         option.url = url;
     }
