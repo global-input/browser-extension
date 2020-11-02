@@ -1,9 +1,10 @@
 
-import { useGlobalInputApp, generateRandomString, encrypt, decrypt } from 'global-input-react';
-import { InitData, ConnectOptions, FormField,GlobalInputData } from 'global-input-react'; //types
+import { useGlobalInputApp, generateRandomString, encrypt, decrypt } from 'global-input-react'; ////global-input-react////
+import { InitData, ConnectOptions, FormField,GlobalInputData } from 'global-input-react'; ////global-input-react//// //types
 ////main////
-
+import * as chromeExtension from './chromeExtensionUtil';
 import {setCacheFields,getCacheFields,clearCacheFields,getURL,getAPIKey} from './storage';
+
 
 const getOption = () => {
     const option: ConnectOptions = {
@@ -83,5 +84,6 @@ export {
     useMobile,
     saveCacheFields,
     loadCacheFields,
-    clearCacheFields
+    clearCacheFields,
+    chromeExtension
     };

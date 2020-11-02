@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 
-import { useMobile,FormField } from '../utils';
+import { useMobile,FormField,saveCacheFields } from '../utils';
+import {chromeExtension} from '../utils';
 
 import {ControlLayout, FormContainer, DisplayInputCopyField, TextButton } from '../app-layout';
 
@@ -135,11 +136,15 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
 
 
     const onCopied = () => {
+        const key=saveCacheFields(domain,formFields);
+        if(key){
+            chromeExtension.sendKey(key);
+        }
+    };
 
-    }
-
-    return (<ControlLayout title="Form Data Transfer" domain={domain} mobile={mobile}>
-
+    return (
+    <ControlLayout title="Form Data Transfer" domain={domain} mobile={mobile}>
+<FormContainer>
             {formFields.map((formField, index) => (<DisplayInputCopyField
                 field={formField}
                 key={formField.id}
@@ -153,7 +158,7 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
                 }
                 } />))}
         <TextButton onClick={toggleVisibility} label={visibility.label} />
-
+    </FormContainer>
         </ControlLayout>);
 
 

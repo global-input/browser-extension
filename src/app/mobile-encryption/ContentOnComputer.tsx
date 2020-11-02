@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { useMobile } from '../utils';
 import {
-    InputWithLabel, FormContainer, DisplayErrorMessage,
-    TextButton, FormFooter, MessageContainer
-} from '../app-layout';
+    InputWithLabel, ControlLayout,FormContainer, DisplayErrorMessage,
+    TextButton, FormFooter
+} from '../app-layout'
 
 interface PROPS {
     initialContent:string;
@@ -18,7 +18,7 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,sta
             action: "input",
             dataType: "form",
             form: {
-                title: "Waiting for Content",
+                title: "Mobile Encryption",
                 fields: Object.values(FIELDS)
             }
     });
@@ -32,7 +32,7 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,sta
        }
        else{
            setErrorMessage('Content missing!');
-           mobile.sendValue(FIELDS.info.id,'Please provide content to encrypt. You can  press "Use Mobile" button to use your mobile to provide the content.')
+           mobile.sendValue(FIELDS.info.id,'The content (in the extension window) on your computer is empty. You can  press "Use Mobile" button to use your mobile to provide the content.')
        }
     };
     mobile.setOnchange(({ field }) => {
@@ -45,15 +45,15 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,sta
                 break;
             case FIELDS.startEncrypt.id:
                 onEncrypt();
+                break;
             default:
         }
     });
 
 
     return (
-        <FormContainer title="Mobile Decryption">
-            <mobile.ConnectQR />
-
+        <ControlLayout title="Mobile Decryption" mobile={mobile}>
+            <FormContainer title="Provide Content to Encrypt">
             <InputWithLabel label="Content to decrypt" id="content"
                 onChange={onContentChange}
                 type="textarea"
@@ -61,11 +61,10 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,sta
             <DisplayErrorMessage errorMessage={errorMessage} />
             <FormFooter>
                 <TextButton onClick={cancel} label='Cancel' />
-                <TextButton onClick={onEncrypt} label='Send To Mobile' />
+                <TextButton onClick={onEncrypt} label='Encrypt' />
             </FormFooter>
-            <MessageContainer title="this is a test">Please provide the content in the text box above that you would like to encrypt . Then, press the "Send To Mobile" button to send it to your mobile for encryption.
-            </MessageContainer>
-        </FormContainer>
+            </FormContainer>
+        </ControlLayout>
     );
 
 
@@ -77,8 +76,8 @@ const FIELDS = {
     info: {
         id:"info",
         type: 'info',
-        value: ['Please operate on your computer (in the extension window) to provide the content you would like to encrypt.',
-                'If you would like to use your mobile to provide content, press the "Use Mobile" button.']
+        value: ['You can now operate on your computer (in the extension window) to provide content for encryption.',
+                'Or, you can press "Use Mobile" button for using your mobile to provide the content.']
     },
     cancel: {
         id: "cancel",

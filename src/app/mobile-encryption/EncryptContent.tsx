@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState } from 'react';
 import {useMobile} from '../utils';
-import {InputWithCopy,TextButton,MessageContainer,FormContainer} from '../app-layout';
+import {MessageContainer,FormContainer, ControlLayout} from '../app-layout';
 
 interface Props {
     content:string;
+    contentOnComputer:(content:string)=>void;
     showOnComputer:(content:string)=>void;
-
 }
 
-const EncryptContent:React.FC<Props> = ({content, showOnComputer})=>{
+const EncryptContent:React.FC<Props> = ({content, contentOnComputer,showOnComputer})=>{
     const [errorMessage, setErrorMessage]=useState('');
     const mobile=useMobile({
             action:"input",
@@ -26,20 +26,25 @@ const EncryptContent:React.FC<Props> = ({content, showOnComputer})=>{
                             showOnComputer(field.value as string)
                         }
                         else{
-                            setErrorMessage("Failed to encrypt");
-                            mobile.sendValue(FIELDS.info.id, {style:{color:"red"}, content:"Failed to Encrypt!"});
+                            setErrorMessage("Failed to encrypt!");
+                            mobile.sendValue(FIELDS.info.id, {style:{color:"red"}, content:"Failed to encrypt!"});
                         }
                         break;
                 case FIELDS.back.id:
-                        showOnComputer(content);
+                        contentOnComputer(content);
                         break;
         }
     });
-    return(<MessageContainer title="Encrypting Content">
-    Please follow the instruction on your mobile to encrypt the content.
-    On your mobile, you can press the "Show" button to view the content it has received.
-    Select one of the encryption keys that create and manage within the mobile app, and press the "Encrypt" button to encrypt the content.
-  </MessageContainer>);
+    return(
+    <ControlLayout title="Mobile Decryption" mobile={mobile} errorMessage={errorMessage}>
+        <FormContainer>
+            <MessageContainer title="Encrypting Content">
+                Follow the instruction on your mobile to encrypt the content.
+            </MessageContainer>
+        </FormContainer>
+
+  </ControlLayout>
+  );
 
 };
 

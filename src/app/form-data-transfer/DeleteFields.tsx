@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FormContainer, CheckboxButton } from '../app-layout';
+import { ControlLayout,FormContainer, CheckboxButton } from '../app-layout';
 import { useMobile,FormField } from '../utils';
 interface Props {
     formFields: FormField[];
@@ -58,17 +58,17 @@ const DeleteFields: React.FC<Props> = ({ formFields, onFormStructureChanged, bac
     }
 
     return (
-        <FormContainer title="Deleting Fields">
-            <mobile.ConnectQR />
-            {mobile.isConnected && (<>
+        <ControlLayout title="Form Data Transfer"  mobile={mobile}>
+            <FormContainer title="Deleting Fields">
                 {items.map(item => (
                     <CheckboxButton
                         label={item.label as string}
                         checked={item.selected} onChange={() => toggleSelected(item)}
                         key={item.value as string} />)
                 )}
-            </>)}
         </FormContainer>
+        </ControlLayout>
+
     )
 };
 

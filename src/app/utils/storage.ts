@@ -1,5 +1,5 @@
 const URL = "iterative.globalInputApp.url";
-export const getURL = () => localStorage.getItem(URL);
+export const getURL = () => 'http://localhost:1337';//localStorage.getItem(URL);
 export const setURL = (url: string) => {
     url = url.trim();
     if (url) {

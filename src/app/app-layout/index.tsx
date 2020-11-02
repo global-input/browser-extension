@@ -1,4 +1,4 @@
-import React, { Children } from 'react';
+import React from 'react';
 import {GlobalInputData} from '../utils';
 
 import InputWithCopy from './input-with-copy';
@@ -20,6 +20,16 @@ const AppTitle: React.FC = ({ children }) => {
     }
     return (<div style={styles.appContainer.title}>{children}</div>);
 };
+
+interface DisplayErrorMessageProps {
+    errorMessage: string|null;
+}
+export const DisplayErrorMessage: React.FC<DisplayErrorMessageProps> = ({ errorMessage,children }) => (
+            <div style={styles.appContainer.errorMessage}>
+                {errorMessage}
+                {children}
+            </div>
+);
 interface AppContainerProps {
     children: React.ReactNode;
     domain?: string;
@@ -56,21 +66,25 @@ const QRCodeContainer:React.FC=({children})=>(
 interface BasicLayoutProps {
     title: string;
     domain?:string;
+    errorMessage?:string|null;
 }
 
-export const  BasicLayout:React.FC<BasicLayoutProps> = ({ title,domain,children }) => (
+export const  BasicLayout:React.FC<BasicLayoutProps> = ({ title,domain,errorMessage,children }) => (
     <AppContainer title={title} domain={domain}>
-        {children}
+        {errorMessage?(<DisplayErrorMessage errorMessage={errorMessage}/>):children}
     </AppContainer>
 );
-
+/**
+ * Only when the mobile connected and there isn't any error in both mobile and errorMessage passed in, then the children will be displayed
+ *
+ */
 interface ControlProps extends BasicLayoutProps{
     mobile:GlobalInputData;
 }
-export const  ControlLayout:React.FC<ControlProps> = ({ title,mobile,domain,children }) =>  (
+export const  ControlLayout:React.FC<ControlProps> = ({ title,errorMessage,mobile,domain,children }) =>  (
     <AppContainer title={title} domain={domain}>
         <mobile.ConnectQR container={QRCodeContainer}/>
-        {mobile.isConnected && children}
+        {(errorMessage || mobile.isError) ?(<DisplayErrorMessage errorMessage={errorMessage?errorMessage:mobile.errorMessage}/>):(mobile.isConnected && children)}
     </AppContainer>
 );
 
@@ -93,28 +107,14 @@ interface FormContainerProps{
     domain?:string;
     title?:string;
 }
-export const FormContainer: React.FC<FormContainerProps> = ({ children, domain, title }) => {
+export const FormContainer: React.FC<FormContainerProps> = ({ children, title }) => {
     return (<div style={styles.form.container}>
-        <AppTitle>{title}</AppTitle>
-        <div style={styles.domain}>{domain}</div>
+        {title && (<Title>{title}</Title>)}
         <div style={styles.form.fields}>
             {children}
         </div>
     </div>);
 };
-
-
-
-/******************* */
-
-
-
-
-
-
-
-
-
 
 
 interface DisplayInputCopyFieldProps {
@@ -124,7 +124,7 @@ interface DisplayInputCopyFieldProps {
     onCopied: () => void;
 }
 
-export const DisplayInputCopyField = ({ field, hideValue, onChange, onCopied }: DisplayInputCopyFieldProps) => {
+export const DisplayInputCopyField:React.FC<DisplayInputCopyFieldProps> = ({ field, hideValue, onChange, onCopied }) => {
     var fieldType = "text";
     if (field.nLines && field.nLines > 1) {
         fieldType = "textarea";
@@ -144,26 +144,6 @@ export const DisplayInputCopyField = ({ field, hideValue, onChange, onCopied }: 
 };
 
 
-interface DisplayErrorMessageProps {
-    errorMessage: string | object;
-}
-export const DisplayErrorMessage: React.FC<DisplayErrorMessageProps> = ({ errorMessage }) => {
-    if (!errorMessage) {
-        return null;
-    }
-    else {
-        let message = errorMessage;
-        if (typeof message === 'object') {
-            message = JSON.stringify(errorMessage);
-        }
-
-        return (
-            <div style={styles.appContainer.errorMessage}>
-                {message}
-            </div>
-        );
-    }
-};
 
 
 

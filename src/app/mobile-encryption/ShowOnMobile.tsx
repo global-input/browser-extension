@@ -7,15 +7,15 @@ interface Props {
     content: string;
     finish: () => void;
     contentOnComputer:(content:string)=>void;
-    showOnMobile:(content:string)=>void;
+    showOnComputer:(content:string)=>void;
 }
-const ShowOnComputer: React.FC<Props> = ({ content, contentOnComputer, showOnMobile,finish }) => {
+const ShowOnMobile: React.FC<Props> = ({ content, contentOnComputer, showOnComputer,finish }) => {
     const mobile = useMobile({
                 action: "input",
                 dataType: "form",
                 form: {
                     title: "Encryption Completed",
-                    fields:Object.values(FIELDS)
+                    fields:[FIELDS.info,{...FIELDS.content,value:content},FIELDS.showOnComputer, FIELDS.restart, FIELDS.finish]
                 }
             });
     const restart=()=>contentOnComputer('');
@@ -24,12 +24,13 @@ const ShowOnComputer: React.FC<Props> = ({ content, contentOnComputer, showOnMob
             case FIELDS.restart.id:
                 restart();
                 break;
-            case FIELDS.showOnMobile.id:
-                showOnMobile(content);
+            case FIELDS.showOnComputer.id:
+                showOnComputer(content);
                 break;
             case FIELDS.finish.id:
                 finish();
                 break;
+
             default:
         }
     });
@@ -57,19 +58,25 @@ const ShowOnComputer: React.FC<Props> = ({ content, contentOnComputer, showOnMob
 const FIELDS = {
     info: {
         type: "info",
-        value: ['You can now copy the encrypted content into your clipboard on your computer (in the extension window).',
-            'You can also load the encrypted content into your mobile by pressing the "Load into Mobile" button.']
+        value: 'You can now copy the encrypted content into your clipboard.'
+    },
+    content:{
+        id:   "encryptedContent",
+        label :"Encrypted Content",
+        type: 'text',
+        nLines:5,
+        value:''
+    },
+    showOnComputer: {
+        id: "showOnComputer",
+        label: "Back",
+        type: "button",
+        viewId: "row1"
     },
     restart:{
         id:"restart",
         label:"Restart",
         type:"button",
-        viewId: "row1"
-    },
-    showOnMobile: {
-        id: "showOnMobile",
-        label: "Load into Mobile",
-        type: "button",
         viewId: "row1"
     },
     finish: {
@@ -80,4 +87,4 @@ const FIELDS = {
     },
 };
 
-export default ShowOnComputer;
+export default ShowOnMobile;

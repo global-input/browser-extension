@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-import * as chromeExtensionUtil from '../chromeExtensionUtil'
+import {chromeExtension} from '../utils';
 
 import {clearCacheFields,loadCacheFields,saveCacheFields}  from '../utils';
 import {FormField} from '../utils'; //types;
 
-import { DisplayInputCopyField, TextButton, FormContainer } from '../app-layout';
+import { DisplayInputCopyField, TextButton, BasicLayout,FormContainer } from '../app-layout';
 
 interface Props {
    cacheKey: string | null;
@@ -32,7 +32,7 @@ const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
       }
       const key = saveCacheFields(domain, fields);
       if (key) {
-         chromeExtensionUtil.sendKey(key);
+         chromeExtension.sendKey(key);
       }
    };
    if (!fields) {
@@ -41,7 +41,8 @@ const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
 
 
    return (
-      <FormContainer title="Cached Values" domain={domain}>
+      <BasicLayout title="Global Input App" domain={domain}>
+      <FormContainer title="Cached Values">
          {fields.map(formField => (<DisplayInputCopyField
             field={formField}
             hideValue={true}
@@ -50,6 +51,7 @@ const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
          <TextButton onClick={back} label={'Back'} />
 
       </FormContainer>
+      </BasicLayout>
    );
 
 };

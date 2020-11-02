@@ -14,10 +14,7 @@ export default {
         fontSize: 20,
         fontWeight: 100,
         whiteSpace: 'nowrap' as 'nowrap',
-        paddingTop: 10,
-        paddingBottom: 10,
-        paddingLeft: 30,
-        paddingRight: 30,
+        padding: 10
     },
     qrCode:{
         minWidth:450,
@@ -53,7 +50,7 @@ export default {
             display:"flex",
             flexDirection:"column" as 'column',
             justifyContent:"flex-start",
-            alignItem:'center',
+            alignItems:'center',
         },
 
 
@@ -83,7 +80,7 @@ export default {
         display:'flex',
         flexDirection:'row' as 'row',
         justifyContent:'space-between',
-        alignItem:'end',
+        alignItems:'end',
         width:"100%",
         padding:10,
         minWidth:"350px"
@@ -116,7 +113,7 @@ export default {
             display:'flex',
             flexDirection:'column' as 'column',
             justifyContent:'center',
-            alignItem:'center'
+            alignItems:'center'
         },
         text:{
             width:"100%",
@@ -138,23 +135,23 @@ export default {
             display:'flex',
             flexDirection:'column' as 'column',
             justifyContent:'start',
-            alignItem:'start',
+            alignItems:'start',
             width:"100%",
             minWidth:300,
+            padding:10
         },
         fields:{
             display:'flex',
             flexDirection:'column' as 'column',
             justifyContent:'start',
-            alignItem:'start',
+            alignItems:'start',
             width:"100%",
-            padding:10
         },
         footer:{
             display:'flex',
             flexDirection:'row' as 'row',
             justifyContent:'space-between',
-            alignItem:'end',
+            alignItems:'end',
             width:"100%",
             padding:10
         }

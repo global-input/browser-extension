@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
-import { BasicLayout, LoadingCircle,Title} from './app-layout';
-import * as chromeExtensionUtil from './chromeExtensionUtil';
+import { BasicLayout, LoadingCircle} from './app-layout';
+
+import {chromeExtension} from './utils';
 
 interface Message {
     status: string;
@@ -15,7 +16,7 @@ interface Props {
 const LoadingContentStatus = ({ onReceivedPageStatus }: Props) => {
     useEffect(() => {
         const checkPageStatus = async () => {
-            const message = await chromeExtensionUtil.checkPageStatus();
+            const message = await chromeExtension.checkPageStatus();
             onReceivedPageStatus(message);
         };
         checkPageStatus();

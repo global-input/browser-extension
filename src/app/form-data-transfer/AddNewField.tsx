@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { InputWithLabel, FormContainer, RadioButton } from '../app-layout';
+import { InputWithLabel, ControlLayout,FormContainer, RadioButton } from '../app-layout';
 import { useMobile, FormField } from '../utils';
 
 interface Props {
@@ -49,10 +49,8 @@ const AddNewField: React.FC<Props> = ({ formFields, onFormStructureChanged, back
         mobile.sendValue(FIELDS.name.id, value);
     }, [setLabel, mobile]);
     return (
-        <FormContainer title="Adding New Field">
-            <mobile.ConnectQR />
-            {mobile.isConnected && (<>
-                Enter the name of the new field
+        <ControlLayout title="Form Data Transfer"  mobile={mobile}>
+            <FormContainer title="Adding New Field">
                 <InputWithLabel label="Name of the field" id="newFieldLabel"
                     onChange={setFormLabel}
                     value={label} />
@@ -65,10 +63,11 @@ const AddNewField: React.FC<Props> = ({ formFields, onFormStructureChanged, back
                     setFieldType(FIELDS.type.items[1].value);
                     mobile.sendValue(FIELDS.type.id, FIELDS.type.items[1].value);
                 }} />
-            </>)}
+            </FormContainer>
+        </ControlLayout>
 
 
-        </FormContainer>
+
     );
 };
 

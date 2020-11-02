@@ -1,6 +1,6 @@
 import React, {useState,useCallback} from 'react';
 import {useMobile} from '../utils';
-import {InputWithLabel,TextButton,DisplayErrorMessage,FormContainer,FormFooter,MessageContainer} from '../app-layout';
+import {InputWithLabel,TextButton,DisplayErrorMessage,FormContainer,FormFooter,ControlLayout} from '../app-layout';
 
 interface PROPS {
     initialContent:string;
@@ -17,7 +17,7 @@ const ContentOnMobile:React.FC<PROPS> = ({initialContent,contentOnComputer,cance
                         dataType:"form",
                         form:{
                             title:"Content To Encrypt",
-                            fields:[{...FIELDS.content,value:initialContent},FIELDS.info,FIELDS.back,FIELDS.cancel,FIELDS.encrypt]
+                            fields:[FIELDS.info,{...FIELDS.content,value:initialContent},FIELDS.back,FIELDS.cancel,FIELDS.encrypt]
                         }
     });
 
@@ -59,43 +59,35 @@ const ContentOnMobile:React.FC<PROPS> = ({initialContent,contentOnComputer,cance
 
 
     return(
-        <FormContainer title="Mobile Encryption">
-            <mobile.ConnectQR/>
-            {mobile.isConnected &&(<>
+        <ControlLayout title="Mobile Decryption" mobile={mobile}>
+            <FormContainer title="Provide Content on Mobile">
                 <InputWithLabel label="Content to encrypt" id="content"
                             onChange={onContentChange}
                             type="textarea"
                             value={content}/>
-            <DisplayErrorMessage errorMessage={errorMessage}/>
-                            <FormFooter>
-            <TextButton onClick={back} label='Back'/>
-            <TextButton onClick={cancel} label='Cancel'/>
-            <TextButton onClick={onEncrypt} label='Send To Mobile'/>
-
+                <DisplayErrorMessage errorMessage={errorMessage}/>
+            <FormFooter>
+                <TextButton onClick={back} label='Back'/>
+                <TextButton onClick={cancel} label='Cancel'/>
+                <TextButton onClick={onEncrypt} label='Encrypt'/>
             </FormFooter>
-            <MessageContainer title="test">
-                Please provide the content in the text box above that you would like to encrypt .
-                Then, press the "Send To Mobile" button to send it to your mobile for encryption.
-            </MessageContainer>
-
-            </>)}
-
-        </FormContainer>
+         </FormContainer>
+        </ControlLayout>
          );
 
 };
 
 const FIELDS={
+    info:{
+        id:"info",
+        type:"info",
+        value:'Please type below to provide the content for encryption'
+    },
     content:{
         id:"contentOnMobile",
         type:'text',
         nLines:5,
         value: '',
-    },
-    info:{
-        id:"info",
-        type:"info",
-        value:''
     },
     back:{
         id:'backToComposeOnComputer',

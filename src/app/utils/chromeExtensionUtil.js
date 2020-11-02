@@ -1,4 +1,4 @@
-////main////
+////main////"
 
 const callChromeAPI = ({ callback, messageType, content }) => {
     if (!window.chrome || !window.chrome.tabs) {
