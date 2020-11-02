@@ -1,40 +1,62 @@
 export default {
-    title:{
-        minWidth:100,
-        minHeight:20,
-        width:"100%",
-        backgroundColor:"#153E85",
-        color:"white",
+    loading:{
         display:"flex",
-        flexDirection:'row',
+        flexDirection:'row' as 'row',
         justifyContent:"center",
-        fontFamily: "Avenir",
         fontSize: 20,
         fontWeight: 100,
-        whiteSpace: 'nowrap',
+        whiteSpace: 'nowrap' as 'nowrap'
+    },
+    title:{
+        display:"flex",
+        flexDirection:'row' as 'row',
+        justifyContent:"flex-start",
+        fontSize: 20,
+        fontWeight: 100,
+        whiteSpace: 'nowrap' as 'nowrap',
         paddingTop: 10,
         paddingBottom: 10,
         paddingLeft: 30,
         paddingRight: 30,
     },
+    qrCode:{
+        minWidth:450,
+        minHeight:450,
+        display:"flex",
+        flexDirection:'column' as 'column',
+        justifyContent:'center',
+        alignItems:'center',
+   },
 
     appContainer:{
+        title:{
+            minWidth:100,
+            minHeight:20,
+            width:"100%",
+            backgroundColor:"#153E85",
+            color:"white",
+            display:"flex",
+            flexDirection:'row' as 'row',
+            justifyContent:"center",
+            fontFamily: "Avenir",
+            fontSize: 20,
+            fontWeight: 100,
+            whiteSpace: 'nowrap' as 'nowrap',
+            paddingTop: 10,
+            paddingBottom: 10,
+            paddingLeft: 30,
+            paddingRight: 30,
+        },
         content:{
             minWidth:100,
             minHeight:100,
             display:"flex",
             flexDirection:"column" as 'column',
             justifyContent:"flex-start",
-            alignItem:'center'
-        },
-        connectionMessage:{
-            minWidth:500,
-            minHeight:500,
-            flexDirection:'column' as 'column',
-            justifyContent:'start',
             alignItem:'center',
+        },
 
-       },
+
        errorMessage:{
         width:"100%",
         color:"red",
@@ -86,6 +108,7 @@ export default {
 
 
      },
+
     message:{
         container:{
             minWidth:300,

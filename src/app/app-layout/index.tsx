@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Children } from 'react';
 import {GlobalInputData} from '../utils';
 
 import InputWithCopy from './input-with-copy';
@@ -9,53 +9,90 @@ import { FormField } from '../utils';
 import { RadioButton, CheckboxButton, SelectItems } from './selectable';
 
 export { InputWithLabel, InputWithCopy, TextButton, RadioButton, CheckboxButton, SelectItems };
-interface AppTitleProps {
-    children: React.ReactNode
-}
-const AppTitle: React.FC<AppTitleProps> = ({ children }) => {
+
+export const Title:React.FC=({children})=>(
+    <div style={styles.title}>{children}</div>
+);
+
+const AppTitle: React.FC = ({ children }) => {
     if (!children) {
         return null;
     }
-    return (<div style={styles.title as React.CSSProperties}>{children}</div>);
+    return (<div style={styles.appContainer.title}>{children}</div>);
 };
-
-export const LoadingCircle = () => (<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50">
-    <path fill="#C779D0" d="M25,5A20.14,20.14,0,0,1,45,22.88a2.51,2.51,0,0,0,2.49,2.26h0A2.52,2.52,0,0,0,50,22.33a25.14,25.14,0,0,0-50,0,2.52,2.52,0,0,0,2.5,2.81h0A2.51,2.51,0,0,0,5,22.88,20.14,20.14,0,0,1,25,5Z">
-        <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="0.5s" repeatCount="indefinite" />
-    </path>
-</svg>);
-
-
-interface MessageProps {
-    title: string;
-    children: React.ReactNode;
-}
-
-
-
-
-
-export const MessageContainer = ({ children, title }: MessageProps) => (<div style={styles.message.container}>
-    <AppTitle>{title}</AppTitle>
-    <div style={styles.message.text}>
-        {children}
-    </div>
-</div>);
-
-
-interface FormContainerProps {
+interface AppContainerProps {
     children: React.ReactNode;
     domain?: string;
     title: string;
 
 }
-export const AppContainer = ({ children, domain, title }: FormContainerProps) => {
-    return (<div style={styles.appContainer.content}>
+export const AppContainer:React.FC<AppContainerProps> = ({ children, domain, title }) => (
+<div style={styles.appContainer.content}>
         <AppTitle>{title}</AppTitle>
         <div style={styles.domain}>{domain}</div>
         {children}
-    </div>);
-};
+    </div>
+    );
+
+
+export const LoadingCircle = () => (
+    <div style={styles.loading}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50">
+            <path fill="#C779D0" d="M25,5A20.14,20.14,0,0,1,45,22.88a2.51,2.51,0,0,0,2.49,2.26h0A2.52,2.52,0,0,0,50,22.33a25.14,25.14,0,0,0-50,0,2.52,2.52,0,0,0,2.5,2.81h0A2.51,2.51,0,0,0,5,22.88,20.14,20.14,0,0,1,25,5Z">
+                <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="0.5s" repeatCount="indefinite" />
+            </path>
+        </svg>
+    </div>
+    );
+
+const QRCodeContainer:React.FC=({children})=>(
+    <div style={styles.qrCode}>
+        {children}
+    </div>
+    );
+
+
+
+interface BasicLayoutProps {
+    title: string;
+    domain?:string;
+}
+
+export const  BasicLayout:React.FC<BasicLayoutProps> = ({ title,domain,children }) => (
+    <AppContainer title={title} domain={domain}>
+        {children}
+    </AppContainer>
+);
+
+interface ControlProps extends BasicLayoutProps{
+    mobile:GlobalInputData;
+}
+export const  ControlLayout:React.FC<ControlProps> = ({ title,mobile,domain,children }) =>  (
+    <AppContainer title={title} domain={domain}>
+        <mobile.ConnectQR container={QRCodeContainer}/>
+        {mobile.isConnected && children}
+    </AppContainer>
+);
+
+
+interface MessageProps {
+    title?: string;
+}
+
+export const MessageContainer:React.FC<MessageProps> = ({ children, title }) => (
+<div style={styles.message.container}>
+    {title && (<Title>{title}</Title>)}
+    <div style={styles.message.text}>
+        {children}
+    </div>
+</div>
+);
+
+
+interface FormContainerProps{
+    domain?:string;
+    title?:string;
+}
 export const FormContainer: React.FC<FormContainerProps> = ({ children, domain, title }) => {
     return (<div style={styles.form.container}>
         <AppTitle>{title}</AppTitle>
@@ -65,6 +102,13 @@ export const FormContainer: React.FC<FormContainerProps> = ({ children, domain, 
         </div>
     </div>);
 };
+
+
+
+/******************* */
+
+
+
 
 
 
@@ -129,28 +173,3 @@ export const FormFooter: React.FC = ({ children }) => (
         {children}
     </div>
 );
-
-/***********/
-const QRCodeContainer:React.FC=({children})=>{
-    return (
-    <div style={styles.appContainer.connectionMessage}>
-        {children}
-    </div>
-    );
-
-}
-
-
-
-interface BasicLayoutProps {
-    title: string;
-    domain:string;
-    mobile:GlobalInputData;
-}
-const BasicLayout:React.FC<BasicLayoutProps> = ({ title,mobile,domain }) => {
-    return (<AppContainer title={title} domain={domain}>
-            <mobile.ConnectQR/>
-    </AppContainer>);
-
-};
-export {BasicLayout};

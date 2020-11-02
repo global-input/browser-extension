@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 
 import { useMobile,FormField } from '../utils';
 
-import { FormContainer, DisplayInputCopyField, TextButton } from '../app-layout';
+import {ControlLayout, FormContainer, DisplayInputCopyField, TextButton } from '../app-layout';
 
 export enum PAGES {
     TRANSFER_FORM_DATA,
@@ -138,9 +138,8 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
 
     }
 
-    return (<FormContainer title="Form Data Transfer" domain={domain}>
-        <mobile.ConnectQR />
-        {mobile.isConnected && (<>
+    return (<ControlLayout title="Form Data Transfer" domain={domain} mobile={mobile}>
+
             {formFields.map((formField, index) => (<DisplayInputCopyField
                 field={formField}
                 key={formField.id}
@@ -153,10 +152,9 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
                     }
                 }
                 } />))}
-        </>)}
         <TextButton onClick={toggleVisibility} label={visibility.label} />
 
-    </FormContainer>);
+        </ControlLayout>);
 
 
 };

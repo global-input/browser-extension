@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { MessageContainer, LoadingCircle } from './app-layout';
+import { BasicLayout, LoadingCircle,Title} from './app-layout';
 import * as chromeExtensionUtil from './chromeExtensionUtil';
 
 interface Message {
@@ -21,10 +21,11 @@ const LoadingContentStatus = ({ onReceivedPageStatus }: Props) => {
         checkPageStatus();
     }, [onReceivedPageStatus]);
 
-    return (<MessageContainer
-        title="Global Input App">
-        <LoadingCircle />
-    </MessageContainer>);
+    return (
+        <BasicLayout title="Global Input App">
+            <LoadingCircle />
+        </BasicLayout>
+    );
 
 };
 export default LoadingContentStatus;

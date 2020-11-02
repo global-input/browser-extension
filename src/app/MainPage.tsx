@@ -1,8 +1,8 @@
 import React from 'react';
 import { useMobile } from './utils';
 
-import { BasicLayout } from './app-layout';
-import * as appSettings from './utils';
+import { ControlLayout,MessageContainer } from './app-layout';
+
 
 export enum PAGES {
     LOADING,
@@ -45,14 +45,13 @@ const MainPage: React.FC<Props> = ({ setPage, domain }) => {
             default:
         }
     });
-
-
-
-
     return (
-    <BasicLayout title="Global Input App" domain={domain} mobile={mobile}>
-        <mobile.ConnectQR />
-    </BasicLayout>);
+    <ControlLayout title="Global Input App" mobile={mobile}>
+        <MessageContainer>
+        Please select from the operations displayed on your mobile
+        </MessageContainer>
+    </ControlLayout>
+        );
 }
 
 
