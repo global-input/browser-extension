@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMobile } from './utils';
 
-import { ControlLayout,MessageContainer } from './app-layout';
+import { ControlLayout,MessageContainer,MessageButton} from './app-layout';
 
 
 export enum PAGES {
@@ -12,6 +12,7 @@ export enum PAGES {
     ENCRYPTION,
     DECRYPTION,
     PAGE_CONTROL,
+    EDIT_CONNECTION_SETTINGS
 }
 
 interface Props {
@@ -45,8 +46,10 @@ const MainPage: React.FC<Props> = ({ setPage, domain }) => {
             default:
         }
     });
+    const toEditConnectionSettings=()=>setPage(PAGES.EDIT_CONNECTION_SETTINGS);
+
     return (
-    <ControlLayout title="Global Input App" mobile={mobile}>
+    <ControlLayout title="Global Input App" mobile={mobile} footer={()=>(<MessageButton label="Settings" onClick={toEditConnectionSettings}/>)}>
         <MessageContainer>
         Please select from the operations displayed on your mobile
         </MessageContainer>

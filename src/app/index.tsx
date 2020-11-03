@@ -4,7 +4,9 @@ import LoadingContentStatus from './LoadingContentStatus';
 import DisplayCachedFields from './form-data-transfer/DisplayCachedFields';
 import FormDataTransfer from './form-data-transfer';
 import MobileEncryption from './mobile-encryption';
+import MobileDecryption from './mobile-decryption';
 import MainPage, { PAGES } from './MainPage';
+import ConnectionSettings from './connection-settings';
 
 const App = () => {
     const [page, setPage] = useState(PAGES.LOADING);
@@ -40,8 +42,13 @@ const App = () => {
             return (<FormDataTransfer domain={domain} back={toHome} />);
         case PAGES.ENCRYPTION:
             return (<MobileEncryption back={toHome} domain={domain} />);
+        case PAGES.DECRYPTION:
+            return (<MobileDecryption back={toHome} domain={domain} />);
         case PAGES.MAIN_PAGE:
-            return <MainPage domain={domain} setPage={setPage} />
+            return (<MainPage domain={domain} setPage={setPage} />);
+        case PAGES.EDIT_CONNECTION_SETTINGS:
+            return (<ConnectionSettings back={toHome}/>)
+
         default:
             return null;
     }

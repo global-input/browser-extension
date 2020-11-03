@@ -5,25 +5,25 @@ import {InputWithLabel,TextButton,DisplayErrorMessage,FormContainer,FormFooter,C
 interface PROPS {
     initialContent:string;
     contentOnComputer:  (content:string) => void;
-    startEncrypt: (content:string) => void;
+    startDecrypt: (content:string) => void;
     cancel:() => void;
 }
 
-const ContentOnMobile:React.FC<PROPS> = ({initialContent,contentOnComputer,cancel,startEncrypt})=>{
+const ContentOnMobile:React.FC<PROPS> = ({initialContent,contentOnComputer,cancel,startDecrypt})=>{
     const [errorMessage, setErrorMessage]=useState('');
     const [content,setContent]=useState<string>(initialContent);
     const mobile=useMobile({
                         action:"input",
                         dataType:"form",
                         form:{
-                            title:"Content To Encrypt",
+                            title:"Content To Decrypt",
                             fields:[FIELDS.info,{...FIELDS.content,value:initialContent},FIELDS.back,FIELDS.cancel,FIELDS.encrypt]
                         }
     });
 
-    const onEncrypt=()=>{
+    const onDecrypt=()=>{
          if(content.trim()){
-            startEncrypt(content.trim());
+            startDecrypt(content.trim());
          }
          else{
            setErrorMessage('Content missing!');
@@ -46,7 +46,7 @@ const ContentOnMobile:React.FC<PROPS> = ({initialContent,contentOnComputer,cance
                        cancel();
                        break;
                   case FIELDS.encrypt.id:
-                        onEncrypt();
+                        onDecrypt();
                         break;
                   default:
         }
@@ -61,7 +61,7 @@ const ContentOnMobile:React.FC<PROPS> = ({initialContent,contentOnComputer,cance
     return(
         <ControlLayout title="Mobile Encryption" mobile={mobile}>
             <FormContainer title="Provide Content on Mobile">
-                <InputWithLabel label="Content to encrypt" id="content"
+                <InputWithLabel label="Content to decrypt" id="content"
                             onChange={onContentChange}
                             type="textarea"
                             value={content}/>
@@ -69,7 +69,7 @@ const ContentOnMobile:React.FC<PROPS> = ({initialContent,contentOnComputer,cance
             <FormFooter>
                 <TextButton onClick={back} label='Back'/>
                 <TextButton onClick={cancel} label='Cancel'/>
-                <TextButton onClick={onEncrypt} label='Encrypt'/>
+                <TextButton onClick={onDecrypt} label='Decrypt'/>
             </FormFooter>
          </FormContainer>
         </ControlLayout>
@@ -81,7 +81,7 @@ const FIELDS={
     info:{
         id:"info",
         type:"info",
-        value:'Please type below to provide the content for encryption'
+        value:'Please type below to provide the content for decryption'
     },
     content:{
         id:"contentOnMobile",
@@ -102,9 +102,9 @@ const FIELDS={
         viewId:"row1"
     },
     encrypt:{
-        id:"toEncrypt",
+        id:"toDecrypt",
         type:"button",
-        label:"Encrypt",
+        label:"Decrypt",
         viewId:"row1"
     }
 }

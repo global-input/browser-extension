@@ -8,17 +8,17 @@ import {
 interface PROPS {
     initialContent:string;
     contentOnMobile:  (content:string) => void;
-    startEncrypt: (content:string) => void;
+    startDecrypt: (content:string) => void;
     cancel:()=>void;
 }
-const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,startEncrypt,cancel }) => {
+const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,startDecrypt,cancel }) => {
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [content, setContent] = useState(initialContent);
     const mobile = useMobile({
             action: "input",
             dataType: "form",
             form: {
-                title: "Mobile Encryption",
+                title: "Mobile Decryption",
                 fields: Object.values(FIELDS)
             }
     });
@@ -26,9 +26,9 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,sta
         setErrorMessage('');
         setContent(value);
     }, []);
-    const onEncrypt = ()=>{
+    const onDecrypt = ()=>{
         if(content.trim().length){
-            startEncrypt(content.trim());
+            startDecrypt(content.trim());
        }
        else{
            setErrorMessage('Content missing!');
@@ -44,7 +44,7 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,sta
                 contentOnMobile(content);
                 break;
             case FIELDS.startEncrypt.id:
-                onEncrypt();
+                onDecrypt();
                 break;
             default:
         }
@@ -52,16 +52,16 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent,contentOnMobile,sta
 
 
     return (
-        <ControlLayout title="Mobile Encryption" mobile={mobile}>
-            <FormContainer title="Provide Content to Encrypt">
-            <InputWithLabel label="Content to encrypt" id="content"
+        <ControlLayout title="Mobile Decryption" mobile={mobile}>
+            <FormContainer title="Provide Content to Decrypt">
+            <InputWithLabel label="Content to decrypt" id="content"
                 onChange={onContentChange}
                 type="textarea"
                 value={content} />
             <DisplayErrorMessage errorMessage={errorMessage} />
             <FormFooter>
                 <TextButton onClick={cancel} label='Cancel' />
-                <TextButton onClick={onEncrypt} label='Encrypt' />
+                <TextButton onClick={onDecrypt} label='Decrypt' />
             </FormFooter>
             </FormContainer>
         </ControlLayout>
@@ -76,7 +76,7 @@ const FIELDS = {
     info: {
         id:"info",
         type: 'info',
-        value: ['You can now provide content for encryption on your computer (in the extension window).',
+        value: ['You can now provide content for decryption on your computer (in the extension window).',
                 'Or alternative, you can press the "Use Mobile" button to provide the content on your mobile.']
     },
     cancel: {

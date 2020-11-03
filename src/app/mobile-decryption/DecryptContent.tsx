@@ -8,13 +8,13 @@ interface Props {
     showOnComputer:(content:string)=>void;
 }
 
-const EncryptContent:React.FC<Props> = ({content, contentOnComputer,showOnComputer})=>{
+const DecryptContent:React.FC<Props> = ({content, contentOnComputer,showOnComputer})=>{
     const [errorMessage, setErrorMessage]=useState('');
     const mobile=useMobile({
             action:"input",
             dataType:"form",
             form:{
-                title:"Mobile Encryption",
+                title:"Mobile Decryption",
                 fields:[{...FIELDS.content,value:content},FIELDS.info,FIELDS.back]
             }
     });
@@ -26,8 +26,8 @@ const EncryptContent:React.FC<Props> = ({content, contentOnComputer,showOnComput
                             showOnComputer(field.value as string)
                         }
                         else{
-                            setErrorMessage("Failed to encrypt!");
-                            mobile.sendValue(FIELDS.info.id, {style:{color:"red"}, content:"Failed to encrypt!"});
+                            setErrorMessage("Failed to decrypt!");
+                            mobile.sendValue(FIELDS.info.id, {style:{color:"red"}, content:"Failed to decrypt!"});
                         }
                         break;
                 case FIELDS.back.id:
@@ -36,10 +36,10 @@ const EncryptContent:React.FC<Props> = ({content, contentOnComputer,showOnComput
         }
     });
     return(
-    <ControlLayout title="Mobile Encryption" mobile={mobile} errorMessage={errorMessage}>
+    <ControlLayout title="Mobile Decryption" mobile={mobile} errorMessage={errorMessage}>
         <FormContainer>
-            <MessageContainer title="Encrypting Content">
-                Follow the instruction on your mobile to encrypt content.
+            <MessageContainer title="Decrypting Content">
+                Follow the instruction on your mobile to decrypt content.
             </MessageContainer>
         </FormContainer>
 
@@ -50,9 +50,9 @@ const EncryptContent:React.FC<Props> = ({content, contentOnComputer,showOnComput
 
 const FIELDS={
     content:{
-        id:"encryptContent",
+        id:"decryptContent",
         label :"Content",
-        type: 'encrypt',
+        type: 'decrypt',
         value:''},
     info:{
         id:"info",
@@ -67,4 +67,4 @@ const FIELDS={
     }
 };
 
-export default EncryptContent;
+export default DecryptContent;

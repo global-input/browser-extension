@@ -80,11 +80,17 @@ export const  BasicLayout:React.FC<BasicLayoutProps> = ({ title,domain,errorMess
  */
 interface ControlProps extends BasicLayoutProps{
     mobile:GlobalInputData;
+    footer?:React.ReactNode;
 }
-export const  ControlLayout:React.FC<ControlProps> = ({ title,errorMessage,mobile,domain,children }) =>  (
+export const  ControlLayout:React.FC<ControlProps> = ({ title,errorMessage,mobile,domain,footer,children }) =>  (
     <AppContainer title={title} domain={domain}>
         <mobile.ConnectQR container={QRCodeContainer}/>
         {(errorMessage || mobile.isError) ?(<DisplayErrorMessage errorMessage={errorMessage?errorMessage:mobile.errorMessage}/>):(mobile.isConnected && children)}
+        {footer && (
+            <div style={styles.appContainer.footer}>
+                    {footer}
+            </div>
+        )}
     </AppContainer>
 );
 
@@ -143,13 +149,24 @@ export const DisplayInputCopyField:React.FC<DisplayInputCopyFieldProps> = ({ fie
     );
 };
 
-
-
-
-
-
 export const FormFooter: React.FC = ({ children }) => (
     <div style={styles.form.footer}>
         {children}
     </div>
 );
+
+interface MessageLinkProps{
+    href?: string;
+    onClick?: ()=>void;
+}
+
+export const MessageLink:React.FC<MessageLinkProps>=({href,onClick,children})=>{
+    return (<a href={href} style={styles.message.alink} rel='noreferrer noopener' target='_blank'>{children}</a>);
+};
+
+interface MessageButtonProp{
+    label:string;
+    onClick:()=>void;
+}
+
+export const MessageButton:React.FC<MessageButtonProp>=({label,onClick})=>(<button style={styles.message.alink} onClick={onClick}>{label}</button>)
