@@ -1,34 +1,37 @@
-import React,{useState} from 'react';
+import React,{useState,useCallback} from 'react';
 import { BasicLayout, FormContainer, InputWithLabel,FormFooter,TextButton,MessageContainer,MessageLink} from '../app-layout';
+import {loadConnectionSettings,saveConnectionSettings} from '../storage';
 interface Props{
     back:()=>void;
 }
-const ConnectionSettings:React.FC<Props> =()=>{
-    const [url,setURL]=useState('');
-    const [apikey,setApikey]=useState('');
-    const back=()=>{};
+const ConnectionSettings:React.FC<Props> =({back})=>{
+    const [setting,setSettings]=useState(()=>loadConnectionSettings());
     const onSave=()=>{
-       // appSettings.saveSettings(settings);
-        //toMobileIntegration();
+       saveConnectionSettings(setting);
+       back();
     };
+    const onURLChange=useCallback((url:string)=>setSettings(setting=>({...setting,url})),[]);
+    const onAPIKey=useCallback((apikey:string)=>setSettings(setting=>({...setting,apikey})),[]);
+    const url=setting.url?setting.url:'';
+    const apikey=setting.apikey?setting.apikey:'';
     return (
     <BasicLayout title="Connection Settings">
          <FormContainer>
             <InputWithLabel label="Proxy URL" id="url"
-                onChange={setURL}
+                onChange={onURLChange}
                 value={url}/>
             <InputWithLabel label="API Key" id="apikey"
-                onChange={setApikey}
+                onChange={onAPIKey}
                 value={apikey}/>
             <FormFooter>
                 <TextButton onClick={back} label='Cancel'/>
                 <TextButton onClick={onSave} label='Save'/>
             </FormFooter>
          <MessageContainer>
-    The proxy url points to a WebSocket server that relays encrypted messages between your browser and your mobile app.
-    The end-to-end encryption that uses a dynamically generated encryption key for each session ensures that only your mobile app and your browser extension can decrypt the messages.
-    You may also install your own proxy server by downloading the source code from
-    <MessageLink href="https://github.com/global-input/global-input-node">GitHub</MessageLink>
+    You can use this configuration to use your own <MessageLink href="https://github.com/global-input/global-input-node">WebSocket Proxy Server</MessageLink>
+    that relays encrypted messages between your browser extension and your mobile app, and the end-to-end encryption ensures that the messages are
+    not visible to the server, meaning that you can install it in an insecure environment.
+
 </MessageContainer>
 
 
@@ -36,6 +39,9 @@ const ConnectionSettings:React.FC<Props> =()=>{
     </BasicLayout>
    )
 
-}
+};
+
+
+
 
 export default ConnectionSettings;

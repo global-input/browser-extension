@@ -1,7 +1,7 @@
-import React from 'react';
-import { useMobile } from './utils';
+import React, { useCallback } from 'react';
+import { useMobile } from './mobile';
 
-import { ControlLayout,MessageContainer,MessageButton} from './app-layout';
+import { ControlLayout,AppFooter,MessageContainer,MessageButton,MessageLink} from './app-layout';
 
 
 export enum PAGES {
@@ -46,10 +46,17 @@ const MainPage: React.FC<Props> = ({ setPage, domain }) => {
             default:
         }
     });
-    const toEditConnectionSettings=()=>setPage(PAGES.EDIT_CONNECTION_SETTINGS);
+    const toEditConnectionSettings=useCallback(()=>setPage(PAGES.EDIT_CONNECTION_SETTINGS),[setPage]);
+    const NotConnected=()=>(
+        <AppFooter>
+            <MessageButton label="Settings" onClick={toEditConnectionSettings}/>
+            <MessageLink href="https://github.com/global-input/browser-extension">Source Code</MessageLink>
+        </AppFooter>
+
+    )
 
     return (
-    <ControlLayout title="Global Input App" mobile={mobile} footer={()=>(<MessageButton label="Settings" onClick={toEditConnectionSettings}/>)}>
+    <ControlLayout title="Global Input App" mobile={mobile} notConnected={<NotConnected/>}>
         <MessageContainer>
         Please select from the operations displayed on your mobile
         </MessageContainer>

@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { InputWithLabel, ControlLayout,FormContainer, RadioButton } from '../app-layout';
-import { useMobile, FormField } from '../utils';
+import { useMobile, FormField } from '../mobile';
 
 interface Props {
     formFields: FormField[];

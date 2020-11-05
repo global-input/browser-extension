@@ -1,11 +1,11 @@
 import React from 'react';
-import {GlobalInputData} from '../utils';
+import {GlobalInputData} from '../mobile';
 
 import InputWithCopy from './input-with-copy';
 import InputWithLabel from './input-with-label';
 import TextButton from './text-button';
 import styles from './styles';
-import { FormField } from '../utils';
+import { FormField } from '../mobile';
 import { RadioButton, CheckboxButton, SelectItems } from './selectable';
 
 export { InputWithLabel, InputWithCopy, TextButton, RadioButton, CheckboxButton, SelectItems };
@@ -74,23 +74,24 @@ export const  BasicLayout:React.FC<BasicLayoutProps> = ({ title,domain,errorMess
         {errorMessage?(<DisplayErrorMessage errorMessage={errorMessage}/>):children}
     </AppContainer>
 );
+export const AppFooter:React.FC =({children})=>(
+        <div style={styles.appContainer.footer}>
+            {children}
+        </div>
+)
 /**
  * Only when the mobile connected and there isn't any error in both mobile and errorMessage passed in, then the children will be displayed
  *
  */
 interface ControlProps extends BasicLayoutProps{
     mobile:GlobalInputData;
-    footer?:React.ReactNode;
+    notConnected?:React.ReactNode;
 }
-export const  ControlLayout:React.FC<ControlProps> = ({ title,errorMessage,mobile,domain,footer,children }) =>  (
+export const  ControlLayout:React.FC<ControlProps> = ({ title,errorMessage,mobile,domain,notConnected,children }) =>  (
     <AppContainer title={title} domain={domain}>
         <mobile.ConnectQR container={QRCodeContainer}/>
         {(errorMessage || mobile.isError) ?(<DisplayErrorMessage errorMessage={errorMessage?errorMessage:mobile.errorMessage}/>):(mobile.isConnected && children)}
-        {footer && (
-            <div style={styles.appContainer.footer}>
-                    {footer}
-            </div>
-        )}
+        {(!mobile.isConnected) && notConnected}
     </AppContainer>
 );
 

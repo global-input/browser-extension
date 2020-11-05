@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import {clearCacheFields} from './utils';
+import * as storage from './storage';
 import LoadingContentStatus from './LoadingContentStatus';
 import DisplayCachedFields from './form-data-transfer/DisplayCachedFields';
 import FormDataTransfer from './form-data-transfer';
@@ -7,6 +7,7 @@ import MobileEncryption from './mobile-encryption';
 import MobileDecryption from './mobile-decryption';
 import MainPage, { PAGES } from './MainPage';
 import ConnectionSettings from './connection-settings';
+import PageControl from './page-control';
 
 const App = () => {
     const [page, setPage] = useState(PAGES.LOADING);
@@ -21,12 +22,12 @@ const App = () => {
                 setPage(PAGES.DISPLAY_CACHED_FORM);
             }
             else {
-                clearCacheFields();
+                storage.clearCacheFields();
                 setPage(PAGES.MAIN_PAGE);
             }
         }
         else {
-            clearCacheFields();
+            storage.clearCacheFields();
             setPage(PAGES.MAIN_PAGE);
         }
     }, []);
@@ -47,7 +48,9 @@ const App = () => {
         case PAGES.MAIN_PAGE:
             return (<MainPage domain={domain} setPage={setPage} />);
         case PAGES.EDIT_CONNECTION_SETTINGS:
-            return (<ConnectionSettings back={toHome}/>)
+            return (<ConnectionSettings back={toHome}/>);
+        case PAGES.PAGE_CONTROL:
+            return (<PageControl back={toHome} domain={domain}/>);
 
         default:
             return null;

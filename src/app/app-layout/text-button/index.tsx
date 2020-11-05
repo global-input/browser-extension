@@ -1,14 +1,14 @@
-import React, {Component} from 'react';
+import React from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
 
 
 interface Props{
-    disabled?:boolean;  
-    label:string; 
-    onClick?:()=>void; 
+    disabled?:boolean;
+    label:string;
+    onClick?:()=>void;
 }
 
-export default ({label="Ok",disabled,onClick}:Props)=>{         
+const TextButton :React.FC<Props>= ({label="Ok",disabled,onClick})=>{
          if(disabled){
               return (<button style={styles.disabled} disabled={true}>{label}</button>);
           }
@@ -34,4 +34,5 @@ var styles={
       margin:"5vw"
     }
 
-}
+};
+export default TextButton;

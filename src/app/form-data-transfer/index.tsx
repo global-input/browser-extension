@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { FormField } from '../utils';
+import { FormField } from '../mobile';
 
 import AddNewField from './AddNewField';
 import DeleteFields from './DeleteFields';

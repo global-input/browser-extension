@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ControlLayout,FormContainer, CheckboxButton } from '../app-layout';
-import { useMobile,FormField } from '../utils';
+import { useMobile,FormField } from '../mobile';
 interface Props {
     formFields: FormField[];
     onFormStructureChanged: (formFields: FormField[]) => void;

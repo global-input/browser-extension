@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { BasicLayout, LoadingCircle} from './app-layout';
 
-import {chromeExtension} from './utils';
+import * as chromeExtension from './chrome-extension';
 
 interface Message {
     status: string;

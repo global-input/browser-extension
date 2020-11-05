@@ -1,7 +1,7 @@
 const URL = "iterative.globalInputApp.url";
-export const getURL = () => localStorage.getItem(URL);
-export const setURL = (url: string) => {
-    url = url.trim();
+const getURL = () => localStorage.getItem(URL);
+const setURL = (url: string|null|undefined) => {
+    url = url?.trim();
     if (url) {
         localStorage.setItem(URL, url);
     }
@@ -12,9 +12,9 @@ export const setURL = (url: string) => {
 
 const API_KEY = "iterative.globalInputApp.apikey";
 
-export const getAPIKey = () => localStorage.getItem(API_KEY);
-export const setAPIKey = (apiKey: string) => {
-    apiKey = apiKey.trim();
+const getAPIKey = () => localStorage.getItem(API_KEY);
+const setAPIKey = (apiKey: string|null|undefined) => {
+    apiKey = apiKey?.trim();
     if (apiKey) {
         localStorage.setItem(API_KEY, apiKey);
     }
@@ -22,6 +22,37 @@ export const setAPIKey = (apiKey: string) => {
         localStorage.removeItem(API_KEY);
     }
 };
+interface ConnectionSettings {
+    url?:string|null;
+    apikey?:string|null;
+}
+export const getConnectOption = () => {
+    const option: ConnectionSettings = {};
+    const url = getURL();////can use your own
+    if (url) {
+        option.url = url;
+    }
+    const apikey = getAPIKey();
+    if (apikey) {
+        option.apikey = apikey;
+    }
+    return option;
+}
+
+export const saveConnectionSettings = (settings:ConnectionSettings) =>{
+    setURL(settings.url);
+    setAPIKey(settings.apikey);
+}
+
+export const loadConnectionSettings=():ConnectionSettings=>{
+    let url=getURL();
+    let apikey=getAPIKey();
+    return {
+        url:url?url:"https://globalinput.co.uk",
+        apikey:apikey?apikey:"k7jc3QcMPKEXGW5UC"
+    };
+
+}
 
 
 const CACHE_FIELDS='extension.content.cacheFields.';
@@ -73,3 +104,8 @@ export const getCacheFields = (domain: string): string => {
     }
     return '';
 };
+
+const PAGE_CONTROL="extension.control.";
+export const removePageControlRule=(domain:string) =>localStorage.removeItem(PAGE_CONTROL+domain);
+export const getPageControlRule =(domain:string)=>localStorage.getItem(PAGE_CONTROL+domain);
+export const savePageControlRule = (domain:string,pageControlRule:string) => localStorage.setItem(PAGE_CONTROL+domain, pageControlRule);

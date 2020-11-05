@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-import {chromeExtension} from '../utils';
-
-import {clearCacheFields,loadCacheFields,saveCacheFields}  from '../utils';
-import {FormField} from '../utils'; //types;
+import * as chromeExtension from '../chrome-extension';
+import * as cache from './cache';
+import * as storage from '../storage';
+import {FormField} from '../mobile'; //types;
 
 import { DisplayInputCopyField, TextButton, BasicLayout,FormContainer } from '../app-layout';
 
@@ -14,10 +14,10 @@ interface Props {
 }
 const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
    const [fields, setFields] = useState<FormField[]>([]);
-   useEffect(() => () => clearCacheFields(), []);
+   useEffect(() => () => storage.clearCacheFields(), []);
    useEffect(() => {
       if (cacheKey && domain) {
-         const cachedFields = loadCacheFields(domain, cacheKey);
+         const cachedFields = cache.loadCacheFields(domain, cacheKey);
          if (!cachedFields || !cachedFields.length) {
             back();
             return;
@@ -27,10 +27,10 @@ const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
    }, [cacheKey, back, domain]);
    const onCopied = () => {
       if (!domain) {
-         clearCacheFields();
+         storage.clearCacheFields();
          return;
       }
-      const key = saveCacheFields(domain, fields);
+      const key = cache.saveCacheFields(domain, fields);
       if (key) {
          chromeExtension.sendKey(key);
       }
