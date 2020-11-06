@@ -5,9 +5,6 @@ import { useMobile } from '../mobile';
 import * as rules from './rules';
 import * as chromeExtension from '../chrome-extension';
 
-
-
-
 interface Props {
     back: () => void;
     domain: string;

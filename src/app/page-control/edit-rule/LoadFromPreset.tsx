@@ -1,6 +1,6 @@
-import React, { useState, useEffect,useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { TextButton, Title,SelectItems,MessageContainer, InputWithLabel, FormFooter,FormContainer, ControlLayout } from '../../app-layout';
-import { useMobile } from '../../mobile';
+import { useMobile, FormField } from '../../mobile';
 import * as rules from '../rules';
 
 
@@ -10,17 +10,18 @@ interface Props {
     loadRule:(content:string)=>void;
 }
 const Editor: React.FC<Props> = ({ back, domain,loadRule}) => {
-    const [content,setContent] = useState<string>('');
     const [selectedValue,setSelectedValue]=useState('0');
-    const [selectionItems, setSelectionItems]=useState<rules.RuleSelectionItem[]>(()=>{
-        return rules.buildSelectionItems();
-    });
+    const [content,setContent] = useState<string>(()=>rules.getPresetRuleByIndexForEdit(0));
+    const selectionItems= useMemo(()=>{
+        return rules.buildSelectionItems()
+    },[])
+
     const mobile = useMobile({
         action: "input",
         dataType: "form",
         form: {
             title: "Examples",
-            fields: Object.values(FIELDS)
+            fields: [FIELDS.info,{...FIELDS.editor,value:content},FIELDS.back, FIELDS.use]
         }
     });
     const onUse= ()=>loadRule(content);
@@ -38,14 +39,20 @@ const Editor: React.FC<Props> = ({ back, domain,loadRule}) => {
                 break;
         }
     });
+    const {sendValue}=mobile;
     const onContentChange=useCallback((content:string)=>{
         setContent(content);
+        sendValue(FIELDS.editor.id,content);
+    },[sendValue]);
+    const onChangeContent=(content:string)=>{
+        setContent(content);
         mobile.sendValue(FIELDS.editor.id,content);
-    },[]);
+    }
 
     const onSelectionChange=(evt:React.ChangeEvent<HTMLSelectElement>)=>{
-       // setSelectionItems(evt.target.value);
-
+        setSelectedValue(evt.target.value);
+        const rule=rules.getPresetRuleByIndexForEdit(parseInt(evt.target.value));
+        onChangeContent(rule);
     }
 
 
@@ -80,7 +87,7 @@ const FIELDS = {
     info:{
         id:'info',
         type:"info",
-        value:"Select example that you can use for setting the rule"
+        value:"Please operate in the extension window"
     },
     editor: {
         id: 'editor',
