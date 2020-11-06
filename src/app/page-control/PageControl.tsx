@@ -11,14 +11,14 @@ import * as chromeExtension from '../chrome-extension';
 interface Props {
     back: () => void;
     domain: string;
-    editRule: () => void;
+    toEditRule: () => void;
 }
 enum PAGE_STATUS {
     LOADING,
     ERROR,
     SUCCESS
 }
-const PageControl: React.FC<Props> = ({ back, domain,editRule }) => {
+const PageControl: React.FC<Props> = ({ back, domain,toEditRule }) => {
     const [data, setData] = useState({
         status: PAGE_STATUS.LOADING,
         message: ""
@@ -47,7 +47,7 @@ const PageControl: React.FC<Props> = ({ back, domain,editRule }) => {
                 back();
                 break;
             case FIELDS.editRule.id:
-                editRule();
+                toEditRule();
                 break;
             default:
         }

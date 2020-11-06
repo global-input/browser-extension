@@ -2,6 +2,10 @@ import React, {useRef,useState,useCallback} from 'react';
 
 import {styles} from './styles';
 
+interface StyleStatus{
+    label:string;
+    field:string;
+}
 interface Props{
     id?:string;
     readOnly?:boolean;
@@ -14,11 +18,7 @@ interface Props{
     help?:string;
     onChange?:(value:string, id?:string)=>void;
 }
-interface StyleStatus{
-    label:string;
-    field:string;
-}
-const InputWithLabel= (props:Props)=>{
+const InputWithLabel:React.FC<Props>= (props)=>{
    const [focus,setFocus]=useState(false);
    const elem=useRef<HTMLInputElement>(null);
 

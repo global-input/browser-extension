@@ -54,7 +54,7 @@ interface HostNamesRule{
     value:string|string[];
 }
 interface PageRule{
-    hostnames:HostNamesRule;
+    hostnames?:HostNamesRule;
     forms:FormRule[];
 }
 const findPresetRuleByDomain = (domain:string) => {
@@ -93,7 +93,27 @@ export const findRuleByDomain = (domain:string)=>{
     }
     return findPresetRuleByDomain(domain);
 };
+export const getRulesForEdit = (domain:string)=>{
+    const ruleString=storage.getPageControlRule(domain);
+    if(ruleString){
+        return   ruleString;
+    }
+    const rule=findPresetRuleByDomain(domain);
+    if(rule){
+        const ruleToEdit={
+            forms:rule.forms
+        } //take away hostnames
+        return JSON.stringify(ruleToEdit,null,2);
+    }
+    return "";
+};
 
+export const saveRule = (domain:string, content:string) => {
+    storage.savePageControlRule(domain,content);
+}
+export const removeRule = (domain:string) =>{
+    storage.removePageControlRule(domain);
+}
 
 export interface MessageField extends FieldRule{
     matchingRule?:FieldRule;
@@ -148,7 +168,7 @@ export const buildFormFieldsFromMessageFields =(rule:any, fieldRules:MessageFiel
     });
 };
 
-const getDomainsFromRule=(rule:PageRule)=>{
+const getDomainsFromRule=(rule:PageRule):string[]=>{
     if(rule.hostnames && rule.hostnames.value){
         if(Array.isArray(rule.hostnames.value)){
             return rule.hostnames.value;
@@ -160,15 +180,15 @@ const getDomainsFromRule=(rule:PageRule)=>{
     return [];
 }
 
-
-export const buildRuleSelectionItems =()=>{
-    const items=[]
-    for(let [i,rule] of presetRules.entries()){
-        let domains=getDomainsFromRule(rule);
-        items.push({
-                value:i,
-                label:domains
-        });
-    }
-    return items;
+export interface RuleSelectionItem{
+    value:string;
+    label:string;
+}
+export const buildSelectionItems = ():RuleSelectionItem[] => {
+    return presetRules.map((rule,i)=>{
+           return {
+               label:getDomainsFromRule(rule)[0],
+               value:`${i}`
+           }
+    });
 };

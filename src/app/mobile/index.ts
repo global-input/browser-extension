@@ -5,7 +5,8 @@ import { InitData, FieldValue, ConnectOptions, FormField,GlobalInputData } from 
 
 import * as storage from '../storage';
 
-export const useMobile = (initData: InitData | (() => InitData)) => {
+
+export const useMobile = (initData: InitData | (() => InitData)):GlobalInputData => {
     const mobile = useGlobalInputApp({ initData,
         options: storage.getConnectOption() as ConnectOptions
     });

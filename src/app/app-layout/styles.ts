@@ -14,7 +14,8 @@ const styles= {
         fontSize: 20,
         fontWeight: 100,
         whiteSpace: 'nowrap' as 'nowrap',
-        padding: 10
+        padding: 10,
+        color:"#153E85"
     },
     qrCode: {
         minWidth: 450,

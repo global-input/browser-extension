@@ -37,7 +37,6 @@ export const CheckboxButton:React.FC<CheckboxButtonProps> = ({ name, checked, on
 };
 interface SelectItemsProps {
     id:string;
-    checked:boolean;
     onChange: (evt:React.ChangeEvent<HTMLSelectElement>) => void;
     label:string;
     value:string;
@@ -72,7 +71,7 @@ const styles = {
         },
         item: {
             display: "flex",
-            flexDirection: "row" as 'row',                        
+            flexDirection: "row" as 'row',
             justifyContent: "flex-start",
             alignItems: "center"
         },
@@ -82,9 +81,9 @@ const styles = {
         }
     },
     select:{
-        container:{            
+        container:{
             display: "flex",
-            flexDirection: "row" as 'row',            
+            flexDirection: "row" as 'row',
             justifyContent: "flex-start",
             alignItems: "flex-end",
             fontSize:14,
@@ -92,12 +91,12 @@ const styles = {
         },
         label:{
             fontSize:12,
-            color:"#5291CD",          
+            color:"#5291CD",
             marginRight:5,
             whiteSpace: 'nowrap' as 'nowrap'
         },
         select:{
-            color:"#5291CD",          
+            color:"#5291CD",
             fontSize:14,
             border:"1px solid #888888",
 
