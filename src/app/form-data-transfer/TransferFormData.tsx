@@ -98,12 +98,12 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
                 }
             };
         });
-
+    const {sendValue}=mobile;
     const toggleVisibility = useCallback(() => {
         const vis = visibility === FIELDS.visibility.options[0] ? FIELDS.visibility.options[1] : FIELDS.visibility.options[0];
         setVisibility(vis);
-        mobile.sendValue(FIELDS.visibility.id, vis.value);
-    }, [visibility, mobile]);
+        sendValue(FIELDS.visibility.id, vis.value);
+    }, [visibility, sendValue]);
 
 
 

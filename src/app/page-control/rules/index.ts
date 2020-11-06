@@ -11,7 +11,7 @@ interface ContentRule {
     textContent?:string;
 }
 type SelectorRule = string|{
-    element:string;
+    element:string|string[];
     content?:ContentRule;
     textContent?:string;
 }
@@ -63,13 +63,13 @@ const findPresetRuleByDomain = (domain:string) => {
             if(Array.isArray(rule.hostnames.value)){
                 for(let hostname of rule.hostnames.value){
                     if(hostname===domain){
-                        return {rule,index:i};
+                        return rule
                     }
                 }
             }
             else if(typeof rule.hostnames.value==='string'){
                     if(rule.hostnames.value===domain){
-                        return {rule,index:1};
+                        return rule;
                     }
             }
         }
@@ -146,4 +146,29 @@ export const buildFormFieldsFromMessageFields =(rule:any, fieldRules:MessageFiel
             }
         };
     });
+};
+
+const getDomainsFromRule=(rule:PageRule)=>{
+    if(rule.hostnames && rule.hostnames.value){
+        if(Array.isArray(rule.hostnames.value)){
+            return rule.hostnames.value;
+        }
+        else if(typeof rule.hostnames.value==='string'){
+            return [rule.hostnames.value];
+        }
+    }
+    return [];
+}
+
+
+export const buildRuleSelectionItems =()=>{
+    const items=[]
+    for(let [i,rule] of presetRules.entries()){
+        let domains=getDomainsFromRule(rule);
+        items.push({
+                value:i,
+                label:domains
+        });
+    }
+    return items;
 };

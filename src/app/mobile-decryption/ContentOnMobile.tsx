@@ -51,11 +51,12 @@ const ContentOnMobile:React.FC<PROPS> = ({initialContent,contentOnComputer,cance
                   default:
         }
    });
+   const {sendValue}=mobile;
    const onContentChange=useCallback((value:string)=>{
         setErrorMessage('');
         setContent(value);
-        mobile.sendValue(FIELDS.content.id,value);
-   },[mobile]);
+        sendValue(FIELDS.content.id,value);
+   },[sendValue]);
 
 
     return(

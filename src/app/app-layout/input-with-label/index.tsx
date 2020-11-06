@@ -14,17 +14,17 @@ interface Props{
     help?:string;
     onChange?:(value:string, id?:string)=>void;
 }
-interface StyleStatus{    
+interface StyleStatus{
     label:string;
-    field:string;             
+    field:string;
 }
-export default (props:Props)=>{   
-   const [focus,setFocus]=useState(false);   
+const InputWithLabel= (props:Props)=>{
+   const [focus,setFocus]=useState(false);
    const elem=useRef<HTMLInputElement>(null);
-   
+
    let stylestatus:StyleStatus={
         label:"",
-        field:""              
+        field:""
    }
    if(elem.current){
         if((!focus) && (!elem.current.value)){
@@ -38,10 +38,10 @@ export default (props:Props)=>{
         stylestatus.field="readOnly"
    }
 
-   const labelClicked = useCallback(() => {
-        const el=props.id && document.getElementById(props.id);
+    const labelClicked = useCallback(() => {
+        const el = props.id && document.getElementById(props.id);
         el && el.focus();
-    },[]);
+    }, [props.id]);
 
    if(props.type==="textarea"){
     return(
@@ -49,9 +49,9 @@ export default (props:Props)=>{
           <label htmlFor={props.id}  onClick={labelClicked}>
                <span style={styles.arealabel.get(stylestatus.label)}>{props.label}</span>
           </label>
-  
+
                 <textarea
-                  id={props.id}                  
+                  id={props.id}
                   style={styles.field.get(stylestatus.field)}
                   readOnly={props.readOnly}
                   rows={6}
@@ -64,7 +64,7 @@ export default (props:Props)=>{
                    }} value={props.value}/>
         </div>
       );
-  
+
    }
    else{
     return(
@@ -87,9 +87,9 @@ export default (props:Props)=>{
                   if(props.onChange){
                      props.onChange(evt.target.value,props.id);
                   }
-  
+
                }} value={props.value}/>
-  
+
             {props.help && (
                 <div style={styles.help}>{props.help}</div>
             )}
@@ -98,7 +98,4 @@ export default (props:Props)=>{
    }
 };
 
-  
-
-
-
+export default InputWithLabel;

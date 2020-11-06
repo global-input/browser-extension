@@ -1,6 +1,6 @@
-import React,{useState,useEffect} from 'react';
-import {TextButton,DisplayErrorMessage,LoadingCircle,ControlLayout} from '../app-layout';
-import {useMobile} from '../mobile';
+import React, { useState, useEffect, useCallback } from 'react';
+import { TextButton, MessageContainer, DisplayErrorMessage, LoadingCircle, ControlLayout } from '../app-layout';
+import { useMobile } from '../mobile';
 
 import * as rules from './rules';
 import * as chromeExtension from '../chrome-extension';
@@ -9,82 +9,105 @@ import * as chromeExtension from '../chrome-extension';
 
 
 interface Props {
-    back:() => void;
-    domain:string;
+    back: () => void;
+    domain: string;
+    editRule: () => void;
 }
-const PageControl:React.FC<Props> = ({back,domain}) => {
-    const [errorMessage,setErrorMessage]=useState("");
-    const [isLoading, setLoading]=useState(true);
-
-    const mobile=useMobile({
+enum PAGE_STATUS {
+    LOADING,
+    ERROR,
+    SUCCESS
+}
+const PageControl: React.FC<Props> = ({ back, domain,editRule }) => {
+    const [data, setData] = useState({
+        status: PAGE_STATUS.LOADING,
+        message: ""
+    });
+    const mobile = useMobile({
         action: "input",
         dataType: "form",
-        form:{
-            title:"Page Control",
+        form: {
+            title: "Page Control",
             fields: Object.values(FIELDS)
         }
     });
-    const onError=(errorMessage:string,mobileMessage:string)=>{
-        setLoading(false);
-        setErrorMessage(errorMessage);
-        mobile.sendValue(FIELDS.info.id, mobileMessage);
-    }
-    mobile.setOnchange(({field})=>{
-        switch(field.id){
+    const { sendValue } = mobile;
+
+    const onError = useCallback((message: string, mobileMessage: string) => {
+        setData({
+            status: PAGE_STATUS.ERROR,
+            message: message
+        });
+        sendValue(FIELDS.info.id, mobileMessage);
+    }, [sendValue]);
+
+    mobile.setOnchange(({ field }) => {
+        switch (field.id) {
             case FIELDS.back.id:
-                    back();
-                    break;
+                back();
+                break;
+            case FIELDS.editRule.id:
+                editRule();
+                break;
+            default:
         }
     });
-    const buildControlFromRule= async (rule:any)=>{
+    const { sendInitData } = mobile;
+
+    const processRule = useCallback(async (rule: any) => {
         const message = await chromeExtension.getPageControlConfig(rule);
-        if(message.status!=="success"){
+        if (message.status !== "success") {
             onError(`No matching HTML element found for the items specified in the configuration created for ${domain} domain. You can edit the configuration by clicking on the "Edit Control Config" button.`,
                 "No matching HTML element found");
             return;
         }
-        if(message.content?.form?.fields?.length){
-            const fields=rules.buildFormFieldsFromMessageFields(rule,message.content.form.fields,(messageField, value)=>{
-                chromeExtension.sendFormField(messageField.id,value);
-                if(messageField.matchingRule?.next){
-                    if(messageField.matchingRule?.next.type==='refresh'){
-                        buildControlFromRule(rule);
+        if (message.content?.form?.fields?.length) {
+            const fields = rules.buildFormFieldsFromMessageFields(rule, message.content.form.fields, (messageField, value) => {
+                chromeExtension.sendFormField(messageField.id, value);
+                if (messageField.matchingRule?.next) {
+                    if (messageField.matchingRule?.next.type === 'refresh') {
+                        processRule(rule);
                     }
                 }
             });
-            mobile.sendInitData({
+            sendInitData({
                 action: "input",
                 dataType: "form",
-                form:{
-                    id:message.content.form.id,
-                    title:message.content.form.title,
-                    fields:[...fields,FIELDS.info,FIELDS.back,FIELDS.editRule]
+                form: {
+                    id: message.content.form.id,
+                    title: message.content.form.title,
+                    fields: [...fields, FIELDS.info, FIELDS.back, FIELDS.editRule]
                 }
             });
+            setData({
+                status: PAGE_STATUS.SUCCESS,
+                message: "You can now use your mobile to operate on the page."
+            })
         }
-        else{
+        else {
             onError(`Failed to locate any controllable elements in the page. You can edit the configuration by clicking on the "Edit Control Config" button.`,
                 "Failed to locate any controllable elements in the page.");
             return;
         }
-    }
-    useEffect(()=>{
-        if(!domain){
-                onError("Failed to contact the page in the tab. Try again with a different website. Make sure that the active tab has completed loading a proper website from the Internet.",
-                        "Failed to contact the page in the tab.");
-                return;
-        }
-        let rule=rules.findRuleByDomain(domain);
-        if(!rule){
-            onError(`No rule is set for ${domain}. You can set up rule for ${domain} by clicking on the "Edit Rule" button.`,
-            `No Rule set for ${domain}`);
+    }, [domain, sendInitData, onError]);
+    useEffect(() => {
+        if (!domain) {
+            onError("Failed to contact the page in the tab. Try again with a different website. Make sure that the active tab has completed loading a proper website from the Internet.",
+                "Failed to contact the page in the tab.");
             return;
         }
-        buildControlFromRule(rule);
-    },[]);
+        let rule = rules.findRuleByDomain(domain);
+        if (!rule) {
+            onError(`No rule is set for ${domain}. You can set up rule for ${domain} by clicking on the "Edit Rule" button.`,
+                `No Rule set for ${domain}`);
+            return;
+        }
+        processRule(rule);
+    }, [domain, onError, processRule]);
     return (<ControlLayout title="Page Control" mobile={mobile}>
-        {isLoading && (<LoadingCircle/>)}
-        {errorMessage && (<DisplayErrorMessage errorMessage={errorMessage}/>)}
+        {data.status === PAGE_STATUS.LOADING && (<LoadingCircle />)}
+        {data.status === PAGE_STATUS.ERROR && (<DisplayErrorMessage errorMessage={data.message} />)}
+        {data.status === PAGE_STATUS.SUCCESS && (<MessageContainer>{data.message}</MessageContainer>)}
     </ControlLayout>);
 }
 

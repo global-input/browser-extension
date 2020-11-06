@@ -1,29 +1,28 @@
 (function(){
 
-//  const sendMessageToExtension=(message,callback)=>{    
+//  const sendMessageToExtension=(message,callback)=>{
 //       chrome.runtime.sendMessage(null,message, function(response) {
-//         callback(response);      
-//       });    
-//  } 
-  
+//         callback(response);
+//       });
+//  }
+
 ////___CONTENT___SCRIPT___////
 
 
 
   var globalInputFormManager={
 
-          pageData:{              
+          pageData:{
               key:null,
               pageForm:null,
           },
-     
+
           /* The entry function when this script file is loaded */
           init:function(){
-                  chrome.runtime.onMessage.addListener(this.onExtensionMessageReceived.bind(this));////listener////
-                
+            chrome.runtime.onMessage.addListener(this.onExtensionMessageReceived.bind(this));////listener////
           },
-     
-     resetAll:function(){       
+
+     resetAll:function(){
         this.pageData.pageForm=null;
         this.pageData.key=null;
      },
@@ -41,7 +40,7 @@
                return;
          }
          else if(message.messageType==='set-key'){
-               this.pageData.key=message.content.key;               
+               this.pageData.key=message.content.key;
                replyBack({
                            messageType:message.messageType,
                            status:"success",
@@ -57,13 +56,13 @@
                   messageType:message.messageType,
                   host:window.location.host,
                   status:"failed",
-                  content:"no recognized form",                  
+                  content:"no recognized form",
                 });
               }
               else{
                 replyBack({
                   messageType:message.messageType,
-                  host:window.location.host,                  
+                  host:window.location.host,
                   status:"success",
                   content:pageConfig
                 });
@@ -86,7 +85,7 @@
                             host:window.location.host,
                             status:"success"
                            });
-         }         
+         }
          else if(message.messageType==='reset'){
             this.resetAll();
             replyBack({
@@ -98,12 +97,12 @@
          else if(message.messageType==='check-page-status'){
            replyBack({
                        messageType:message.messageType,
-                       host:window.location.host,                       
+                       host:window.location.host,
                        status:"success",
                        content:{
                               key:this.pageData.key
                         }
-                      });                                      
+                      });
          }
          else{
             replyBack({
@@ -392,7 +391,7 @@
                     else{
                       console.warn("missing data attribute, which is used for label:"+JSON.stringify(fieldRule));
                     }
-                    
+
                     var fieldProperty={
                       id:fieldRule.id,
                       label:data.label,
@@ -490,7 +489,7 @@
                                         }
                                   }
 
-                              }                              
+                              }
                               else{
                                   this.fields[i].formElement.value=newValue;
                                   this.fileInputEvent(this.fields[i].formElement);

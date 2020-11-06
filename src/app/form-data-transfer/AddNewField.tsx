@@ -44,10 +44,12 @@ const AddNewField: React.FC<Props> = ({ formFields, onFormStructureChanged, back
                 back();
         }
     });
+    const {sendValue}=mobile;
+
     const setFormLabel = useCallback((value: string) => {
         setLabel(value);
-        mobile.sendValue(FIELDS.name.id, value);
-    }, [setLabel, mobile]);
+        sendValue(FIELDS.name.id, value);
+    }, [setLabel, sendValue]);
     return (
         <ControlLayout title="Form Data Transfer"  mobile={mobile}>
             <FormContainer title="Adding New Field">
