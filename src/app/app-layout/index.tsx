@@ -89,7 +89,7 @@ interface ControlProps extends BasicLayoutProps{
 }
 export const  ControlLayout:React.FC<ControlProps> = ({ title,errorMessage,mobile,domain,notConnected,children }) =>  (
     <AppContainer title={title} domain={domain}>
-        <mobile.ConnectQR container={QRCodeContainer}/>
+        {mobile.isReady && (<QRCodeContainer><mobile.ConnectQR/></QRCodeContainer>)}
         {(errorMessage || mobile.isError) ?(<DisplayErrorMessage errorMessage={errorMessage?errorMessage:mobile.errorMessage}/>):(mobile.isConnected && children)}
         {(!mobile.isConnected) && notConnected}
     </AppContainer>
