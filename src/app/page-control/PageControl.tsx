@@ -22,9 +22,10 @@ const PageControl: React.FC<Props> = ({ back, domain,toEditRule }) => {
 
     const { sendValue } = mobile;
     const onError = useCallback((message: string) => {
+        sendValue(FIELDS.domain.id, domain);
         sendValue(FIELDS.info.id, {
             content:message,
-            style:{color:"red"}
+            style:{color:"brown"}
         });
     }, [sendValue]);
 
@@ -44,7 +45,7 @@ const PageControl: React.FC<Props> = ({ back, domain,toEditRule }) => {
     const processRule = useCallback(async (rule: any) => {
         const message = await chromeExtension.getPageControlConfig(rule);
         if (message.status !== "success") {
-            onError(`No matching HTML element found for the items specified in the configuration created for ${domain} domain. You can edit the configuration by clicking on the "Edit Control Config" button.`);
+            onError("The rule does not match the loaded page.");
             return;
         }
         if (message.content?.form?.fields?.length) {
@@ -68,28 +69,33 @@ const PageControl: React.FC<Props> = ({ back, domain,toEditRule }) => {
         }
         else {
 
-            onError(`Failed to locate any controllable elements in the page. You can edit the configuration by clicking on the "Edit Control Config" button.`);
+            onError("The rule does not set up controllable elements for the page loaded");
             return;
         }
-    }, [domain, sendInitData, onError]);
+    }, [sendInitData, onError]);
     useEffect(() => {
         if (!domain) {
-            onError("Failed to contact the page in the tab. Try again with a different website. Make sure that the active tab has completed loading a proper website from the Internet.");
+            onError("The domain of the loaded page cannot be identified.");
             return;
         }
         let rule = rules.findRuleByDomain(domain);
         if (!rule) {
-            onError(`No rule is set for ${domain}. You can set up rule for ${domain} by clicking on the "Edit Rule" button.`);
+            onError("No matching rules found for the loaded page.");
             return;
         }
         processRule(rule);
     }, [domain, onError, processRule]);
     return (<ControlLayout title="Page Control" mobile={mobile}>
-        <MessageContainer>You can use your mobile to operate on the page.</MessageContainer>
+        <MessageContainer>Use your mobile to operate.</MessageContainer>
     </ControlLayout>);
 }
 
 const FIELDS = {
+    domain:{
+           id:"domain",
+           type:"info",
+           value:"Loading..."
+    },
     info: {
         id: "info",
         type: "info",
