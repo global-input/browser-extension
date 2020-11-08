@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { TextButton, Title,SelectItems,MessageContainer, InputWithLabel, FormFooter,FormContainer, ControlLayout } from '../../app-layout';
+import { TextButton, Title,SelectItems,MessageContainer, InputWithLabel, FormFooter,FormContainer, BasicLayout } from '../../app-layout';
 import { useMobile, FormField } from '../../mobile';
 import * as rules from '../rules';
 
@@ -58,7 +58,7 @@ const Editor: React.FC<Props> = ({ back, domain,loadRule}) => {
 
     return (
 
-        <ControlLayout title="Edit Rule" mobile={mobile}>
+        <BasicLayout title="Edit Rule">
             <FormContainer>
 
             <Title>{domain}</Title>
@@ -79,7 +79,7 @@ const Editor: React.FC<Props> = ({ back, domain,loadRule}) => {
             </FormContainer>
 
 
-        </ControlLayout>);
+        </BasicLayout>);
 
 }
 

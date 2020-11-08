@@ -58,7 +58,7 @@ const MainPage: React.FC<Props> = ({ setPage, domain }) => {
     return (
     <ControlLayout title="Global Input App" mobile={mobile} notConnected={<NotConnected/>}>
         <MessageContainer>
-        Please select from the operations displayed on your mobile
+        You can now operate on your mobile
         </MessageContainer>
     </ControlLayout>
         );
@@ -87,7 +87,7 @@ const FIELDS = {
     control: {
         id: "page-control",
         type: 'button',
-        label: 'Sign In/Page Control',
+        label: 'Page Control',
         viewId: "row3"
     }
 };

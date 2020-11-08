@@ -40,20 +40,22 @@ interface FieldRule {
     value?: string;
     label?: string;
     next?: NextRule;
+    matchingRule?: FieldRule;
 }
 interface FormIdRule {
     selector: SelectorRule;
     data: Data;
 }
-interface FormRule {
+export interface FormRule {
     title: string;
     fields: FieldRule[];
     formid?: FormIdRule;
+    id?:string;
 }
 interface HostNamesRule {
     value: string | string[];
 }
-interface PageRule {
+export interface PageRule {
     hostnames?: HostNamesRule;
     forms: FormRule[];
 }
@@ -123,12 +125,9 @@ export const removeRule = (domain: string) => {
     storage.removePageControlRule(domain);
 }
 
-export interface MessageField extends FieldRule {
-    matchingRule?: FieldRule;
-}
 
 
-const mapFieldId = (filedRule: MessageField) => {
+const mapFieldId = (filedRule: FieldRule) => {
     if (filedRule.type === 'list' || filedRule.type === 'info' || filedRule.type === 'picker' || filedRule.type === 'select') {
         return undefined;
     }
@@ -136,7 +135,7 @@ const mapFieldId = (filedRule: MessageField) => {
         return filedRule.id;
     }
 };
-const mapFieldValue = (filedRule: MessageField) => {
+const mapFieldValue = (filedRule: FieldRule) => {
     if (filedRule.type === 'picker') {
         return typeof filedRule.value === 'undefined' ? filedRule?.items?.length && filedRule.items[0].value : filedRule.value;
     }
@@ -144,7 +143,7 @@ const mapFieldValue = (filedRule: MessageField) => {
         return filedRule.value;
     }
 };
-export const mapField = (fieldRule: MessageField): FormField => {
+export const mapField = (fieldRule: FieldRule): FormField => {
     return {
         id: mapFieldId(fieldRule),
         label: fieldRule.label,
@@ -157,20 +156,20 @@ export const mapField = (fieldRule: MessageField): FormField => {
 
 
 
-type OnFieldInput = (messageField: MessageField, value: FieldValue) => void;
+type OnFieldInput = (fieldRule: FieldRule, value: FieldValue) => void;
 
 
-export const buildFormFieldsFromMessageFields = (rule: any, fieldRules: MessageField[], onFieldInput: OnFieldInput) => {
-    return fieldRules.map((messageField: MessageField) => {
+export const buildFormFieldsFieldRules = (form:FormRule, onFieldInput: OnFieldInput) => {
+    return form.fields.map((fieldRule: FieldRule) => {
         return {
-            id: mapFieldId(messageField),
-            label: messageField.label,
-            type: messageField.type,
-            items: messageField.items,
-            selectType: messageField.selectType,
-            value: mapFieldValue(messageField),
+            id: mapFieldId(fieldRule),
+            label: fieldRule.label,
+            type: fieldRule.type,
+            items: fieldRule.items,
+            selectType: fieldRule.selectType,
+            value: mapFieldValue(fieldRule),
             operations: {
-                onInput: (value: FieldValue) => onFieldInput(messageField, value)
+                onInput: (value: FieldValue) => onFieldInput(fieldRule, value)
             }
         };
     });
