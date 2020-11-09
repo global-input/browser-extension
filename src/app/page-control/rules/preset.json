@@ -3,7 +3,7 @@
          "value": "www.dropbox.com"
       },
       "forms": [{
-         "title": "Sign In",
+         "title": "Dropbox Sign In",
          "fields": [{
                "id": "username",
                "type": "text",
@@ -39,7 +39,7 @@
          "value": "accounts.google.com"
       },
       "forms": [{
-            "title": "Choose an Account",
+            "title": "Choose Google Account",
             "fields": [{
                "id": "account",
                "type": "list",
@@ -84,7 +84,7 @@
             }]
          },
          {
-            "title": "Choose an Account",
+            "title": "Choose Google Account",
             "fields": [{
                "id": "account",
                "type": "list",
@@ -128,7 +128,7 @@
             }]
          },
          {
-            "title": "Enter Password",
+            "title": "Google Password",
             "formid": {
                "selector": "div[id=\"profileIdentifier\"]",
                "data": {
@@ -170,7 +170,7 @@
             ]
          },
          {
-            "title": "Enter Email",
+            "title": "Google Email",
             "fields": [{
                   "id": "username",
                   "type": "text",
@@ -615,7 +615,7 @@
             ]
          },
          {
-            "title": "Password for Amazon",
+            "title": "Amazon Sign In",
             "formid": {
                "selector": "input[id=\"ap_email\"]",
                "data": {
@@ -727,7 +727,7 @@
             ]
          },
          {
-            "title": "Verifying that it's you",
+            "title": "Verification",
             "fields": [{
                   "id": "code",
                   "type": "text",
@@ -824,7 +824,7 @@
                }
             }
          ]
-      },{
+      }, {
          "title": "Digital Ocean Verify",
          "fields": [{
                "id": "username",
@@ -856,7 +856,7 @@
          "value": "id.docker.com"
       },
       "forms": [{
-         "title": "Welcome to Docker",
+         "title": "Docker Sign In",
          "fields": [{
                "id": "username",
                "type": "text",
@@ -895,7 +895,7 @@
          ]
       },
       "forms": [{
-         "title": "Sign In",
+         "title": "Evernote Log In",
          "fields": [{
                "id": "username",
                "type": "text",
@@ -970,7 +970,7 @@
          "value": "github.com"
       },
       "forms": [{
-            "title": "Sign In to GitHub",
+            "title": "GitHub Sign in",
             "fields": [{
                   "id": "username",
                   "type": "text",
@@ -1001,7 +1001,7 @@
             ]
          },
          {
-            "title": "Two-factor authentication",
+            "title": "GitHub Two-factor",
             "fields": [{
                   "id": "twofactorcode",
                   "type": "secret",
@@ -1030,7 +1030,7 @@
          "value": "gitlab.com"
       },
       "forms": [{
-         "title": "Sign In to GitLab",
+         "title": "GitLab Sign In",
          "fields": [{
                "id": "username",
                "type": "text",
@@ -1066,7 +1066,7 @@
          "value": "id.heroku.com"
       },
       "forms": [{
-         "title": "HEROKU",
+         "title": "HEROKU Log In",
          "fields": [{
                "id": "username",
                "type": "text",
@@ -1138,7 +1138,7 @@
          "value": "id.atlassian.com"
       },
       "forms": [{
-            "title": "Username for Atlassian",
+            "title": "Atlassian Username",
             "fields": [{
                   "id": "username",
                   "type": "text",
@@ -1161,7 +1161,7 @@
             ]
          },
          {
-            "title": "Enter Password",
+            "title": "Atlassian Sign In",
             "formid": {
                "selector": "form[id=\"form-login\"] div[tabindex=\"0\"] span",
                "data": {
@@ -1241,7 +1241,7 @@
             ]
          },
          {
-            "title": "Password for Amazon",
+            "title": "Apple Sign In",
             "formid": {
                "selector": "input[id=\"ap_email\"]",
                "data": {
@@ -1281,6 +1281,59 @@
                   }
                }
             ]
+         },
+         {
+            "title": "Apple Two-factor",
+            "type": "iframe",
+            "fields": [{
+                  "id": "char0",
+                  "type": "text",
+                  "selector": "input[id=\"char0\"]",
+                  "data": {
+                     "label": "1"
+                  }
+               },
+               {
+                  "id": "char1",
+                  "type": "text",
+                  "selector": "input[id=\"char1\"]",
+                  "data": {
+                     "label": "2"
+                  }
+               },
+               {
+                  "id": "char2",
+                  "type": "text",
+                  "selector": "input[id=\"char2\"]",
+                  "data": {
+                     "label": "3"
+                  }
+               },
+               {
+                  "id": "char3",
+                  "type": "text",
+                  "selector": "input[id=\"char3\"]",
+                  "data": {
+                     "label": "4"
+                  }
+               },
+               {
+                  "id": "char4",
+                  "type": "text",
+                  "selector": "input[id=\"char4\"]",
+                  "data": {
+                     "label": "5"
+                  }
+               },
+               {
+                  "id": "char5",
+                  "type": "text",
+                  "selector": "input[id=\"char5\"]",
+                  "data": {
+                     "label": "6"
+                  }
+               }
+            ]
          }
       ]
    }, {
@@ -1288,7 +1341,7 @@
          "value": "www.join.me"
       },
       "forms": [{
-         "title": "Log In (Join Me)",
+         "title": "Join Me Sign In",
          "fields": [{
                "id": "username",
                "type": "text",
@@ -1324,7 +1377,7 @@
          "value": "jsbin.com"
       },
       "forms": [{
-         "title": "JS Bin Login",
+         "title": "JS Bin Log In",
          "fields": [{
                "id": "username",
                "type": "text",
@@ -1396,45 +1449,16 @@
          "value": [
             "www.linkedin.com",
             "uk.linkedin.com",
-            "fr.linkedin.com"
+            "fr.linkedin.com",
+            "gr.linkedin.com"
          ]
       },
       "forms": [{
-         "title": "Linked In",
+         "title": "Linked In Sign In",
          "fields": [{
                "id": "username",
                "type": "text",
-               "selector": "input[id=\"login-email\"]",
-               "data": {
-                  "label": "Email"
-               }
-            },
-            {
-               "id": "password",
-               "type": "secret",
-               "selector": "input[id=\"login-password\"][type=\"password\"]",
-               "data": {
-                  "label": "Password"
-               }
-            },
-            {
-               "id": "login",
-               "type": "button",
-               "selector": "input[id=\"login-submit\"][type=\"submit\"]",
-               "data": {
-                  "label": "Sign In"
-               },
-               "next": {
-                  "type": "refresh"
-               }
-            }
-         ]
-      }, {
-         "title": "Linked In",
-         "fields": [{
-               "id": "username",
-               "type": "text",
-               "selector": "input[name=\"session_key\"]",
+               "selector": "input[name=\"session_key\"], input[id=\"session_key\"]",
                "data": {
                   "label": "Email or phone"
                }
@@ -1442,7 +1466,7 @@
             {
                "id": "password",
                "type": "secret",
-               "selector": "input[name=\"session_password\"][type=\"password\"]",
+               "selector": "input[id=\"password\"], input[id=\"session_password\"]",
                "data": {
                   "label": "Password"
                }
@@ -1451,10 +1475,12 @@
                "id": "login",
                "type": "button",
                "selector": {
-                  "element": ["button[data-control-urn=\"login-submit\"][type=\"submit\"]", "button[class=\"sign-in-form__submit-btn\"][type=\"submit\"]"]
+                  "element": ["button[type=\"submit\"][data-litms-control-urn=\"login-submit\"]",
+                     "button[type=\"submit\"][data-tracking-control-name=\"homepage-basic_signin-form_submit-button\"]"
+                  ]
                },
                "data": {
-                  "label": "Sign In"
+                  "label": "Sign in"
                },
                "next": {
                   "type": "refresh"
@@ -1501,7 +1527,9 @@
    },
    {
       "hostnames": {
-         "value": "login.wordpress.org"
+         "value": ["login.wordpress.org",
+            "wordpress.com"
+         ]
       },
       "forms": [{
          "title": "Log In",
@@ -1533,17 +1561,44 @@
                }
             }
          ]
+      }, {
+         "title": "Log in to your account",
+         "fields": [{
+               "id": "username",
+               "type": "text",
+               "selector": "input[id=\"usernameOrEmail\"]",
+               "data": {
+                  "label": "Username"
+               }
+            },
+            {
+               "id": "continue",
+               "type": "button",
+               "selector": {
+                  "element": "button[type=\"submit\"]",
+                  "textContent": "Continue"
+               },
+               "data": {
+                  "label": "Continue"
+               },
+               "next": {
+                  "type": "refresh"
+               }
+            }
+         ]
       }]
    },
    {
       "hostnames": {
          "value": [
             "www.lucidchart.com",
-            "store.logmein.com"
+            "store.logmein.com",
+            "lucid.app",
+            "app.lucidchart.com"
          ]
       },
       "forms": [{
-            "title": "Account Update",
+            "title": "Lucid Account Update",
             "formid": {
                "selector": "input[id=\"user-username\"]",
                "data": {
@@ -1594,7 +1649,7 @@
             ]
          },
          {
-            "title": "Sign Up",
+            "title": "Lucid Sign Up",
             "fields": [{
                   "id": "name",
                   "type": "text",
@@ -1633,7 +1688,7 @@
             ]
          },
          {
-            "title": "Log in",
+            "title": "Lucid Log in",
             "fields": [{
                   "id": "username",
                   "type": "text",
@@ -1664,7 +1719,54 @@
             ]
          },
          {
-            "title": "Choose Actions",
+            "title": "Lucid Log in",
+            "fields": [{
+                  "id": "username",
+                  "type": "text",
+                  "selector": "input[name=\"init-username\"]",
+                  "data": {
+                     "label": "UseEmail address"
+                  }
+               },
+               {
+                  "id": "signin",
+                  "type": "button",
+                  "selector": "lucid-button[ng-reflect-label=\"Next\"]",
+                  "data": {
+                     "label": "Next"
+                  },
+                  "next": {
+                     "type": "refresh"
+                  }
+               }
+            ]
+         },
+         {
+            "title": "Lucid Log in",
+            "fields": [{
+                  "id": "password",
+                  "type": "text",
+                  "selector": "input[type=\"password\"]",
+                  "data": {
+                     "label": "Password"
+                  }
+               },
+               {
+                  "id": "signin",
+                  "type": "button",
+                  "selector": "lucid-button[ng-reflect-label=\"Log in\"]",
+                  "data": {
+                     "label": "Log in"
+                  },
+                  "next": {
+                     "type": "refresh"
+                  }
+               }
+            ]
+         },
+
+         {
+            "title": "Lucid Choose Actions",
             "fields": [{
                   "id": "login",
                   "type": "button",
@@ -2155,28 +2257,25 @@
          "fields": [{
                "id": "username",
                "type": "text",
-               "selector": "form input[id=\"Email\"]",
+               "selector": "form input.sl-login-input__field[type=\"email\"]",
                "data": {
-                  "label": "Email"
+                  "label": "E-MAIL"
                }
             },
             {
                "id": "password",
                "type": "secret",
-               "selector": "form input[id=\"Password\"][type=\"password\"]",
+               "selector": "form input.sl-login-input__field[type=\"password\"]",
                "data": {
-                  "label": "Password"
+                  "label": "PASSWORD"
                }
             },
             {
                "id": "login",
                "type": "button",
-               "selector": "form button[type=\"submit\"]",
+               "selector": "form button.sl-login-button[type=\"submit\"]",
                "data": {
-                  "label": "SIGN IN"
-               },
-               "next": {
-                  "type": "refresh"
+                  "label": "Sign in with E-mail"
                }
             }
          ]
@@ -2348,7 +2447,7 @@
          "value": "www.wisepay.co.uk"
       },
       "forms": [{
-         "title": "Sign In",
+         "title": "Wise Pay Login",
          "fields": [{
                "id": "username",
                "type": "text",
@@ -2380,31 +2479,37 @@
                }
             }
          ]
-      }]
-   },
-   {
-      "hostnames": {
-         "value": "wordpress.com"
-      },
-      "forms": [{
-         "title": "Log in to your account",
+      }, {
+         "title": "Wise Pay Login",
          "fields": [{
+               "id": "code",
+               "type": "text",
+               "selector": "input[id=\"securityCode\"]",
+               "data": {
+                  "label": "Security Challenge Code"
+               }
+            }, {
                "id": "username",
                "type": "text",
-               "selector": "input[id=\"usernameOrEmail\"]",
+               "selector": "input[name=\"acc_user_email\"]",
                "data": {
                   "label": "Username"
                }
             },
             {
-               "id": "continue",
-               "type": "button",
-               "selector": {
-                  "element": "button[type=\"submit\"]",
-                  "textContent": "Continue"
-               },
+               "id": "password",
+               "type": "secret",
+               "selector": "input[name=\"acc_password\"][type=\"password\"]",
                "data": {
-                  "label": "Continue"
+                  "label": "Password"
+               }
+            },
+            {
+               "id": "login",
+               "type": "button",
+               "selector": "form[name=\"login\"] input[type=\"image\"]",
+               "data": {
+                  "label": "Sign In"
                },
                "next": {
                   "type": "refresh"
@@ -2413,16 +2518,17 @@
          ]
       }]
    },
+
    {
       "hostnames": {
-         "value": "www.123-reg.co.uk"
+         "value": ["www.123-reg.co.uk", "sso.123-reg.co.uk"]
       },
       "forms": [{
          "title": "Log In to 123-reg",
          "fields": [{
                "id": "username",
                "type": "text",
-               "selector": "form input[name=\"username\"]",
+               "selector": "form input[autocomplete=\"email\"][name=\"identifier\"]",
                "data": {
                   "label": "Username"
                }
@@ -2430,7 +2536,7 @@
             {
                "id": "password",
                "type": "secret",
-               "selector": "form input[name=\"password\"][type=\"password\"]",
+               "selector": "form input[autocomplete=\"current-password\"][type=\"password\"]",
                "data": {
                   "label": "Password"
                }
@@ -2438,9 +2544,9 @@
             {
                "id": "login",
                "type": "button",
-               "selector": "button[type=\"submit\"][id=\"login\"]",
+               "selector": "form button[type=\"submit\"]",
                "data": {
-                  "label": "Log Me In"
+                  "label": "Log in"
                },
                "next": {
                   "type": "refresh"

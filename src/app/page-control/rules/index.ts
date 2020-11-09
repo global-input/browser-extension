@@ -51,6 +51,7 @@ export interface FormRule {
     fields: FieldRule[];
     formid?: FormIdRule;
     id?:string;
+    type?:string;
 }
 interface HostNamesRule {
     value: string | string[];

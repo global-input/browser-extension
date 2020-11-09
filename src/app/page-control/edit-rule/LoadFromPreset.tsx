@@ -58,19 +58,16 @@ const Editor: React.FC<Props> = ({ back, domain,loadRule}) => {
 
     return (
 
-        <BasicLayout title="Edit Rule">
+        <BasicLayout title="Preset Rules">
             <FormContainer>
-
-            <Title>{domain}</Title>
-
-
+            <SelectItems id="rulSelection" items={selectionItems} value={selectedValue} label="Select:" onChange={onSelectionChange}/>
             <InputWithLabel label="Rule" id="content"
                 onChange={onContentChange}
                 type="textarea"
                 value={content}/>
 
 
-            <SelectItems id="rulSelection" items={selectionItems} value={selectedValue} label="Load Example:" onChange={onSelectionChange}/>
+
             <FormFooter>
                 <TextButton onClick={back} label='Cancel' />
                 <TextButton onClick={onUse} label='Use' />
@@ -87,7 +84,7 @@ const FIELDS = {
     info:{
         id:'info',
         type:"info",
-        value:"Please operate in the extension window"
+        value:"Please operate in the extension window on your computer"
     },
     editor: {
         id: 'editor',
