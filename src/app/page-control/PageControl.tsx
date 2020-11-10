@@ -16,12 +16,10 @@ interface Props {
 
 
 const PageControl: React.FC<Props> = ({ back, domain, form, editRule, loadRule }) => {
-    const { mobile} = useControl({ back, domain, form, editRule, loadRule })
+    const { mobile,display} = useControl({ back, domain, form, editRule, loadRule })
     return (
         <ControlLayout title="Page Control" mobile={mobile}>
-            <MessageContainer>
-                You can use your mobile to operate on the page.
-            </MessageContainer>
+            {display}
         </ControlLayout>
     )
 }

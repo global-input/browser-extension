@@ -1,3 +1,4 @@
+import {FormField} from 'global-input-react';
 const URL = "iterative.globalInputApp.url";
 const getURL = () => localStorage.getItem(URL);
 const setURL = (url: string|null|undefined) => {
@@ -109,3 +110,41 @@ const PAGE_CONTROL="extension.control.";
 export const removePageControlRule=(domain:string) =>localStorage.removeItem(PAGE_CONTROL+domain);
 export const getPageControlRule =(domain:string)=>localStorage.getItem(PAGE_CONTROL+domain);
 export const savePageControlRule = (domain:string,pageControlRule:string) => localStorage.setItem(PAGE_CONTROL+domain, pageControlRule);
+
+const FORM_DATA_FIELDS="extension.forms.fields.";
+
+const getVarForFormFields = (domain: string) => {
+    const domainPart = domain ? domain : 'default';
+    return FORM_DATA_FIELDS + domainPart;
+};
+
+
+export const loadSavedFormFields = (domain: string) => {
+    var fieldString = localStorage.getItem(getVarForFormFields(domain));
+    if (!fieldString) {
+        return null;
+    }
+    try {
+        const fields = JSON.parse(fieldString);
+        if (fields && fields.length > 0) {
+            return fields;
+        }
+    }
+    catch (error) {
+        console.error(error);
+    }
+    return null;
+};
+
+const removeFormFields = (domain: string) => localStorage.removeItem(getVarForFormFields(domain));
+
+export const saveFormFields=(domain:string, formFields:FormField[])=>{
+    if (formFields.length) {
+        const formsFieldsToSave = formFields.map(f => ({ ...f, value: undefined }));
+        var fieldString = JSON.stringify(formsFieldsToSave);
+        localStorage.setItem(getVarForFormFields(domain), fieldString);
+    }
+    else {
+        removeFormFields(domain);
+    }
+}

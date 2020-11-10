@@ -4,15 +4,7 @@ import { useMobile,FormField} from '../mobile';
 import * as chromeExtension from '../chrome-extension';
 import * as cache from './cache';
 
-import {ControlLayout, FormContainer, DisplayInputCopyField, TextButton } from '../app-layout';
-
-export enum PAGES {
-    TRANSFER_FORM_DATA,
-    ADD_FIELD,
-    DELETE_FIELDS,
-    EDIT_FORM_PROPERTIES
-};
-
+import {ControlLayout, FormContainer, DisplayInputCopyField, TextButton, FormFooter } from '../app-layout';
 
 const computerFormId = (domain: string, fields: FormField[]) => {
     const id = fields.length ? '###' + fields[0].id + '###' : 'credential';
@@ -20,31 +12,26 @@ const computerFormId = (domain: string, fields: FormField[]) => {
 }
 
 const FIELDS = {
-    visibility: {
-        id: "fieldValueVisibility",
-        type: 'button',
-        viewId: "row0",
-        options: [{ value: 0, label: 'Show' }, { value: 1, label: 'Hide' }],
-        value: 0
-    },
-    add: {
-        id: "addNewField",
-        type: "button",
-        label: "Add New Field",
-        viewId: "row1"
-    },
-    delete: {
-        id: "deleteFields",
-        type: "button",
-        label: "Delete Fields",
-        viewId: "row1"
-    },
     back: {
         id: "backToHome",
         type: "button",
         label: "Back",
-        viewId: "row2"
+        viewId: "row1"
+    },
+    manage: {
+        id: "manageForm",
+        type: "button",
+        label: "Manage",
+        viewId: "row1"
+    },
+    visibility: {
+        id: "fieldValueVisibility",
+        type: 'button',
+        viewId: "row1",
+        options: [{ value: 0, label: 'Show' }, { value: 1, label: 'Hide' }],
+        value: 0
     }
+
 };
 
 
@@ -80,10 +67,10 @@ interface Props {
     domain: string;
     formFields: FormField[];
     setFormFields: (formFields: FormField[]) => void;
-    setPage: (page: PAGES) => void;
     back: () => void;
+    manageForm:()=>void;
 };
-const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, setPage, back }) => {
+const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, manageForm, back }) => {
     const [visibility, setVisibility] = useState(FIELDS.visibility.options[0]);
     const mobile = useMobile(() => {
         const id = computerFormId(domain, formFields);
@@ -105,18 +92,13 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
         sendValue(FIELDS.visibility.id, vis.value);
     }, [visibility, sendValue]);
 
-
-
     mobile.setOnchange(({ field }) => {
         switch (field.id) {
             case FIELDS.visibility.id:
                 toggleVisibility();
                 break;
-            case FIELDS.add.id:
-                setPage(PAGES.ADD_FIELD);
-                break;
-            case FIELDS.delete.id:
-                setPage(PAGES.DELETE_FIELDS);
+            case FIELDS.manage.id:
+                manageForm();
                 break;
             case FIELDS.back.id:
                 back();
@@ -132,10 +114,6 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
                 }
         }
     });
-
-
-
-
     const onCopied = () => {
         const key=cache.saveCacheFields(domain,formFields);
         if(key){
@@ -158,8 +136,14 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
                     }
                 }
                 } />))}
-        <TextButton onClick={toggleVisibility} label={visibility.label} />
+
+
     </FormContainer>
+    <FormFooter>
+        <TextButton onClick={back} label="Back"/>
+        <TextButton onClick={toggleVisibility} label={visibility.label} />
+        <TextButton onClick={manageForm} label="Manage" />
+    </FormFooter>
         </ControlLayout>);
 
 

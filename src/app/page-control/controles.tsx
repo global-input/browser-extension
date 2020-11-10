@@ -1,7 +1,7 @@
 
 import React, { useState, useCallback } from 'react';
-import { useMobile, GlobalInputData } from '../mobile';
-import { TextButton, MessageContainer, DisplayErrorMessage, LoadingCircle, ControlLayout, FormFooter } from '../app-layout';
+import { useMobile } from '../mobile';
+import { TextButton, MessageContainer, DisplayErrorMessage, LoadingCircle, FormFooter } from '../app-layout';
 import * as rules from './rules';
 import * as chromeExtension from '../chrome-extension';
 const FIELDS = {
@@ -140,5 +140,16 @@ export const useControl = ({ back, domain, form, editRule, loadRule }: ControlPr
             default:
         }
     });
-    return { mobile }
+    const display=(
+        <>
+        <MessageContainer>
+            You can use your mobile to operate on the page.
+        </MessageContainer>
+         <FormFooter>
+            <TextButton onClick={back} label='Back' />
+            <TextButton onClick={editRule} label='Edit Rule' />
+        </FormFooter>
+        </>
+    );
+    return { mobile,display };
 }

@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
+
+import * as storage from '../storage';
 
 import { FormField } from '../mobile';
 
-import AddNewField from './AddNewField';
-import DeleteFields from './DeleteFields';
-import TransferFormData, { PAGES } from './TransferFormData';
+import CreateField from './CreateField';
+import ManageForm from './ManageForm';
+import TransferFormData from './TransferFormData';
 
+export enum PAGES {
+    TRANSFER_FORM_DATA,
+    MANAGER_FORM,
+    CREATE_FIELD
+};
 
 interface Props {
     domain: string;
@@ -14,52 +21,25 @@ interface Props {
 const MainControl: React.FC<Props> = ({ domain, back }) => {
     const [page, setPage] = useState(PAGES.TRANSFER_FORM_DATA);
     const [formFields, setFormFields] = useState(() => buildFormFields(domain));
+
     const onFormStructureChanged = (formFields: FormField[]) => {
         setFormFields(formFields);
-        if (formFields.length) {
-            const formsFieldsToSave = formFields.map(f => ({ ...f, value: undefined }));
-            var fieldString = JSON.stringify(formsFieldsToSave);
-            localStorage.setItem(getFormFieldsPrefix(domain), fieldString);
-        }
-        else {
-            localStorage.removeItem(getFormFieldsPrefix(domain));
-        }
+        storage.saveFormFields(domain,formFields);
     };
-    const toTransfer = () => setPage(PAGES.TRANSFER_FORM_DATA);
+    const transferFormData = useCallback(() => setPage(PAGES.TRANSFER_FORM_DATA), []);
+    const manageForm = useCallback(() => setPage(PAGES.MANAGER_FORM), []);
+    const createField = useCallback(() => setPage(PAGES.CREATE_FIELD), []);
+
     switch (page) {
         case PAGES.TRANSFER_FORM_DATA:
-            return (<TransferFormData domain={domain} formFields={formFields} setFormFields={setFormFields} setPage={setPage} back={back} />);
-        case PAGES.ADD_FIELD:
-            return (<AddNewField formFields={formFields} onFormStructureChanged={onFormStructureChanged} back={toTransfer} />);
-        case PAGES.DELETE_FIELDS:
-            return (<DeleteFields formFields={formFields} onFormStructureChanged={onFormStructureChanged} back={toTransfer} />);
+            return (<TransferFormData domain={domain} formFields={formFields} setFormFields={setFormFields} back={back} manageForm={manageForm} />);
+        case PAGES.MANAGER_FORM:
+            return (<ManageForm formFields={formFields} onFormStructureChanged={onFormStructureChanged} back={transferFormData} createField={createField} />);
+        case PAGES.CREATE_FIELD:
+            return (<CreateField formFields={formFields} onFormStructureChanged={onFormStructureChanged} back={manageForm} />);
         default:
     }
     return null
-};
-
-
-
-const getFormFieldsPrefix = (domain: string) => {
-    const domainPart = domain ? domain : 'default';
-    return "extension.forms.fields." + domainPart;
-};
-
-const loadSavedFormFields = (domain: string) => {
-    var fieldString = localStorage.getItem(getFormFieldsPrefix(domain));
-    if (!fieldString) {
-        return null;
-    }
-    try {
-        const fields = JSON.parse(fieldString);
-        if (fields && fields.length > 0) {
-            return fields;
-        }
-    }
-    catch (error) {
-        console.error(error);
-    }
-    return null;
 };
 
 const defaultFormFields = [{
@@ -69,6 +49,7 @@ const defaultFormFields = [{
 }, {
     id: "password",
     label: "Password",
+    type: "secret",
     value: ''
 }, {
     id: "note",
@@ -77,7 +58,7 @@ const defaultFormFields = [{
 }];
 
 const buildFormFields = (domain: string) => {
-    let fields = loadSavedFormFields(domain);
+    let fields = storage.loadSavedFormFields(domain);
     if (!fields) {
         fields = defaultFormFields;
     }

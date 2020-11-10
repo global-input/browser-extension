@@ -278,7 +278,7 @@
                 }
               }
               else {
-                var elements = formContainer.querySelectorAll(elementRule.element);
+                const elements = formContainer.querySelectorAll(elementRule.element);
                 collectMatchedElements(elements);
               }
 
@@ -450,8 +450,8 @@
     getSignInForm: function () {
       return {
         form: {
-          id: "###username###" + "@" + window.location.host, // unique id for saving the form content in mobile automating the form-filling process.
-          title: "Sign In on " + window.location.host,  //Title of the form displayed on the mobile
+          id: `"###username###@${window.location.host}`, // unique id for saving the form content in mobile automating the form-filling process.
+          title: `${window.location.host} Sign In`,  //Title of the form displayed on the mobile
           fields: [],  //the fields to be displayed on the mobile screen, this will be populated in the next step
           setFormFieldValue: function (fieldId, newValue) {
             if (this.fields.length) {
@@ -467,10 +467,10 @@
 
                     if (Array.isArray(newValue) && newValue.length) {
                       newValue = newValue[0];
-                      for (var k = 0; k < this.fields[i].items.length; k++) {
-                        var vitem = this.fields[i].items[k];
-                        if (vitem.value === newValue) {
-                          vitem.element.click();
+                      for (let k = 0; k < this.fields[i].items.length; k++) {
+                        const it = this.fields[i].items[k];
+                        if (it.value === newValue) {
+                          it.element.click();
                           return;
                         }
                       }

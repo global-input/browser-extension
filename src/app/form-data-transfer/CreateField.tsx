@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { InputWithLabel, ControlLayout,FormContainer, RadioButton } from '../app-layout';
+import { Title,InputWithLabel, TextButton, FormFooter, BasicLayout, FormContainer, RadioButton } from '../app-layout';
 import { useMobile, FormField } from '../mobile';
 
 interface Props {
@@ -7,18 +7,18 @@ interface Props {
     onFormStructureChanged: (formFields: FormField[]) => void;
     back: () => void;
 }
-const AddNewField: React.FC<Props> = ({ formFields, onFormStructureChanged, back }) => {
+const CreateField: React.FC<Props> = ({ formFields, onFormStructureChanged, back }) => {
     const [label, setLabel] = useState('');
     const [fieldType, setFieldType] = useState(FIELDS.type.items[0].value);
     const mobile = useMobile({
-            action: "input",
-            dataType: "form",
-            form: {
-                title: "Adding New Field",
-                fields: Object.values(FIELDS)
-            }
-        });
-    const onAddNew = () => {
+        action: "input",
+        dataType: "form",
+        form: {
+            title: "Creating New Field",
+            fields: Object.values(FIELDS)
+        }
+    });
+    const onCreateNew = () => {
         const newFormFields = createNewFormFields(formFields, label, fieldType);
         if (newFormFields) {
             onFormStructureChanged(newFormFields);
@@ -37,26 +37,29 @@ const AddNewField: React.FC<Props> = ({ formFields, onFormStructureChanged, back
             case FIELDS.name.id:
                 setLabel(field.value as string);
                 break;
-            case FIELDS.add.id:
-                onAddNew();
+            case FIELDS.createField.id:
+                onCreateNew();
                 break;
             case FIELDS.cancel.id:
                 back();
         }
     });
-    const {sendValue}=mobile;
+    const { sendValue } = mobile;
 
     const setFormLabel = useCallback((value: string) => {
         setLabel(value);
         sendValue(FIELDS.name.id, value);
     }, [setLabel, sendValue]);
     return (
-        <ControlLayout title="Form Data Transfer"  mobile={mobile}>
-            <FormContainer title="Adding New Field">
+        <BasicLayout title="Form Manager">
+            <FormContainer title="Creating Field">
+
+
                 <InputWithLabel label="Name of the field" id="newFieldLabel"
                     onChange={setFormLabel}
                     value={label} />
-
+                <FormContainer>
+                    <Title>Type:</Title>
                 <RadioButton name="fieldType" checked={fieldType === FIELDS.type.items[0].value} label="Single-line" onChange={() => {
                     setFieldType(FIELDS.type.items[0].value);
                     mobile.sendValue(FIELDS.type.id, FIELDS.type.items[0].value);
@@ -65,8 +68,17 @@ const AddNewField: React.FC<Props> = ({ formFields, onFormStructureChanged, back
                     setFieldType(FIELDS.type.items[1].value);
                     mobile.sendValue(FIELDS.type.id, FIELDS.type.items[1].value);
                 }} />
+                <RadioButton name="fieldType" checked={fieldType === FIELDS.type.items[2].value} label="Password" onChange={() => {
+                    setFieldType(FIELDS.type.items[2].value);
+                    mobile.sendValue(FIELDS.type.id, FIELDS.type.items[2].value);
+                }} />
+                </FormContainer>
             </FormContainer>
-        </ControlLayout>
+            <FormFooter>
+                <TextButton label="Back" onClick={back}/>
+                <TextButton label="Create" onClick={onCreateNew}/>
+            </FormFooter>
+        </BasicLayout>
 
 
 
@@ -87,14 +99,16 @@ const createNewFormFields = (formFields: FormField[], label: string, fieldType: 
             return null;
         }
     }
-    return [...formFields, { id, label, value: '', nLines }];
+    const type = fieldType === FIELDS.type.items[2].value ? 'secret' : 'text';
+    return [...formFields, { id, label, type, value: '', nLines }];
 };
 
 const FIELDS = {
     name: {
         id: "nameOfNewField",
         type: "text",
-        value: ""
+        value: "",
+        label:"Name of the field"
     },
     type: {
         id: "multiLines",
@@ -104,7 +118,9 @@ const FIELDS = {
         value: 'single-line',
         items: [
             { value: "single-line", label: "Single-line" },
-            { value: "multi-line", label: "Multi-line" }
+            { value: "multi-line", label: "Multi-line" },
+            { value: "password", label: "secret" }
+
         ]
     },
     cancel: {
@@ -113,12 +129,12 @@ const FIELDS = {
         type: "button",
         viewId: "row1"
     },
-    add: {
-        id: "addNew",
-        label: "Add",
+    createField: {
+        id: "createNew",
+        label: "Create",
         type: "button",
         viewId: "row1"
     }
 }
 
-export default AddNewField;
+export default CreateField;

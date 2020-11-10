@@ -1338,7 +1338,7 @@
       ]
    }, {
       "hostnames": {
-         "value": "www.join.me"
+         "value": ["www.join.me","accounts.logme.in"]
       },
       "forms": [{
          "title": "Join Me Sign In",

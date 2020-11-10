@@ -1,48 +1,49 @@
-import React, { useState } from 'react';
-import { ControlLayout,FormContainer, CheckboxButton } from '../app-layout';
+import React, { useEffect, useState } from 'react';
+import { BasicLayout,FormContainer, CheckboxButton, FormFooter, TextButton } from '../app-layout';
 import { useMobile,FormField } from '../mobile';
 interface Props {
     formFields: FormField[];
     onFormStructureChanged: (formFields: FormField[]) => void;
     back: () => void;
+    createField: ()=>void;
+
 }
 
-const DeleteFields: React.FC<Props> = ({ formFields, onFormStructureChanged, back }) => {
+
+const ManagerForm: React.FC<Props> = ({ formFields, onFormStructureChanged, back, createField }) => {
     const [items, setItems] = useState(() => createSelectableItems(formFields));
-    const mobile = useMobile({
-            action: "input",
-            dataType: "form",
-            form: {
-                title: "Deleting Fields",
-                fields: [{ ...FIELDS.select, items }, FIELDS.cancel, FIELDS.delete]
-            }
-        });
+
+    const mobile = useMobile(()=>initData(items));
+    const onDelete = () => {
+        const newFormFields = deleteFormFields(formFields, items);
+        if (newFormFields) {
+            onFormStructureChanged(newFormFields);
+            const items=createSelectableItems(newFormFields);
+            setItems(items);
+            mobile.sendInitData(initData(items));
+        }
+    };
     mobile.setOnchange(({ field }) => {
         switch (field.id) {
             case FIELDS.select.id:
                 const newItems = updateSelection(items, field.value as string[]);
                 setItems(newItems);
                 break;
-            case FIELDS.cancel.id:
+            case FIELDS.back.id:
                 back();
                 break;
             case FIELDS.delete.id:
-                const newFormFields = deleteFormFields(formFields, items);
-                if (newFormFields) {
-                    onFormStructureChanged(newFormFields);
-                    back();
-                }
+                onDelete();
+                break;
+            case FIELDS.create.id:
+                createField();
                 break;
             default:
-
-
-
         }
     });
 
     const toggleSelected = (itm: Item) => {
         const values: string[] = [];
-
         const newItems = items.map((f) => {
             if (f === itm) {
                 f = { ...f, selected: !f.selected };
@@ -53,13 +54,12 @@ const DeleteFields: React.FC<Props> = ({ formFields, onFormStructureChanged, bac
             return f;
         });
         setItems(newItems);
-
         mobile.sendValue(FIELDS.select.id, values);
     }
 
     return (
-        <ControlLayout title="Form Data Transfer"  mobile={mobile}>
-            <FormContainer title="Deleting Fields">
+        <BasicLayout title="Form Manager">
+            <FormContainer title="List Fields">
                 {items.map(item => (
                     <CheckboxButton
                         label={item.label as string}
@@ -67,7 +67,12 @@ const DeleteFields: React.FC<Props> = ({ formFields, onFormStructureChanged, bac
                         key={item.value as string} />)
                 )}
         </FormContainer>
-        </ControlLayout>
+        <FormFooter>
+                <TextButton label="Back" onClick={back}/>
+                <TextButton label="Delete" onClick={onDelete}/>
+                <TextButton label="Create" onClick={createField}/>
+            </FormFooter>
+        </BasicLayout>
 
     )
 };
@@ -86,21 +91,39 @@ const FIELDS = {
         type: "list",
         selectType: "multiple",
         value: null,
-        items: ["dd", "dd"]
+        items: []
     },
-    cancel: {
-        id: "cancelDelete",
-        label: "Cancel",
+    back: {
+        id: "Back",
+        label: "Back",
         type: "button",
         viewId: "row1"
     },
     delete: {
         id: "deleteSelected",
-        label: "Delete",
+        label: "Delete Selected",
+        type: "button",
+        viewId: "row1"
+    },
+    create:{
+        id: "createNewField",
+        label: "Create",
         type: "button",
         viewId: "row1"
     }
+
 };
+
+const initData =(items:Item[])=>{
+    return {
+        action: "input",
+        dataType: "form",
+        form: {
+            title: "Form Manager",
+            fields: [{ ...FIELDS.select, items }, FIELDS.back, FIELDS.delete, FIELDS.create]
+        }
+    };
+}
 
 
 
@@ -139,4 +162,4 @@ const deleteFormFields = (formFields: FormField[], items: Item[]) => {
     return modified ? newFormFields : null;
 };
 
-export default DeleteFields;
+export default ManagerForm;

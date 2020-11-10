@@ -29,9 +29,8 @@ const ConnectionSettings:React.FC<Props> =({back})=>{
             </FormFooter>
          <MessageContainer>
     You can use this configuration to use your own <MessageLink href="https://github.com/global-input/global-input-node">WebSocket Proxy Server</MessageLink>
-    that relays encrypted messages between your browser extension and your mobile app, and the end-to-end encryption ensures that the messages are
-    not visible to the server, meaning that you can install it in an insecure environment.
-
+    that provides connectivity between your mobile app and your browser extension, allowing them to exchange encrypted messages. The end-to-end encryption ensures that the messages are
+    readable only to your mobile app and your browser extension. This means that you can install <MessageLink href="https://github.com/global-input/global-input-node">WebSocket Proxy Server</MessageLink> in an insecure environment.
 </MessageContainer>
 
 

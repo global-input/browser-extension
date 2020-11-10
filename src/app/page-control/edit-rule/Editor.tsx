@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { TextButton, Title, DisplayErrorMessage, MessageButton, InputWithLabel, FormFooter, FormContainer, BasicLayout } from '../../app-layout';
 import { useMobile } from '../../mobile';
 interface Props {
@@ -68,10 +68,11 @@ const Editor: React.FC<Props> = ({ back, domain, initialContent, saveRule, loadL
                 )}
                 <FormFooter>
                     <TextButton onClick={back} label='Cancel' />
+                    <TextButton label="Use Preset" onClick={loadLoadFromPreset} />
                     <TextButton onClick={onSave} label='Save' />
                 </FormFooter>
             </FormContainer>
-            <MessageButton label="Load Example" onClick={loadLoadFromPreset} />
+
         </BasicLayout>);
 
 }
