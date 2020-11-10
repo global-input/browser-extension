@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useMobile } from './mobile';
 
-import { ControlLayout, AppFooter, MessageContainer, MessageButton, MessageLink } from './app-layout';
+import { ControlLayout, AppFooter, MessageContainer, MessageButton, MessageLink, FormFooter, TextButton } from './app-layout';
 
 
 export enum PAGES {
@@ -60,6 +60,9 @@ const MainPage: React.FC<Props> = ({ setPage, domain }) => {
             <MessageContainer>
                 You can now operate on your mobile
         </MessageContainer>
+        <FormFooter>
+            <TextButton onClick={mobile.restart} label="Disconnect"/>
+        </FormFooter>
         </ControlLayout>
     );
 }

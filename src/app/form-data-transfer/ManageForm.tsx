@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { BasicLayout, FormContainer, CheckboxButton, FormFooter, TextButton } from '../app-layout';
 import { useMobile, FormField } from '../mobile';
 interface Props {

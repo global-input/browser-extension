@@ -223,7 +223,7 @@
                   }
                },
                {
-                  "id": "twofactorcode",
+                  "id": "twoFactorCode",
                   "selector": "input[id=\"totpPin\"]",
                   "type": "text",
                   "data": {
@@ -246,7 +246,7 @@
          {
             "title": "2-step Verification",
             "fields": [{
-                  "id": "twofactorcode",
+                  "id": "twoFactorCode",
                   "type": "text",
                   "selector": "input[id=\"idvPin\"]",
                   "data": {
@@ -434,7 +434,7 @@
                   "type": "text",
                   "selector": "input[id=\"code\"]",
                   "data": {
-                     "label": "Verfication Code"
+                     "label": "Verification Code"
                   }
                },
                {
@@ -1003,7 +1003,7 @@
          {
             "title": "GitHub Two-factor",
             "fields": [{
-                  "id": "twofactorcode",
+                  "id": "twoFactorCode",
                   "type": "secret",
                   "selector": "input[id=\"otp\"]",
                   "data": {
@@ -1935,7 +1935,7 @@
          "value": "anypoint.mulesoft.com"
       },
       "forms": [{
-         "title": "Anypoint",
+         "title": "AnyPoint",
          "fields": [{
                "id": "username",
                "type": "text",

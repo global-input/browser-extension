@@ -22,7 +22,7 @@ interface Props {
 }
 
 
-export default (props: Props) => {
+const InputWithCopy = (props: Props) => {
   const [message, setMessage] = useState<string | null>('');
   const timerHandler = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
@@ -116,4 +116,6 @@ const styles = {
   }
 
 
-}
+};
+
+export default InputWithCopy;

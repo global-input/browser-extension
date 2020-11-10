@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import * as rules from './rules';
 import * as chromeExtension from '../chrome-extension';
-import { useLoader } from './controles';
-import { TextButton, MessageContainer, DisplayErrorMessage, LoadingCircle, ControlLayout } from '../app-layout';
+import { useLoader } from './controllers';
+import { ControlLayout } from '../app-layout';
 
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const ProcessControl: React.FC<Props> = ({ back, domain, rule, editRule, pageControl }) => {
-    const { status, message, onError, display, mobile } = useLoader({ domain, back, editRule });
+    const { onError, display, mobile } = useLoader({ domain, back, editRule });
     useEffect(() => {
         if (!domain) {
             onError("The domain of the loaded page cannot be identified.");

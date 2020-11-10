@@ -50,6 +50,7 @@ export const loadConnectionSettings = (): ConnectionSettings => {
     let apikey = getAPIKey();
     return {
         url: url ? url : "https://globalinput.co.uk",
+        /* cSpell:disable */
         apikey: apikey ? apikey : "k7jc3QcMPKEXGW5UC"
     };
 

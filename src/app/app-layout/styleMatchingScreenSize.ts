@@ -54,7 +54,7 @@ let screenMedia = {
     }
 };
 
-export default function (namedState: any) {
+const styleMatchingScreenSize= function (namedState: any) {
 
     if (this.bigScreen) {
 
@@ -100,3 +100,5 @@ export default function (namedState: any) {
     }
 
 }
+
+export default styleMatchingScreenSize;

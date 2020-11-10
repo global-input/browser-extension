@@ -22,20 +22,20 @@ const InputWithLabel: React.FC<Props> = (props) => {
     const [focus, setFocus] = useState(false);
     const elem = useRef<HTMLInputElement>(null);
 
-    let stylestatus: StyleStatus = {
+    let styleStatus: StyleStatus = {
         label: "",
         field: ""
     }
     if (elem.current) {
         if ((!focus) && (!elem.current.value)) {
-            stylestatus.label = "placeholder"
+            styleStatus.label = "placeholder"
         }
     }
     else if ((!focus) && (!props.value)) {
-        stylestatus.label = "placeholder"
+        styleStatus.label = "placeholder"
     }
     if (props.readOnly) {
-        stylestatus.field = "readOnly"
+        styleStatus.field = "readOnly"
     }
 
     const labelClicked = useCallback(() => {
@@ -47,12 +47,12 @@ const InputWithLabel: React.FC<Props> = (props) => {
         return (
             <div style={styles.container}>
                 <label htmlFor={props.id} onClick={labelClicked}>
-                    <span style={styles.arealabel.get(stylestatus.label)}>{props.label}</span>
+                    <span style={styles.arealabel.get(styleStatus.label)}>{props.label}</span>
                 </label>
 
                 <textarea
                     id={props.id}
-                    style={styles.field.get(stylestatus.field)}
+                    style={styles.field.get(styleStatus.field)}
                     readOnly={props.readOnly}
                     rows={6}
                     onFocus={() => setFocus(true)}
@@ -70,13 +70,13 @@ const InputWithLabel: React.FC<Props> = (props) => {
         return (
             <div style={styles.container}>
                 <label htmlFor={props.id} onClick={labelClicked}>
-                    <span style={styles.label.get(stylestatus.label)}>{props.label}</span>
+                    <span style={styles.label.get(styleStatus.label)}>{props.label}</span>
                 </label>
                 <input
                     id={props.id}
                     ref={elem => elem}
                     type={props.type}
-                    style={styles.field.get(stylestatus.field)}
+                    style={styles.field.get(styleStatus.field)}
                     readOnly={props.readOnly}
                     min={props.min}
                     max={props.max}
