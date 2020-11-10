@@ -1,6 +1,6 @@
 {
   "name": "browser-extension",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -18,7 +18,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "env INLINE_RUNTIME_CHUNK=false react-scripts build",
-    "package": "rm -rf build && npm run build && cd build && rm service-worker.js && rm precache-manifest* && zip -r ./globalinputapp.zip .",
+    "package": "rm -rf build && npm run build && cd build && zip -r ./globalinputapp.zip .",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
