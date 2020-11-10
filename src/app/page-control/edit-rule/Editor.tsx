@@ -55,11 +55,11 @@ const Editor: React.FC<Props> = ({ back, domain, initialContent, saveRule, loadL
 
     return (
 
-        <BasicLayout title="Edit Rule">
+        <BasicLayout title="Edit Rules">
             <FormContainer>
 
                 <Title>{domain}</Title>
-                <InputWithLabel label="Rule" id="content"
+                <InputWithLabel label="Rules" id="content"
                     onChange={onContentChange}
                     type="textarea"
                     value={content} />

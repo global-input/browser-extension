@@ -20,7 +20,7 @@ const Editor: React.FC<Props> = ({ back, domain, loadRule }) => {
         action: "input",
         dataType: "form",
         form: {
-            title: "Examples",
+            title: "Preset Rules",
             fields: [FIELDS.info, { ...FIELDS.editor, value: content }, FIELDS.back, FIELDS.use]
         }
     });
