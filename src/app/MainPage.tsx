@@ -47,6 +47,9 @@ const MainPage: React.FC<Props> = ({ setPage, domain }) => {
         }
     });
     const toEditConnectionSettings = useCallback(() => setPage(PAGES.EDIT_CONNECTION_SETTINGS), [setPage]);
+    const {restart}=mobile;
+    const disconnect=useCallback(()=>restart(),[restart]);
+
     const NotConnected = () => (
         <AppFooter>
             <MessageButton label="Settings" onClick={toEditConnectionSettings} />
@@ -61,7 +64,7 @@ const MainPage: React.FC<Props> = ({ setPage, domain }) => {
                 You can now operate on your mobile
         </MessageContainer>
         <FormFooter>
-            <TextButton onClick={mobile.restart} label="Disconnect"/>
+            <TextButton onClick={disconnect} label="Disconnect"/>
         </FormFooter>
         </ControlLayout>
     );
