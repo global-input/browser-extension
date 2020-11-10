@@ -17,7 +17,7 @@ const Editor: React.FC<Props> = ({ back, domain, initialContent, saveRule, loadL
         dataType: "form",
         form: {
             title: "Edit Rules",
-            fields: [{ ...FIELDS.domain, value: domain },FIELDS.info, { ...FIELDS.editor, value: content }, FIELDS.cancel, FIELDS.save, FIELDS.loadFromPreset]
+            fields: [{ ...FIELDS.domain, value: domain }, FIELDS.info, { ...FIELDS.editor, value: content }, FIELDS.cancel, FIELDS.save, FIELDS.loadFromPreset]
         }
     });
     const onSave = () => {
@@ -82,10 +82,10 @@ const FIELDS = {
         type: 'info',
         value: '',
     },
-    info:{
-        id:'info',
-        type:"info",
-        value:"Please operate in the extension window on your computer",
+    info: {
+        id: 'info',
+        type: "info",
+        value: "Please operate in the extension window on your computer",
         viewId: "row3"
     },
     editor: {

@@ -81,7 +81,7 @@ export const useLoader = ({ back, domain, editRule }: LoaderProps) => {
             default:
         }
     });
-    const display=(
+    const display = (
         <>
             <MessageContainer>
                 {status === STATUS.LOADING && (<LoadingCircle />)}
@@ -140,16 +140,16 @@ export const useControl = ({ back, domain, form, editRule, loadRule }: ControlPr
             default:
         }
     });
-    const display=(
+    const display = (
         <>
-        <MessageContainer>
-            You can use your mobile to operate on the page.
+            <MessageContainer>
+                You can use your mobile to operate on the page.
         </MessageContainer>
-         <FormFooter>
-            <TextButton onClick={back} label='Back' />
-            <TextButton onClick={editRule} label='Edit Rule' />
-        </FormFooter>
+            <FormFooter>
+                <TextButton onClick={back} label='Back' />
+                <TextButton onClick={editRule} label='Edit Rule' />
+            </FormFooter>
         </>
     );
-    return { mobile,display };
+    return { mobile, display };
 }

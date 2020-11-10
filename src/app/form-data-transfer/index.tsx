@@ -24,7 +24,7 @@ const MainControl: React.FC<Props> = ({ domain, back }) => {
 
     const onFormStructureChanged = (formFields: FormField[]) => {
         setFormFields(formFields);
-        storage.saveFormFields(domain,formFields);
+        storage.saveFormFields(domain, formFields);
     };
     const transferFormData = useCallback(() => setPage(PAGES.TRANSFER_FORM_DATA), []);
     const manageForm = useCallback(() => setPage(PAGES.MANAGER_FORM), []);

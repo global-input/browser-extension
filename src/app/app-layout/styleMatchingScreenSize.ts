@@ -1,7 +1,7 @@
 let screenMedia = {
     screenmedias: [] as any[],
-    biggerThan: function (width:number) {
-        var matched = this.screenmedias.filter((s:any) => s.width === width);
+    biggerThan: function (width: number) {
+        var matched = this.screenmedias.filter((s: any) => s.width === width);
         if (matched.length) {
             return matched[0].media.matches;
         }
@@ -12,7 +12,7 @@ let screenMedia = {
         this.screenmedias.push(scm);
         return scm.media.matches;
     },
-    getScreenStyle: function (defaultStyle:any, specificStyle:any, target:any, name:string, namedState:string) {
+    getScreenStyle: function (defaultStyle: any, specificStyle: any, target: any, name: string, namedState: string) {
 
         if (!target.computedStyles) {
             target.computedStyles = [];
@@ -54,8 +54,8 @@ let screenMedia = {
     }
 };
 
-export default function (namedState:any) {
-    
+export default function (namedState: any) {
+
     if (this.bigScreen) {
 
         if (screenMedia.biggerThan(1440)) {

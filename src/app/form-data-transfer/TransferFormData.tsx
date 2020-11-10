@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react';
 
-import { useMobile,FormField} from '../mobile';
+import { useMobile, FormField } from '../mobile';
 import * as chromeExtension from '../chrome-extension';
 import * as cache from './cache';
 
-import {ControlLayout, FormContainer, DisplayInputCopyField, TextButton, FormFooter } from '../app-layout';
+import { ControlLayout, FormContainer, DisplayInputCopyField, TextButton, FormFooter } from '../app-layout';
 
 const computerFormId = (domain: string, fields: FormField[]) => {
     const id = fields.length ? '###' + fields[0].id + '###' : 'credential';
@@ -68,24 +68,24 @@ interface Props {
     formFields: FormField[];
     setFormFields: (formFields: FormField[]) => void;
     back: () => void;
-    manageForm:()=>void;
+    manageForm: () => void;
 };
 const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, manageForm, back }) => {
     const [visibility, setVisibility] = useState(FIELDS.visibility.options[0]);
     const mobile = useMobile(() => {
         const id = computerFormId(domain, formFields);
         return {
-                form: {
-                    id,
-                    title: domain,
-                    label: "web",
-                    domain: domain,
-                    fields: [...Object.values(FIELDS),
-                    ...formFields]
-                }
-            };
-        });
-    const {sendValue}=mobile;
+            form: {
+                id,
+                title: domain,
+                label: "web",
+                domain: domain,
+                fields: [...Object.values(FIELDS),
+                ...formFields]
+            }
+        };
+    });
+    const { sendValue } = mobile;
     const toggleVisibility = useCallback(() => {
         const vis = visibility === FIELDS.visibility.options[0] ? FIELDS.visibility.options[1] : FIELDS.visibility.options[0];
         setVisibility(vis);
@@ -115,35 +115,35 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
         }
     });
     const onCopied = () => {
-        const key=cache.saveCacheFields(domain,formFields);
-        if(key){
+        const key = cache.saveCacheFields(domain, formFields);
+        if (key) {
             chromeExtension.sendKey(key);
         }
     };
 
     return (
-    <ControlLayout title="Form Data Transfer" domain={domain} mobile={mobile}>
-<FormContainer>
-            {formFields.map((formField, index) => (<DisplayInputCopyField
-                field={formField}
-                key={formField.id}
-                onCopied={onCopied}
-                hideValue={visibility.value === 0} onChange={value => {
-                    const changedFormFields = computeChangedFormFields(formFields, formField.id, value, index);
-                    if (changedFormFields) {
-                        setFormFields(changedFormFields);
-                        mobile.sendValue(formField.id as string, value, index);
+        <ControlLayout title="Form Data Transfer" domain={domain} mobile={mobile}>
+            <FormContainer>
+                {formFields.map((formField, index) => (<DisplayInputCopyField
+                    field={formField}
+                    key={formField.id}
+                    onCopied={onCopied}
+                    hideValue={visibility.value === 0} onChange={value => {
+                        const changedFormFields = computeChangedFormFields(formFields, formField.id, value, index);
+                        if (changedFormFields) {
+                            setFormFields(changedFormFields);
+                            mobile.sendValue(formField.id as string, value, index);
+                        }
                     }
-                }
-                } />))}
+                    } />))}
 
 
-    </FormContainer>
-    <FormFooter>
-        <TextButton onClick={back} label="Back"/>
-        <TextButton onClick={toggleVisibility} label={visibility.label} />
-        <TextButton onClick={manageForm} label="Manage" />
-    </FormFooter>
+            </FormContainer>
+            <FormFooter>
+                <TextButton onClick={back} label="Back" />
+                <TextButton onClick={toggleVisibility} label={visibility.label} />
+                <TextButton onClick={manageForm} label="Manage" />
+            </FormFooter>
         </ControlLayout>);
 
 

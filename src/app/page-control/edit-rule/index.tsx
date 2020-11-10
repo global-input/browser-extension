@@ -36,7 +36,7 @@ export const EditRule: React.FC<Props> = ({ back, domain }) => {
         case PAGES.EDIT:
             return (<Editor back={back} domain={domain} initialContent={content} saveRule={saveRule} loadLoadFromPreset={loadLoadFromPreset} />);
         case PAGES.LOAD_FROM_PRESET:
-            return (<LoadFromPreset back={toEdit} domain={domain} loadRule={loadRule}/>)
+            return (<LoadFromPreset back={toEdit} domain={domain} loadRule={loadRule} />)
         default:
     }
     return null;

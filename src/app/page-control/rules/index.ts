@@ -50,8 +50,8 @@ export interface FormRule {
     title: string;
     fields: FieldRule[];
     formid?: FormIdRule;
-    id?:string;
-    type?:string;
+    id?: string;
+    type?: string;
 }
 interface HostNamesRule {
     value: string | string[];
@@ -97,9 +97,9 @@ export const findRuleByDomain = (domain: string) => {
     return findPresetRuleByDomain(domain);
 };
 
-const ruleToString=(rule:PageRule)=>{
+const ruleToString = (rule: PageRule) => {
     const ruleToEdit = {
-            forms: rule.forms
+        forms: rule.forms
     } //take away hostnames
     return JSON.stringify(ruleToEdit, null, 2);
 }
@@ -110,10 +110,10 @@ export const getRulesForEdit = (domain: string) => {
         return ruleString;
     }
     const rule = findPresetRuleByDomain(domain);
-    return rule?ruleToString(rule):'';
+    return rule ? ruleToString(rule) : '';
 };
-export const getPresetRuleByIndexForEdit = (index:number) => {
-    if(index<0 ||index>=presetRules.length){
+export const getPresetRuleByIndexForEdit = (index: number) => {
+    if (index < 0 || index >= presetRules.length) {
         return "";
     }
     return ruleToString(presetRules[index]);
@@ -160,7 +160,7 @@ export const mapField = (fieldRule: FieldRule): FormField => {
 type OnFieldInput = (fieldRule: FieldRule, value: FieldValue) => void;
 
 
-export const buildFormFieldsFieldRules = (form:FormRule, onFieldInput: OnFieldInput) => {
+export const buildFormFieldsFieldRules = (form: FormRule, onFieldInput: OnFieldInput) => {
     return form.fields.map((fieldRule: FieldRule) => {
         return {
             id: mapFieldId(fieldRule),

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { TextButton, Title,SelectItems,MessageContainer, InputWithLabel, FormFooter,FormContainer, BasicLayout } from '../../app-layout';
+import { TextButton, Title, SelectItems, MessageContainer, InputWithLabel, FormFooter, FormContainer, BasicLayout } from '../../app-layout';
 import { useMobile, FormField } from '../../mobile';
 import * as rules from '../rules';
 
@@ -7,27 +7,27 @@ import * as rules from '../rules';
 interface Props {
     back: () => void;
     domain: string;
-    loadRule:(content:string)=>void;
+    loadRule: (content: string) => void;
 }
-const Editor: React.FC<Props> = ({ back, domain,loadRule}) => {
-    const [selectedValue,setSelectedValue]=useState('0');
-    const [content,setContent] = useState<string>(()=>rules.getPresetRuleByIndexForEdit(0));
-    const selectionItems= useMemo(()=>{
+const Editor: React.FC<Props> = ({ back, domain, loadRule }) => {
+    const [selectedValue, setSelectedValue] = useState('0');
+    const [content, setContent] = useState<string>(() => rules.getPresetRuleByIndexForEdit(0));
+    const selectionItems = useMemo(() => {
         return rules.buildSelectionItems()
-    },[])
+    }, [])
 
     const mobile = useMobile({
         action: "input",
         dataType: "form",
         form: {
             title: "Examples",
-            fields: [FIELDS.info,{...FIELDS.editor,value:content},FIELDS.back, FIELDS.use]
+            fields: [FIELDS.info, { ...FIELDS.editor, value: content }, FIELDS.back, FIELDS.use]
         }
     });
-    const onUse= ()=>loadRule(content);
+    const onUse = () => loadRule(content);
 
-    mobile.setOnchange(({field})=>{
-        switch(field.id){
+    mobile.setOnchange(({ field }) => {
+        switch (field.id) {
             case FIELDS.back.id:
                 back();
                 break;
@@ -39,19 +39,19 @@ const Editor: React.FC<Props> = ({ back, domain,loadRule}) => {
                 break;
         }
     });
-    const {sendValue}=mobile;
-    const onContentChange=useCallback((content:string)=>{
+    const { sendValue } = mobile;
+    const onContentChange = useCallback((content: string) => {
         setContent(content);
-        sendValue(FIELDS.editor.id,content);
-    },[sendValue]);
-    const onChangeContent=(content:string)=>{
+        sendValue(FIELDS.editor.id, content);
+    }, [sendValue]);
+    const onChangeContent = (content: string) => {
         setContent(content);
-        mobile.sendValue(FIELDS.editor.id,content);
+        mobile.sendValue(FIELDS.editor.id, content);
     }
 
-    const onSelectionChange=(evt:React.ChangeEvent<HTMLSelectElement>)=>{
+    const onSelectionChange = (evt: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedValue(evt.target.value);
-        const rule=rules.getPresetRuleByIndexForEdit(parseInt(evt.target.value));
+        const rule = rules.getPresetRuleByIndexForEdit(parseInt(evt.target.value));
         onChangeContent(rule);
     }
 
@@ -60,18 +60,18 @@ const Editor: React.FC<Props> = ({ back, domain,loadRule}) => {
 
         <BasicLayout title="Preset Rules">
             <FormContainer>
-            <SelectItems id="rulSelection" items={selectionItems} value={selectedValue} label="Select:" onChange={onSelectionChange}/>
-            <InputWithLabel label="Rule" id="content"
-                onChange={onContentChange}
-                type="textarea"
-                value={content}/>
+                <SelectItems id="rulSelection" items={selectionItems} value={selectedValue} label="Select:" onChange={onSelectionChange} />
+                <InputWithLabel label="Rule" id="content"
+                    onChange={onContentChange}
+                    type="textarea"
+                    value={content} />
 
 
 
-            <FormFooter>
-                <TextButton onClick={back} label='Cancel' />
-                <TextButton onClick={onUse} label='Use' />
-            </FormFooter>
+                <FormFooter>
+                    <TextButton onClick={back} label='Cancel' />
+                    <TextButton onClick={onUse} label='Use' />
+                </FormFooter>
 
             </FormContainer>
 
@@ -81,10 +81,10 @@ const Editor: React.FC<Props> = ({ back, domain,loadRule}) => {
 }
 
 const FIELDS = {
-    info:{
-        id:'info',
-        type:"info",
-        value:"Please operate in the extension window on your computer"
+    info: {
+        id: 'info',
+        type: "info",
+        value: "Please operate in the extension window on your computer"
     },
     editor: {
         id: 'editor',

@@ -1,24 +1,24 @@
 import React from 'react';
 import { useMobile } from '../mobile';
-import { InputWithCopy, TextButton, ControlLayout, FormContainer,FormFooter } from '../app-layout';
+import { InputWithCopy, TextButton, ControlLayout, FormContainer, FormFooter } from '../app-layout';
 
 
 interface Props {
     content: string;
     finish: () => void;
-    contentOnComputer:(content:string)=>void;
-    showOnMobile:(content:string)=>void;
+    contentOnComputer: (content: string) => void;
+    showOnMobile: (content: string) => void;
 }
-const ShowOnComputer: React.FC<Props> = ({ content, contentOnComputer, showOnMobile,finish }) => {
+const ShowOnComputer: React.FC<Props> = ({ content, contentOnComputer, showOnMobile, finish }) => {
     const mobile = useMobile({
-                action: "input",
-                dataType: "form",
-                form: {
-                    title: "Encryption Completed",
-                    fields:Object.values(FIELDS)
-                }
-            });
-    const restart=()=>contentOnComputer('');
+        action: "input",
+        dataType: "form",
+        form: {
+            title: "Encryption Completed",
+            fields: Object.values(FIELDS)
+        }
+    });
+    const restart = () => contentOnComputer('');
     mobile.setOnchange(({ field }) => {
         switch (field.id) {
             case FIELDS.restart.id:
@@ -38,12 +38,12 @@ const ShowOnComputer: React.FC<Props> = ({ content, contentOnComputer, showOnMob
         <ControlLayout title="Mobile Encryption" mobile={mobile}>
             <FormContainer title="Encrypted Content">
                 <InputWithCopy id="encryptedContent" readOnly={true}
-                        label="Encrypted Content"
-                        type={"textarea"}
-                        value={content} />
+                    label="Encrypted Content"
+                    type={"textarea"}
+                    value={content} />
                 <FormFooter>
-                <TextButton onClick={restart} label='Restart' />
-                <TextButton onClick={finish} label='Finish' />
+                    <TextButton onClick={restart} label='Restart' />
+                    <TextButton onClick={finish} label='Finish' />
                 </FormFooter>
             </FormContainer>
         </ControlLayout>
@@ -60,10 +60,10 @@ const FIELDS = {
         value: ['You can now copy the encrypted content into your clipboard on your computer (in the extension window).',
             'You can also load the encrypted content into your mobile by pressing the "Load into Mobile" button.']
     },
-    restart:{
-        id:"restart",
-        label:"Restart",
-        type:"button",
+    restart: {
+        id: "restart",
+        label: "Restart",
+        type: "button",
         viewId: "row1"
     },
     showOnMobile: {

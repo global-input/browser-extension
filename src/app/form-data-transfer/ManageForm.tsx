@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { BasicLayout,FormContainer, CheckboxButton, FormFooter, TextButton } from '../app-layout';
-import { useMobile,FormField } from '../mobile';
+import { BasicLayout, FormContainer, CheckboxButton, FormFooter, TextButton } from '../app-layout';
+import { useMobile, FormField } from '../mobile';
 interface Props {
     formFields: FormField[];
     onFormStructureChanged: (formFields: FormField[]) => void;
     back: () => void;
-    createField: ()=>void;
+    createField: () => void;
 
 }
 
@@ -13,12 +13,12 @@ interface Props {
 const ManagerForm: React.FC<Props> = ({ formFields, onFormStructureChanged, back, createField }) => {
     const [items, setItems] = useState(() => createSelectableItems(formFields));
 
-    const mobile = useMobile(()=>initData(items));
+    const mobile = useMobile(() => initData(items));
     const onDelete = () => {
         const newFormFields = deleteFormFields(formFields, items);
         if (newFormFields) {
             onFormStructureChanged(newFormFields);
-            const items=createSelectableItems(newFormFields);
+            const items = createSelectableItems(newFormFields);
             setItems(items);
             mobile.sendInitData(initData(items));
         }
@@ -66,11 +66,11 @@ const ManagerForm: React.FC<Props> = ({ formFields, onFormStructureChanged, back
                         checked={item.selected} onChange={() => toggleSelected(item)}
                         key={item.value as string} />)
                 )}
-        </FormContainer>
-        <FormFooter>
-                <TextButton label="Back" onClick={back}/>
-                <TextButton label="Delete" onClick={onDelete}/>
-                <TextButton label="Create" onClick={createField}/>
+            </FormContainer>
+            <FormFooter>
+                <TextButton label="Back" onClick={back} />
+                <TextButton label="Delete" onClick={onDelete} />
+                <TextButton label="Create" onClick={createField} />
             </FormFooter>
         </BasicLayout>
 
@@ -105,7 +105,7 @@ const FIELDS = {
         type: "button",
         viewId: "row1"
     },
-    create:{
+    create: {
         id: "createNewField",
         label: "Create",
         type: "button",
@@ -114,7 +114,7 @@ const FIELDS = {
 
 };
 
-const initData =(items:Item[])=>{
+const initData = (items: Item[]) => {
     return {
         action: "input",
         dataType: "form",

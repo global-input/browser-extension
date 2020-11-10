@@ -48,9 +48,9 @@ const App = () => {
         case PAGES.MAIN_PAGE:
             return (<MainPage domain={domain} setPage={setPage} />);
         case PAGES.EDIT_CONNECTION_SETTINGS:
-            return (<ConnectionSettings back={toHome}/>);
+            return (<ConnectionSettings back={toHome} />);
         case PAGES.PAGE_CONTROL:
-            return (<PageControl back={toHome} domain={domain}/>);
+            return (<PageControl back={toHome} domain={domain} />);
 
         default:
             return null;

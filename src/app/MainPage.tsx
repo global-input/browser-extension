@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useMobile } from './mobile';
 
-import { ControlLayout,AppFooter,MessageContainer,MessageButton,MessageLink} from './app-layout';
+import { ControlLayout, AppFooter, MessageContainer, MessageButton, MessageLink } from './app-layout';
 
 
 export enum PAGES {
@@ -21,13 +21,13 @@ interface Props {
 }
 const MainPage: React.FC<Props> = ({ setPage, domain }) => {
     const mobile = useMobile({
-            action: "input",
-            dataType: "form",
-            form: {
-                title: "Please Select",
-                fields: Object.values(FIELDS)
-            }
-        });
+        action: "input",
+        dataType: "form",
+        form: {
+            title: "Please Select",
+            fields: Object.values(FIELDS)
+        }
+    });
 
     mobile.setOnchange(({ field }) => {
         switch (field.id) {
@@ -46,22 +46,22 @@ const MainPage: React.FC<Props> = ({ setPage, domain }) => {
             default:
         }
     });
-    const toEditConnectionSettings=useCallback(()=>setPage(PAGES.EDIT_CONNECTION_SETTINGS),[setPage]);
-    const NotConnected=()=>(
+    const toEditConnectionSettings = useCallback(() => setPage(PAGES.EDIT_CONNECTION_SETTINGS), [setPage]);
+    const NotConnected = () => (
         <AppFooter>
-            <MessageButton label="Settings" onClick={toEditConnectionSettings}/>
+            <MessageButton label="Settings" onClick={toEditConnectionSettings} />
             <MessageLink href="https://github.com/global-input/browser-extension">Source Code</MessageLink>
         </AppFooter>
 
     )
 
     return (
-    <ControlLayout title="Global Input App" mobile={mobile} notConnected={<NotConnected/>}>
-        <MessageContainer>
-        You can now operate on your mobile
+        <ControlLayout title="Global Input App" mobile={mobile} notConnected={<NotConnected />}>
+            <MessageContainer>
+                You can now operate on your mobile
         </MessageContainer>
-    </ControlLayout>
-        );
+        </ControlLayout>
+    );
 }
 
 

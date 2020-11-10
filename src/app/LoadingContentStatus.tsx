@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BasicLayout, LoadingCircle} from './app-layout';
+import { BasicLayout, LoadingCircle } from './app-layout';
 
 import * as chromeExtension from './chrome-extension';
 

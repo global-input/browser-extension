@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import * as rules from './rules';
 import * as chromeExtension from '../chrome-extension';
-import { useLoader} from './controles';
+import { useLoader } from './controles';
 import { TextButton, MessageContainer, DisplayErrorMessage, LoadingCircle, ControlLayout } from '../app-layout';
 
 

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Title,InputWithLabel, TextButton, FormFooter, BasicLayout, FormContainer, RadioButton } from '../app-layout';
+import { Title, InputWithLabel, TextButton, FormFooter, BasicLayout, FormContainer, RadioButton } from '../app-layout';
 import { useMobile, FormField } from '../mobile';
 
 interface Props {
@@ -60,23 +60,23 @@ const CreateField: React.FC<Props> = ({ formFields, onFormStructureChanged, back
                     value={label} />
                 <FormContainer>
                     <Title>Type:</Title>
-                <RadioButton name="fieldType" checked={fieldType === FIELDS.type.items[0].value} label="Single-line" onChange={() => {
-                    setFieldType(FIELDS.type.items[0].value);
-                    mobile.sendValue(FIELDS.type.id, FIELDS.type.items[0].value);
-                }} />
-                <RadioButton name="fieldType" checked={fieldType === FIELDS.type.items[1].value} label="Multi-line" onChange={() => {
-                    setFieldType(FIELDS.type.items[1].value);
-                    mobile.sendValue(FIELDS.type.id, FIELDS.type.items[1].value);
-                }} />
-                <RadioButton name="fieldType" checked={fieldType === FIELDS.type.items[2].value} label="Password" onChange={() => {
-                    setFieldType(FIELDS.type.items[2].value);
-                    mobile.sendValue(FIELDS.type.id, FIELDS.type.items[2].value);
-                }} />
+                    <RadioButton name="fieldType" checked={fieldType === FIELDS.type.items[0].value} label="Single-line" onChange={() => {
+                        setFieldType(FIELDS.type.items[0].value);
+                        mobile.sendValue(FIELDS.type.id, FIELDS.type.items[0].value);
+                    }} />
+                    <RadioButton name="fieldType" checked={fieldType === FIELDS.type.items[1].value} label="Multi-line" onChange={() => {
+                        setFieldType(FIELDS.type.items[1].value);
+                        mobile.sendValue(FIELDS.type.id, FIELDS.type.items[1].value);
+                    }} />
+                    <RadioButton name="fieldType" checked={fieldType === FIELDS.type.items[2].value} label="Password" onChange={() => {
+                        setFieldType(FIELDS.type.items[2].value);
+                        mobile.sendValue(FIELDS.type.id, FIELDS.type.items[2].value);
+                    }} />
                 </FormContainer>
             </FormContainer>
             <FormFooter>
-                <TextButton label="Back" onClick={back}/>
-                <TextButton label="Create" onClick={onCreateNew}/>
+                <TextButton label="Back" onClick={back} />
+                <TextButton label="Create" onClick={onCreateNew} />
             </FormFooter>
         </BasicLayout>
 
@@ -108,7 +108,7 @@ const FIELDS = {
         id: "nameOfNewField",
         type: "text",
         value: "",
-        label:"Name of the field"
+        label: "Name of the field"
     },
     type: {
         id: "multiLines",

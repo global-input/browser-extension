@@ -3,7 +3,7 @@ import { TextButton, MessageContainer, DisplayErrorMessage, LoadingCircle, Contr
 
 
 import * as rules from './rules';
-import { useLoader} from './controles';
+import { useLoader } from './controles';
 
 
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
 
 const LoadRules: React.FC<Props> = ({ back, domain, editRule, processRule }) => {
 
-    const { status, message, onError, mobile,display } = useLoader({ domain, back, editRule });
+    const { status, message, onError, mobile, display } = useLoader({ domain, back, editRule });
     useEffect(() => {
         if (!domain) {
             onError("The domain of the loaded page cannot be identified.");

@@ -1,5 +1,5 @@
 import React from 'react';
-import {GlobalInputData} from '../mobile';
+import { GlobalInputData } from '../mobile';
 
 import InputWithCopy from './input-with-copy';
 import InputWithLabel from './input-with-label';
@@ -10,7 +10,7 @@ import { RadioButton, CheckboxButton, SelectItems } from './selectable';
 
 export { InputWithLabel, InputWithCopy, TextButton, RadioButton, CheckboxButton, SelectItems };
 
-export const Title:React.FC=({children})=>(
+export const Title: React.FC = ({ children }) => (
     <div style={styles.title}>{children}</div>
 );
 
@@ -22,13 +22,13 @@ const AppTitle: React.FC = ({ children }) => {
 };
 
 interface DisplayErrorMessageProps {
-    errorMessage: string|null;
+    errorMessage: string | null;
 }
-export const DisplayErrorMessage: React.FC<DisplayErrorMessageProps> = ({ errorMessage,children }) => (
-            <div style={styles.appContainer.errorMessage}>
-                {errorMessage}
-                {children}
-            </div>
+export const DisplayErrorMessage: React.FC<DisplayErrorMessageProps> = ({ errorMessage, children }) => (
+    <div style={styles.appContainer.errorMessage}>
+        {errorMessage}
+        {children}
+    </div>
 );
 interface AppContainerProps {
     children: React.ReactNode;
@@ -36,13 +36,13 @@ interface AppContainerProps {
     title: string;
 
 }
-export const AppContainer:React.FC<AppContainerProps> = ({ children, domain, title }) => (
-<div style={styles.appContainer.content}>
+export const AppContainer: React.FC<AppContainerProps> = ({ children, domain, title }) => (
+    <div style={styles.appContainer.content}>
         <AppTitle>{title}</AppTitle>
         <div style={styles.domain}>{domain}</div>
         {children}
     </div>
-    );
+);
 
 
 export const LoadingCircle = () => (
@@ -53,44 +53,44 @@ export const LoadingCircle = () => (
             </path>
         </svg>
     </div>
-    );
+);
 
-const QRCodeContainer:React.FC=({children})=>(
+const QRCodeContainer: React.FC = ({ children }) => (
     <div style={styles.qrCode}>
         {children}
     </div>
-    );
+);
 
 
 
 interface BasicLayoutProps {
     title: string;
-    domain?:string;
-    errorMessage?:string|null;
+    domain?: string;
+    errorMessage?: string | null;
 }
 
-export const  BasicLayout:React.FC<BasicLayoutProps> = ({ title,domain,errorMessage,children }) => (
+export const BasicLayout: React.FC<BasicLayoutProps> = ({ title, domain, errorMessage, children }) => (
     <AppContainer title={title} domain={domain}>
-        {errorMessage?(<DisplayErrorMessage errorMessage={errorMessage}/>):children}
+        {errorMessage ? (<DisplayErrorMessage errorMessage={errorMessage} />) : children}
     </AppContainer>
 );
-export const AppFooter:React.FC =({children})=>(
-        <div style={styles.appContainer.footer}>
-            {children}
-        </div>
+export const AppFooter: React.FC = ({ children }) => (
+    <div style={styles.appContainer.footer}>
+        {children}
+    </div>
 )
 /**
  * Only when the mobile connected and there isn't any error in both mobile and errorMessage passed in, then the children will be displayed
  *
  */
-interface ControlProps extends BasicLayoutProps{
-    mobile:GlobalInputData;
-    notConnected?:React.ReactNode;
+interface ControlProps extends BasicLayoutProps {
+    mobile: GlobalInputData;
+    notConnected?: React.ReactNode;
 }
-export const  ControlLayout:React.FC<ControlProps> = ({ title,errorMessage,mobile,domain,notConnected,children }) =>  (
+export const ControlLayout: React.FC<ControlProps> = ({ title, errorMessage, mobile, domain, notConnected, children }) => (
     <AppContainer title={title} domain={domain}>
-        {mobile.isReady && (<QRCodeContainer><mobile.ConnectQR/></QRCodeContainer>)}
-        {(errorMessage || mobile.isError) ?(<DisplayErrorMessage errorMessage={errorMessage?errorMessage:mobile.errorMessage}/>):(mobile.isConnected && children)}
+        {mobile.isReady && (<QRCodeContainer><mobile.ConnectQR /></QRCodeContainer>)}
+        {(errorMessage || mobile.isError) ? (<DisplayErrorMessage errorMessage={errorMessage ? errorMessage : mobile.errorMessage} />) : (mobile.isConnected && children)}
         {(!mobile.isConnected) && notConnected}
     </AppContainer>
 );
@@ -100,19 +100,19 @@ interface MessageProps {
     title?: string;
 }
 
-export const MessageContainer:React.FC<MessageProps> = ({ children, title }) => (
-<div style={styles.message.container}>
-    {title && (<Title>{title}</Title>)}
-    <div style={styles.message.text}>
-        {children}
+export const MessageContainer: React.FC<MessageProps> = ({ children, title }) => (
+    <div style={styles.message.container}>
+        {title && (<Title>{title}</Title>)}
+        <div style={styles.message.text}>
+            {children}
+        </div>
     </div>
-</div>
 );
 
 
-interface FormContainerProps{
-    domain?:string;
-    title?:string;
+interface FormContainerProps {
+    domain?: string;
+    title?: string;
 }
 export const FormContainer: React.FC<FormContainerProps> = ({ children, title }) => {
     return (<div style={styles.form.container}>
@@ -131,7 +131,7 @@ interface DisplayInputCopyFieldProps {
     onCopied: () => void;
 }
 
-export const DisplayInputCopyField:React.FC<DisplayInputCopyFieldProps> = ({ field, hideValue, onChange, onCopied }) => {
+export const DisplayInputCopyField: React.FC<DisplayInputCopyFieldProps> = ({ field, hideValue, onChange, onCopied }) => {
     var fieldType = "text";
     if (field.nLines && field.nLines > 1) {
         fieldType = "textarea";
@@ -156,18 +156,18 @@ export const FormFooter: React.FC = ({ children }) => (
     </div>
 );
 
-interface MessageLinkProps{
+interface MessageLinkProps {
     href?: string;
-    onClick?: ()=>void;
+    onClick?: () => void;
 }
 
-export const MessageLink:React.FC<MessageLinkProps>=({href,onClick,children})=>{
+export const MessageLink: React.FC<MessageLinkProps> = ({ href, onClick, children }) => {
     return (<a href={href} style={styles.message.alink} rel='noreferrer noopener' target='_blank'>{children}</a>);
 };
 
-interface MessageButtonProp{
-    label:string;
-    onClick:()=>void;
+interface MessageButtonProp {
+    label: string;
+    onClick: () => void;
 }
 
-export const MessageButton:React.FC<MessageButtonProp>=({label,onClick})=>(<button style={styles.message.alink} onClick={onClick}>{label}</button>)
+export const MessageButton: React.FC<MessageButtonProp> = ({ label, onClick }) => (<button style={styles.message.alink} onClick={onClick}>{label}</button>)

@@ -1,4 +1,4 @@
-const styles= {
+const styles = {
     loading: {
         display: "flex",
         flexDirection: 'row' as 'row',
@@ -15,7 +15,7 @@ const styles= {
         fontWeight: 100,
         whiteSpace: 'nowrap' as 'nowrap',
         padding: 10,
-        color:"#153E85"
+        color: "#153E85"
     },
     qrCode: {
         minWidth: 450,
