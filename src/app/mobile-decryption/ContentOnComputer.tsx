@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useMobile } from '../mobile';
 import {
-    InputWithLabel, ControlLayout, FormContainer, DisplayErrorMessage,
+    InputWithLabel, BasicLayout, FormContainer, DisplayErrorMessage,
     TextButton, FormFooter
 } from '../app-layout'
 
@@ -43,7 +43,7 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent, contentOnMobile, s
             case FIELDS.contentOnMobile.id:
                 contentOnMobile(content);
                 break;
-            case FIELDS.startEncrypt.id:
+            case FIELDS.startDecrypt.id:
                 onDecrypt();
                 break;
             default:
@@ -52,7 +52,7 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent, contentOnMobile, s
 
 
     return (
-        <ControlLayout title="Mobile Decryption" mobile={mobile}>
+        <BasicLayout title="Mobile Decryption">
             <FormContainer title="Provide Content to Decrypt">
                 <InputWithLabel label="Content to decrypt" id="content"
                     onChange={onContentChange}
@@ -64,7 +64,7 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent, contentOnMobile, s
                     <TextButton onClick={onDecrypt} label='Decrypt' />
                 </FormFooter>
             </FormContainer>
-        </ControlLayout>
+        </BasicLayout>
     );
 
 
@@ -91,10 +91,10 @@ const FIELDS = {
         label: "Use Mobile",
         viewId: "row1"
     },
-    startEncrypt: {
-        id: "startEncrypt",
+    startDecrypt: {
+        id: "startDecrypt",
         type: "button",
-        label: "Encrypt",
+        label: "Decrypt",
         viewId: "row1"
     }
 }

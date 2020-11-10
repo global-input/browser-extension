@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useMobile } from '../mobile';
 import {
-    InputWithLabel, ControlLayout, FormContainer, DisplayErrorMessage,
+    InputWithLabel, BasicLayout, FormContainer, DisplayErrorMessage,
     TextButton, FormFooter
 } from '../app-layout'
 
@@ -52,7 +52,7 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent, contentOnMobile, s
 
 
     return (
-        <ControlLayout title="Mobile Encryption" mobile={mobile}>
+        <BasicLayout title="Mobile Encryption">
             <FormContainer title="Provide Content to Encrypt">
                 <InputWithLabel label="Content to encrypt" id="content"
                     onChange={onContentChange}
@@ -64,7 +64,7 @@ const ContentOnComputer: React.FC<PROPS> = ({ initialContent, contentOnMobile, s
                     <TextButton onClick={onEncrypt} label='Encrypt' />
                 </FormFooter>
             </FormContainer>
-        </ControlLayout>
+        </BasicLayout>
     );
 
 

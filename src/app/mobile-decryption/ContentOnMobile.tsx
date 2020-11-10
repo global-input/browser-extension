@@ -17,7 +17,7 @@ const ContentOnMobile: React.FC<PROPS> = ({ initialContent, contentOnComputer, c
         dataType: "form",
         form: {
             title: "Content To Decrypt",
-            fields: [FIELDS.info, { ...FIELDS.content, value: initialContent }, FIELDS.back, FIELDS.cancel, FIELDS.encrypt]
+            fields: [FIELDS.info, { ...FIELDS.content, value: initialContent }, FIELDS.back, FIELDS.cancel, FIELDS.decrypt]
         }
     });
 
@@ -45,7 +45,7 @@ const ContentOnMobile: React.FC<PROPS> = ({ initialContent, contentOnComputer, c
             case FIELDS.cancel.id:
                 cancel();
                 break;
-            case FIELDS.encrypt.id:
+            case FIELDS.decrypt.id:
                 onDecrypt();
                 break;
             default:
@@ -60,7 +60,7 @@ const ContentOnMobile: React.FC<PROPS> = ({ initialContent, contentOnComputer, c
 
 
     return (
-        <ControlLayout title="Mobile Encryption" mobile={mobile}>
+        <ControlLayout title="Mobile Decryption" mobile={mobile}>
             <FormContainer title="Provide Content on Mobile">
                 <InputWithLabel label="Content to decrypt" id="content"
                     onChange={onContentChange}
@@ -102,7 +102,7 @@ const FIELDS = {
         label: 'Cancel',
         viewId: "row1"
     },
-    encrypt: {
+    decrypt: {
         id: "toDecrypt",
         type: "button",
         label: "Decrypt",
