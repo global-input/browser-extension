@@ -23,9 +23,38 @@ const setAPIKey = (apiKey: string | null | undefined) => {
         localStorage.removeItem(API_KEY);
     }
 };
+
+const SECURITY_GROUP="iterative.globalInputApp.securityGroup";
+const getSecurityGroup = () => localStorage.getItem(SECURITY_GROUP);
+const setSecurityGroup = (securityGroup: string | null | undefined) => {
+    securityGroup = securityGroup?.trim();
+    if (securityGroup) {
+        localStorage.setItem(SECURITY_GROUP, securityGroup);
+    }
+    else {
+        localStorage.removeItem(SECURITY_GROUP);
+    }
+};
+
+const CODE_KEY="iterative.globalInputApp.codeKey";
+const getCodeKey = () => localStorage.getItem(CODE_KEY);
+const setCodeKey = (codeKey: string | null | undefined) => {
+    codeKey = codeKey?.trim();
+    if (codeKey) {
+        localStorage.setItem(CODE_KEY, codeKey);
+    }
+    else {
+        localStorage.removeItem(CODE_KEY);
+    }
+};
+
+
+
 interface ConnectionSettings {
     url?: string | null;
     apikey?: string | null;
+    securityGroup?: string | null;
+    codeAES?: string | null;
 }
 export const getConnectOption = () => {
     const option: ConnectionSettings = {};
@@ -37,23 +66,36 @@ export const getConnectOption = () => {
     if (apikey) {
         option.apikey = apikey;
     }
+    const securityGroup = getSecurityGroup();
+    if (securityGroup) {
+        option.securityGroup = securityGroup;
+    }
+
+    const codeAES = getCodeKey();
+    if (codeAES) {
+        option.codeAES = codeAES;
+    }
     return option;
 }
 
 export const saveConnectionSettings = (settings: ConnectionSettings) => {
     setURL(settings.url);
     setAPIKey(settings.apikey);
+    setSecurityGroup(settings.securityGroup);
+    setCodeKey(settings.codeAES);
 }
 
 export const loadConnectionSettings = (): ConnectionSettings => {
-    let url = getURL();
-    let apikey = getAPIKey();
+    const url = getURL();
+    const apikey = getAPIKey();
+    const securityGroup = getSecurityGroup();
+    const codeAES =getCodeKey();
     return {
-        url: url ? url : "https://globalinput.co.uk",
-        /* cSpell:disable */
-        apikey: apikey ? apikey : "k7jc3QcMPKEXGW5UC"
+        url: url ? url : undefined,
+        apikey: apikey ? apikey : undefined,
+        securityGroup: securityGroup ? securityGroup : undefined,
+        codeAES: codeAES ? codeAES: undefined
     };
-
 }
 
 
