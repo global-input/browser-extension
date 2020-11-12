@@ -55,7 +55,7 @@ export const LoadingCircle = () => (
     </div>
 );
 
-const QRCodeContainer: React.FC = ({ children }) => (
+export const QRCodeContainer: React.FC = ({ children }) => (
     <div style={styles.qrCode}>
         {children}
     </div>

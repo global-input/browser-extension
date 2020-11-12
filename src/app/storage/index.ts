@@ -24,79 +24,72 @@ const setAPIKey = (apiKey: string | null | undefined) => {
     }
 };
 
-const SECURITY_GROUP="iterative.globalInputApp.securityGroup";
+const SECURITY_GROUP = "iterative.globalInputApp.securityGroup";
 const getSecurityGroup = () => localStorage.getItem(SECURITY_GROUP);
 const setSecurityGroup = (securityGroup: string | null | undefined) => {
+    let modified=false;
     securityGroup = securityGroup?.trim();
     if (securityGroup) {
-        localStorage.setItem(SECURITY_GROUP, securityGroup);
+        if(securityGroup!==getSecurityGroup()){
+            localStorage.setItem(SECURITY_GROUP, securityGroup);
+            modified=true;
+        }
     }
-    else {
-        localStorage.removeItem(SECURITY_GROUP);
+    else if(getSecurityGroup()){
+            localStorage.removeItem(SECURITY_GROUP);
+            modified=true;
     }
+
+    return modified;
 };
 
-const CODE_KEY="iterative.globalInputApp.codeKey";
+const CODE_KEY = "iterative.globalInputApp.codeKey";
 const getCodeKey = () => localStorage.getItem(CODE_KEY);
 const setCodeKey = (codeKey: string | null | undefined) => {
+    let modified=false;
     codeKey = codeKey?.trim();
     if (codeKey) {
-        localStorage.setItem(CODE_KEY, codeKey);
+        if(codeKey!==getCodeKey()){
+            localStorage.setItem(CODE_KEY, codeKey);
+            modified=true;
+        }
     }
-    else {
+    else if(getCodeKey()){
+        modified=true;
         localStorage.removeItem(CODE_KEY);
     }
+    return modified;
 };
 
 
 
 interface ConnectionSettings {
-    url?: string | null;
-    apikey?: string | null;
-    securityGroup?: string | null;
-    codeAES?: string | null;
+    url?: string;
+    apikey?: string;
+    securityGroup?: string;
+    codeKey?: string;
 }
-export const getConnectOption = () => {
-    const option: ConnectionSettings = {};
-    const url = getURL();////can use your own
-    if (url) {
-        option.url = url;
-    }
-    const apikey = getAPIKey();
-    if (apikey) {
-        option.apikey = apikey;
-    }
-    const securityGroup = getSecurityGroup();
-    if (securityGroup) {
-        option.securityGroup = securityGroup;
-    }
-
-    const codeAES = getCodeKey();
-    if (codeAES) {
-        option.codeAES = codeAES;
-    }
-    return option;
-}
-
 export const saveConnectionSettings = (settings: ConnectionSettings) => {
     setURL(settings.url);
     setAPIKey(settings.apikey);
-    setSecurityGroup(settings.securityGroup);
-    setCodeKey(settings.codeAES);
-}
+    const needsToPair1=setSecurityGroup(settings.securityGroup);
+    const needsToPair2=setCodeKey(settings.codeKey);
+    return needsToPair1 || needsToPair2;
+};
 
 export const loadConnectionSettings = (): ConnectionSettings => {
     const url = getURL();
     const apikey = getAPIKey();
     const securityGroup = getSecurityGroup();
-    const codeAES =getCodeKey();
+    const codeKey = getCodeKey();
     return {
         url: url ? url : undefined,
         apikey: apikey ? apikey : undefined,
         securityGroup: securityGroup ? securityGroup : undefined,
-        codeAES: codeAES ? codeAES: undefined
+        codeKey: codeKey ? codeKey : undefined
     };
 }
+
 
 
 const CACHE_FIELDS = 'extension.content.cacheFields.';

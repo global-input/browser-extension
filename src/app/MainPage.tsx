@@ -4,22 +4,16 @@ import { useMobile } from './mobile';
 import { ControlLayout, AppFooter, MessageContainer, MessageButton, MessageLink, FormFooter, TextButton } from './app-layout';
 
 
-export enum PAGES {
-    LOADING,
-    DISPLAY_CACHED_FORM,
-    MAIN_PAGE,
-    TRANSFER_FORM_DATA,
-    ENCRYPTION,
-    DECRYPTION,
-    PAGE_CONTROL,
-    EDIT_CONNECTION_SETTINGS
-}
 
 interface Props {
     domain: string;
-    setPage: (page: PAGES) => void;
+    transferFormData:()=>void;
+    encryption:()=>void;
+    decryption:()=>void;
+    pageControl:()=>void;
+    editConnectionSettings:()=>void;
 }
-const MainPage: React.FC<Props> = ({ setPage, domain }) => {
+const MainPage: React.FC<Props> = ({ domain,transferFormData,encryption,decryption,pageControl,editConnectionSettings,}) => {
     const mobile = useMobile({
         action: "input",
         dataType: "form",
@@ -32,28 +26,29 @@ const MainPage: React.FC<Props> = ({ setPage, domain }) => {
     mobile.setOnchange(({ field }) => {
         switch (field.id) {
             case FIELDS.transfer.id:
-                setPage(PAGES.TRANSFER_FORM_DATA);
+                transferFormData();
                 break;
             case FIELDS.encryption.id:
-                setPage(PAGES.ENCRYPTION);
+                encryption();
                 break;
             case FIELDS.decryption.id:
-                setPage(PAGES.DECRYPTION);
+                decryption();
                 break;
             case FIELDS.control.id:
-                setPage(PAGES.PAGE_CONTROL);
+                pageControl();
                 break;
             default:
         }
     });
-    const toEditConnectionSettings = useCallback(() => setPage(PAGES.EDIT_CONNECTION_SETTINGS), [setPage]);
+
     const {restart}=mobile;
     const disconnect=useCallback(()=>restart(),[restart]);
 
     const NotConnected = () => (
         <AppFooter>
-            <MessageButton label="Settings" onClick={toEditConnectionSettings} />
+            <MessageButton label="Settings" onClick={editConnectionSettings} />
             <MessageLink href="https://github.com/global-input/browser-extension">Source Code</MessageLink>
+
         </AppFooter>
 
     )
@@ -61,7 +56,7 @@ const MainPage: React.FC<Props> = ({ setPage, domain }) => {
     return (
         <ControlLayout title="Global Input App" mobile={mobile} notConnected={<NotConnected />}>
             <MessageContainer>
-                You can now operate on your mobile
+                You can now operate on your mobile.
         </MessageContainer>
         <FormFooter>
             <TextButton onClick={disconnect} label="Disconnect"/>

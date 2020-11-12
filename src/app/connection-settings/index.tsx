@@ -2,35 +2,79 @@ import React, { useState, useCallback } from 'react';
 import { BasicLayout, FormContainer, InputWithLabel, FormFooter, TextButton, MessageContainer, MessageLink } from '../app-layout';
 import { loadConnectionSettings, saveConnectionSettings } from '../storage';
 
-import {useMobile} from '../mobile';
+import { useMobile } from '../mobile';
 interface Props {
     back: () => void;
+    pairing:()=>void;
 }
 
-const ConnectionSettings: React.FC<Props> = ({ back }) => {
+const ConnectionSettings: React.FC<Props> = ({ back,pairing }) => {
     const [setting, setSettings] = useState(() => loadConnectionSettings());
-    const mobile = useMobile({
-        action: "input",
-        dataType: "form",
-        form: {
-            title: "Connecting Settings",
-            fields: Object.values(FIELDS)
-        }
-    });
-    const {disconnect}=mobile;
-    const onSave = useCallback(() => {
-        saveConnectionSettings(setting);
-        disconnect();
-        back();
-    },[disconnect,back,setting]);
-    const onURLChange = useCallback((url: string) => setSettings(setting => ({ ...setting, url })), []);
-    const onAPIKey = useCallback((apikey: string) => setSettings(setting => ({ ...setting, apikey })), []);
-    const onSecurityGroupChanged = useCallback((securityGroup: string) => setSettings(setting => ({ ...setting, securityGroup })), []);
-    const onCodeKeyChanged = useCallback((codeAES: string) => setSettings(setting => ({ ...setting, codeAES })), []);
+    const setURL = (url: string) => setSettings(setting => ({ ...setting, url }));
+    const setAPIKey = (apikey: string) => setSettings(setting => ({ ...setting, apikey }));
+    const setSecurityGroup = (securityGroup: string) => setSettings(setting => ({ ...setting, securityGroup }));
+    const setCodeKey = (codeKey: string) => setSettings(setting => ({ ...setting, codeKey }));
+
     const url = setting.url ? setting.url : '';
     const apikey = setting.apikey ? setting.apikey : '';
     const securityGroup = setting.securityGroup ? setting.securityGroup : '';
-    const codeKey = setting.codeAES ? setting.codeAES : '';
+    const codeKey = setting.codeKey ? setting.codeKey : '';
+
+    const mobile = useMobile(initData(url, apikey, securityGroup, codeKey));
+    mobile.setOnchange(({ field }) => {
+        switch (field.id) {
+            case FIELDS.url.id:
+                setURL(field.value as string);
+                break;
+            case FIELDS.apikey.id:
+                setAPIKey(field.value as string);
+                break;
+            case FIELDS.securityGroup.id:
+                setSecurityGroup(field.value as string);
+                break;
+            case FIELDS.back.id:
+                back();
+                break;
+            case FIELDS.save.id:
+                onSave();
+        }
+    });
+    const { disconnect, sendValue } = mobile;
+
+    const onSave = useCallback(() => {
+        disconnect();
+        if(saveConnectionSettings(setting)){
+            pairing();
+        }
+        else{
+            back();
+        }
+    }, [disconnect, back, setting,pairing]);
+
+    const onURLChange = useCallback((url: string) => {
+        setURL(url);
+        sendValue(FIELDS.url.id, url);
+    }, [sendValue]);
+
+    const onAPIKey = useCallback((apikey: string) => {
+        setAPIKey(apikey);
+        sendValue(FIELDS.apikey.id, apikey);
+    }, [sendValue]);
+
+    const onSecurityGroupChanged = useCallback((securityGroup: string) => {
+        setSecurityGroup(securityGroup);
+        sendValue(FIELDS.securityGroup.id, securityGroup);
+    }, [sendValue]);
+
+    const onCodeKeyChanged = useCallback((codeKey: string) => {
+        setCodeKey(codeKey);
+        sendValue(FIELDS.codeKey.id, codeKey);
+    }, [sendValue]);
+
+
+
+
+
     return (
         <BasicLayout title="Connection Settings">
             <FormContainer>
@@ -46,24 +90,34 @@ const ConnectionSettings: React.FC<Props> = ({ back }) => {
                 <InputWithLabel label="Code Key" id="codeKey"
                     onChange={onCodeKeyChanged}
                     value={codeKey} />
+                </FormContainer>
                 <FormFooter>
                     <TextButton onClick={back} label='Cancel' />
                     <TextButton onClick={onSave} label='Save' />
                 </FormFooter>
                 <MessageContainer>
-    Proxy URL and the API Key are used when you use your own <MessageLink href="https://github.com/global-input/global-input-node">WebSocket Proxy Server</MessageLink>
+                    Proxy URL and the API Key are used when you use your own <MessageLink href="https://github.com/global-input/global-input-node">WebSocket Proxy Server</MessageLink>
     that provides connectivity between your mobile app and your browser extension, allowing them to exchange encrypted messages. The end-to-end encryption ensures that the messages are
     readable only to your mobile app and your browser extension. This means that you can install <MessageLink href="https://github.com/global-input/global-input-node">WebSocket Proxy Server</MessageLink> in an insecure environment.
     The Security Group is used for your applications to identify incoming connections in the same way that API Key is used for server applications to identify incoming connections. The Code Key is used to encrypt the content of the QR Code being displayed for mobile apps to scan to connect to your extension.
 </MessageContainer>
 
 
-            </FormContainer>
+
         </BasicLayout>
     )
 
 };
-
+const initData = (url: string, apikey: string, securityGroup: string, codeKey: string) => {
+    return {
+        action: "input",
+        dataType: "form",
+        form: {
+            title: "Connecting Settings",
+            fields: [{ ...FIELDS.url, value: url }, { ...FIELDS.apikey, value: apikey }, { ...FIELDS.securityGroup, value: securityGroup }, { ...FIELDS.codeKey, value: codeKey }, FIELDS.back, FIELDS.save]
+        }
+    }
+}
 
 
 const FIELDS = {
@@ -93,10 +147,10 @@ const FIELDS = {
         label: 'Back',
         viewId: "row1"
     },
-    cancel: {
-        id: 'cancel',
+    save: {
+        id: 'saveSettings',
         type: 'button',
-        label: 'Cancel',
+        label: 'Save',
         viewId: "row1"
     },
 
