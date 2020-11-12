@@ -10,8 +10,9 @@ interface PROPS {
     contentOnMobile: (content: string) => void;
     startEncrypt: (content: string) => void;
     cancel: () => void;
+    domain: string;
 }
-const ContentOnComputer: React.FC<PROPS> = ({ initialContent, contentOnMobile, startEncrypt, cancel }) => {
+const ContentOnComputer: React.FC<PROPS> = ({ initialContent, contentOnMobile, startEncrypt, cancel, domain }) => {
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [content, setContent] = useState(initialContent);
     const mobile = useMobile({

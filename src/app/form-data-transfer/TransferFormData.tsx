@@ -120,7 +120,14 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
             chromeExtension.sendKey(key);
         }
     };
-    const { ControlledContainer } = mobile;
+    const onFieldChanged=(formFields:FormField[],formField:FormField,index:number,value:string)=>{
+        const changedFormFields = computeChangedFormFields(formFields, formField.id, value, index);
+        if (changedFormFields) {
+            setFormFields(changedFormFields);
+            mobile.sendValue(formField.id as string, value, index);
+        }
+    }
+
     return (
         <mobile.ControlledContainer title="Form Data Transfer" domain={domain}>
             <FormContainer>
@@ -128,16 +135,7 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
                     field={formField}
                     key={formField.id}
                     onCopied={onCopied}
-                    hideValue={visibility.value === 0} onChange={value => {
-                        const changedFormFields = computeChangedFormFields(formFields, formField.id, value, index);
-                        if (changedFormFields) {
-                            setFormFields(changedFormFields);
-                            mobile.sendValue(formField.id as string, value, index);
-                        }
-                    }
-                    } />))}
-
-
+                    hideValue={visibility.value === 0} onChange={value => onFieldChanged(formFields,formField,index,value)} />))}
             </FormContainer>
             <FormFooter>
                 <TextButton onClick={back} label="Back" />

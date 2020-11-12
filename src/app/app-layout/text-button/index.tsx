@@ -23,13 +23,13 @@ var styles = {
     borderRadius: 5,
     margin: "5vw",
     color: "white",
-    padding: 10,
-    minWidth: 150,
+    padding: 5,
+    minWidth: 100,
   },
   disabled: {
     backgroundColor: "#888888",
     color: "white",
-    borderRadius: 8,
+    borderRadius: 5,
     border: "3px solid #888888",
     margin: "5vw"
   }

@@ -99,14 +99,16 @@ const styles = {
       borderRadius: 5,
       color: "white",
       padding: 5,
-      fontSize: 10
+      fontSize: 10,
+      marginLeft:3
     },
     disabled: {
       padding: 5,
       backgroundColor: "#888888",
       color: "white",
       borderRadius: 5,
-      fontSize: 10
+      fontSize: 10,
+      marginLeft:3
     }
   },
   message: {

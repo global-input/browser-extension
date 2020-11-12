@@ -5,7 +5,7 @@ import * as globalInput from 'global-input-react';////global-input-react////
 
 import * as storage from '../storage';
 
-import { AppContainer, FormFooter, TextButton, QRCodeContainer, DisplayErrorMessage, MessageContainer } from '../app-layout';
+import { AppContainer, RowCenter, FormContainer,TextButton, QRCodeContainer, DisplayErrorMessage, MessageContainer } from '../app-layout';
 
 interface ControlledContainerProps {
     domain: string;
@@ -16,6 +16,7 @@ interface ControlledContainerProps {
 interface MobileInputData extends globalInput.GlobalInputData {
     ControlledContainer: React.FC<ControlledContainerProps>;
     pairing: React.ReactNode;
+    disconnectButton:React.ReactNode;
 }
 export const useMobile = (initData: globalInput.InitData | (() => globalInput.InitData)): MobileInputData => {
     const connectionSettings = storage.loadConnectionSettings();
@@ -32,27 +33,34 @@ export const useMobile = (initData: globalInput.InitData | (() => globalInput.In
         <mobile.PairingQR />
     </QRCodeContainer>);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const restart=useCallback(()=>mobile.restart(),[mobile.restart]);
+
+    const disconnectButton=(<TextButton onClick={restart} label="Disconnect" />);
+
 
     const ControlledContainer: React.FC<ControlledContainerProps> = useCallback(({ domain, title, notConnected, errorMessage, children }) => (
         <AppContainer title={title} domain={domain}>
+            {mobile.isConnectionDenied && (
+                <FormContainer>
+                    <MessageContainer>You can only use one mobile app per session. Disconnect to start a new session.</MessageContainer>
+                    <RowCenter>
+
+                        {disconnectButton}
+                    </RowCenter>
+                </FormContainer>
+
+            )}
             {mobile.isReady && (<QRCodeContainer><mobile.ConnectQR /></QRCodeContainer>)}
             {(mobile.isError || errorMessage) ? (<DisplayErrorMessage errorMessage={errorMessage ? errorMessage : mobile.errorMessage} />) : (mobile.isConnected && children)}
             {(!mobile.isConnected) && notConnected}
-            {mobile.isConnected && (<FormFooter>
-                <TextButton onClick={mobile.disconnect} label="Disconnect" />
-            </FormFooter>)}
-            {mobile.isConnectionDenied && (
-                <FormFooter>
-                    <MessageContainer>A different mobile app instance is trying to connect. Press Disconnect button and tray again</MessageContainer>
-                    <TextButton onClick={mobile.disconnect} label="Disconnect" />
-                </FormFooter>
-            )}
+
         </AppContainer>
         // eslint-disable-next-line react-hooks/exhaustive-deps
     ), [mobile.isConnectionDenied, mobile.isError, mobile.isConnected, mobile.isReady, mobile.disconnect, mobile.ConnectQR, mobile.errorMessage]);
 
 
-    return { ...mobile, ControlledContainer, pairing };
+    return { ...mobile, ControlledContainer, pairing,disconnectButton };
 };
 
 export type { FormField, FieldValue } from 'global-input-react';////global-input-react////

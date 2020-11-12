@@ -14,10 +14,10 @@ export var styles = {
             width: "100%",
             fontSize: 12,
             color: "#5291CD",
-            border: "1px solid #888888",
+            border: "1px solid #AAAAAA",
         },
         readOnly: {
-            backgroundColor: "#AAAAAA"
+            backgroundColor: "#CCCCCC"
         }
     },
 

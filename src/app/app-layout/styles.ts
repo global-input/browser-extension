@@ -162,6 +162,13 @@ const styles = {
             width: "100%",
             padding: 10
         }
+    },
+    rowCenter: {
+        display: 'flex',
+        flexDirection: 'row' as 'row',
+        justifyContent: 'center',
+        alignItems: 'end',
+        width: "100%"
     }
 
 };

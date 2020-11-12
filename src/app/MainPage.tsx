@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMobile } from './mobile';
 
-import { AppFooter, MessageContainer, MessageButton, MessageLink } from './app-layout';
+import { AppFooter, MessageContainer, MessageButton, MessageLink, RowCenter } from './app-layout';
 
 interface Props {
     domain: string;
@@ -50,8 +50,8 @@ const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption, decry
         <mobile.ControlledContainer title="Global Input App" domain={domain} notConnected={<NotConnected />}>
             <MessageContainer>
                 You can now operate on your mobile.
-        </MessageContainer>
-
+            </MessageContainer>
+            <RowCenter>{mobile.disconnectButton}</RowCenter>
         </mobile.ControlledContainer>
     );
 }

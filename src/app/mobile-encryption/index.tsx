@@ -43,15 +43,15 @@ const MobileEncryption: React.FC<MobileEncryptionProps> = ({ domain, back }) => 
 
     switch (page) {
         case PAGES.CONTENT_ON_COMPUTER:
-            return (<ContentOnComputer initialContent={content} cancel={back} contentOnMobile={contentOnMobile} startEncrypt={startEncrypt} />);
+            return (<ContentOnComputer domain={domain} initialContent={content} cancel={back} contentOnMobile={contentOnMobile} startEncrypt={startEncrypt} />);
         case PAGES.CONTENT_ON_MOBILE:
-            return (<ContentOnMobile initialContent={content} cancel={back} contentOnComputer={contentOnComputer} startEncrypt={startEncrypt} />);
+            return (<ContentOnMobile domain={domain} initialContent={content} cancel={back} contentOnComputer={contentOnComputer} startEncrypt={startEncrypt} />);
         case PAGES.START_ENCRYPT:
-            return (<EncryptContent content={content} showOnComputer={showOnComputer} contentOnComputer={contentOnComputer} />);
+            return (<EncryptContent domain={domain} content={content} showOnComputer={showOnComputer} contentOnComputer={contentOnComputer} />);
         case PAGES.SHOW_ON_COMPUTER:
-            return (<ShowOnComputer content={content} contentOnComputer={contentOnComputer} finish={back} showOnMobile={showOnMobile} />)
+            return (<ShowOnComputer domain={domain} content={content} contentOnComputer={contentOnComputer} finish={back} showOnMobile={showOnMobile} />)
         case PAGES.SHOW_ON_MOBILE:
-            return (<ShowOnMobile content={content} contentOnComputer={contentOnComputer} finish={back} showOnComputer={showOnComputer} />)
+            return (<ShowOnMobile  domain={domain} content={content} contentOnComputer={contentOnComputer} finish={back} showOnComputer={showOnComputer} />)
 
 
 

@@ -139,6 +139,11 @@ export const FormFooter: React.FC = ({ children }) => (
         {children}
     </div>
 );
+export const RowCenter: React.FC = ({ children }) => (
+    <div style={styles.rowCenter}>
+        {children}
+    </div>
+);
 
 interface MessageLinkProps {
     href?: string;
