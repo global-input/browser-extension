@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMobile } from '../mobile';
-import { InputWithCopy, TextButton, ControlLayout, FormContainer, FormFooter } from '../app-layout';
+import { InputWithCopy, TextButton, FormContainer, FormFooter } from '../app-layout';
 
 
 interface Props {
@@ -8,8 +8,9 @@ interface Props {
     finish: () => void;
     contentOnComputer: (content: string) => void;
     showOnComputer: (content: string) => void;
+    domain: string;
 }
-const ShowOnMobile: React.FC<Props> = ({ content, contentOnComputer, showOnComputer, finish }) => {
+const ShowOnMobile: React.FC<Props> = ({ content, contentOnComputer, showOnComputer, finish, domain }) => {
     const mobile = useMobile({
         action: "input",
         dataType: "form",
@@ -36,7 +37,7 @@ const ShowOnMobile: React.FC<Props> = ({ content, contentOnComputer, showOnCompu
     });
 
     return (
-        <ControlLayout title="Mobile Decryption" mobile={mobile}>
+        <mobile.ControlledContainer title="Mobile Decryption" domain={domain}>
             <FormContainer title="Decrypted Content">
                 <InputWithCopy id="decryptedContent" readOnly={true}
                     label="Decrypted Content"
@@ -47,7 +48,7 @@ const ShowOnMobile: React.FC<Props> = ({ content, contentOnComputer, showOnCompu
                     <TextButton onClick={finish} label='Finish' />
                 </FormFooter>
             </FormContainer>
-        </ControlLayout>
+        </mobile.ControlledContainer>
 
     );
 

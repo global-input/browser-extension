@@ -1,19 +1,17 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useMobile } from './mobile';
 
-import { ControlLayout, AppFooter, MessageContainer, MessageButton, MessageLink, FormFooter, TextButton } from './app-layout';
-
-
+import { AppFooter, MessageContainer, MessageButton, MessageLink } from './app-layout';
 
 interface Props {
     domain: string;
-    transferFormData:()=>void;
-    encryption:()=>void;
-    decryption:()=>void;
-    pageControl:()=>void;
-    editConnectionSettings:()=>void;
+    transferFormData: () => void;
+    encryption: () => void;
+    decryption: () => void;
+    pageControl: () => void;
+    editConnectionSettings: () => void;
 }
-const MainPage: React.FC<Props> = ({ domain,transferFormData,encryption,decryption,pageControl,editConnectionSettings,}) => {
+const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption, decryption, pageControl, editConnectionSettings, }) => {
     const mobile = useMobile({
         action: "input",
         dataType: "form",
@@ -41,27 +39,20 @@ const MainPage: React.FC<Props> = ({ domain,transferFormData,encryption,decrypti
         }
     });
 
-    const {restart}=mobile;
-    const disconnect=useCallback(()=>restart(),[restart]);
-
     const NotConnected = () => (
         <AppFooter>
             <MessageButton label="Settings" onClick={editConnectionSettings} />
             <MessageLink href="https://github.com/global-input/browser-extension">Source Code</MessageLink>
-
         </AppFooter>
-
     )
 
     return (
-        <ControlLayout title="Global Input App" mobile={mobile} notConnected={<NotConnected />}>
+        <mobile.ControlledContainer title="Global Input App" domain={domain} notConnected={<NotConnected />}>
             <MessageContainer>
                 You can now operate on your mobile.
         </MessageContainer>
-        <FormFooter>
-            <TextButton onClick={disconnect} label="Disconnect"/>
-        </FormFooter>
-        </ControlLayout>
+
+        </mobile.ControlledContainer>
     );
 }
 

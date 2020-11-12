@@ -8,8 +8,9 @@ interface Props {
     finish: () => void;
     contentOnComputer: (content: string) => void;
     showOnMobile: (content: string) => void;
+    domain: string;
 }
-const ShowOnComputer: React.FC<Props> = ({ content, contentOnComputer, showOnMobile, finish }) => {
+const ShowOnComputer: React.FC<Props> = ({ content, contentOnComputer, showOnMobile, finish, domain }) => {
     const mobile = useMobile({
         action: "input",
         dataType: "form",

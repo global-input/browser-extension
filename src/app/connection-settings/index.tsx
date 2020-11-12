@@ -5,10 +5,10 @@ import { loadConnectionSettings, saveConnectionSettings } from '../storage';
 import { useMobile } from '../mobile';
 interface Props {
     back: () => void;
-    pairing:()=>void;
+    pairing: () => void;
 }
 
-const ConnectionSettings: React.FC<Props> = ({ back,pairing }) => {
+const ConnectionSettings: React.FC<Props> = ({ back, pairing }) => {
     const [setting, setSettings] = useState(() => loadConnectionSettings());
     const setURL = (url: string) => setSettings(setting => ({ ...setting, url }));
     const setAPIKey = (apikey: string) => setSettings(setting => ({ ...setting, apikey }));
@@ -39,37 +39,42 @@ const ConnectionSettings: React.FC<Props> = ({ back,pairing }) => {
                 onSave();
         }
     });
-    const { disconnect, sendValue } = mobile;
+
 
     const onSave = useCallback(() => {
-        disconnect();
-        if(saveConnectionSettings(setting)){
+        mobile.disconnect();
+        if (saveConnectionSettings(setting)) {
             pairing();
         }
-        else{
+        else {
             back();
         }
-    }, [disconnect, back, setting,pairing]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [mobile.disconnect, back, setting, mobile.pairing]);
 
     const onURLChange = useCallback((url: string) => {
         setURL(url);
-        sendValue(FIELDS.url.id, url);
-    }, [sendValue]);
+        mobile.sendValue(FIELDS.url.id, url);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [mobile.sendValue]);
 
     const onAPIKey = useCallback((apikey: string) => {
         setAPIKey(apikey);
-        sendValue(FIELDS.apikey.id, apikey);
-    }, [sendValue]);
+        mobile.sendValue(FIELDS.apikey.id, apikey);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [mobile.sendValue]);
 
     const onSecurityGroupChanged = useCallback((securityGroup: string) => {
         setSecurityGroup(securityGroup);
-        sendValue(FIELDS.securityGroup.id, securityGroup);
-    }, [sendValue]);
+        mobile.sendValue(FIELDS.securityGroup.id, securityGroup);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [mobile.sendValue]);
 
     const onCodeKeyChanged = useCallback((codeKey: string) => {
         setCodeKey(codeKey);
-        sendValue(FIELDS.codeKey.id, codeKey);
-    }, [sendValue]);
+        mobile.sendValue(FIELDS.codeKey.id, codeKey);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [mobile.sendValue]);
 
 
 
@@ -90,13 +95,13 @@ const ConnectionSettings: React.FC<Props> = ({ back,pairing }) => {
                 <InputWithLabel label="Code Key" id="codeKey"
                     onChange={onCodeKeyChanged}
                     value={codeKey} />
-                </FormContainer>
-                <FormFooter>
-                    <TextButton onClick={back} label='Cancel' />
-                    <TextButton onClick={onSave} label='Save' />
-                </FormFooter>
-                <MessageContainer>
-                    Proxy URL and the API Key are used when you use your own <MessageLink href="https://github.com/global-input/global-input-node">WebSocket Proxy Server</MessageLink>
+            </FormContainer>
+            <FormFooter>
+                <TextButton onClick={back} label='Cancel' />
+                <TextButton onClick={onSave} label='Save' />
+            </FormFooter>
+            <MessageContainer>
+                Proxy URL and the API Key are used when you use your own <MessageLink href="https://github.com/global-input/global-input-node">WebSocket Proxy Server</MessageLink>
     that provides connectivity between your mobile app and your browser extension, allowing them to exchange encrypted messages. The end-to-end encryption ensures that the messages are
     readable only to your mobile app and your browser extension. This means that you can install <MessageLink href="https://github.com/global-input/global-input-node">WebSocket Proxy Server</MessageLink> in an insecure environment.
     The Security Group is used for your applications to identify incoming connections in the same way that API Key is used for server applications to identify incoming connections. The Code Key is used to encrypt the content of the QR Code being displayed for mobile apps to scan to connect to your extension.

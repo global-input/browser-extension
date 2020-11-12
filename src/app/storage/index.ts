@@ -27,17 +27,17 @@ const setAPIKey = (apiKey: string | null | undefined) => {
 const SECURITY_GROUP = "iterative.globalInputApp.securityGroup";
 const getSecurityGroup = () => localStorage.getItem(SECURITY_GROUP);
 const setSecurityGroup = (securityGroup: string | null | undefined) => {
-    let modified=false;
+    let modified = false;
     securityGroup = securityGroup?.trim();
     if (securityGroup) {
-        if(securityGroup!==getSecurityGroup()){
+        if (securityGroup !== getSecurityGroup()) {
             localStorage.setItem(SECURITY_GROUP, securityGroup);
-            modified=true;
+            modified = true;
         }
     }
-    else if(getSecurityGroup()){
-            localStorage.removeItem(SECURITY_GROUP);
-            modified=true;
+    else if (getSecurityGroup()) {
+        localStorage.removeItem(SECURITY_GROUP);
+        modified = true;
     }
 
     return modified;
@@ -46,16 +46,16 @@ const setSecurityGroup = (securityGroup: string | null | undefined) => {
 const CODE_KEY = "iterative.globalInputApp.codeKey";
 const getCodeKey = () => localStorage.getItem(CODE_KEY);
 const setCodeKey = (codeKey: string | null | undefined) => {
-    let modified=false;
+    let modified = false;
     codeKey = codeKey?.trim();
     if (codeKey) {
-        if(codeKey!==getCodeKey()){
+        if (codeKey !== getCodeKey()) {
             localStorage.setItem(CODE_KEY, codeKey);
-            modified=true;
+            modified = true;
         }
     }
-    else if(getCodeKey()){
-        modified=true;
+    else if (getCodeKey()) {
+        modified = true;
         localStorage.removeItem(CODE_KEY);
     }
     return modified;
@@ -72,8 +72,8 @@ interface ConnectionSettings {
 export const saveConnectionSettings = (settings: ConnectionSettings) => {
     setURL(settings.url);
     setAPIKey(settings.apikey);
-    const needsToPair1=setSecurityGroup(settings.securityGroup);
-    const needsToPair2=setCodeKey(settings.codeKey);
+    const needsToPair1 = setSecurityGroup(settings.securityGroup);
+    const needsToPair2 = setCodeKey(settings.codeKey);
     return needsToPair1 || needsToPair2;
 };
 

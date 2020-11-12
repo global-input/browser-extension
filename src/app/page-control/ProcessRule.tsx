@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import * as rules from './rules';
 import * as chromeExtension from '../chrome-extension';
 import { useLoader } from './controllers';
-import { ControlLayout } from '../app-layout';
+
 
 
 interface Props {
@@ -37,9 +37,9 @@ const ProcessControl: React.FC<Props> = ({ back, domain, rule, editRule, pageCon
         processRule();
     }, [domain, onError, rule, pageControl]);
     return (
-        <ControlLayout title="Page Control" mobile={mobile}>
+        <mobile.ControlledContainer title="Page Control" domain={domain}>
             {display}
-        </ControlLayout>
+        </mobile.ControlledContainer>
 
     );
 }

@@ -44,12 +44,13 @@ const CreateField: React.FC<Props> = ({ formFields, onFormStructureChanged, back
                 back();
         }
     });
-    const { sendValue } = mobile;
+
 
     const setFormLabel = useCallback((value: string) => {
         setLabel(value);
-        sendValue(FIELDS.name.id, value);
-    }, [setLabel, sendValue]);
+        mobile.sendValue(FIELDS.name.id, value);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [setLabel, mobile.sendValue]);
     return (
         <BasicLayout title="Form Manager">
             <FormContainer title="Creating Field">

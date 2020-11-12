@@ -4,7 +4,7 @@ import { useMobile, FormField } from '../mobile';
 import * as chromeExtension from '../chrome-extension';
 import * as cache from './cache';
 
-import { ControlLayout, FormContainer, DisplayInputCopyField, TextButton, FormFooter } from '../app-layout';
+import { FormContainer, DisplayInputCopyField, TextButton, FormFooter } from '../app-layout';
 
 const computerFormId = (domain: string, fields: FormField[]) => {
     const id = fields.length ? '###' + fields[0].id + '###' : 'credential';
@@ -120,9 +120,9 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
             chromeExtension.sendKey(key);
         }
     };
-
+    const { ControlledContainer } = mobile;
     return (
-        <ControlLayout title="Form Data Transfer" domain={domain} mobile={mobile}>
+        <mobile.ControlledContainer title="Form Data Transfer" domain={domain}>
             <FormContainer>
                 {formFields.map((formField, index) => (<DisplayInputCopyField
                     field={formField}
@@ -144,7 +144,7 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
                 <TextButton onClick={toggleVisibility} label={visibility.label} />
                 <TextButton onClick={manageForm} label="Manage" />
             </FormFooter>
-        </ControlLayout>);
+        </mobile.ControlledContainer>);
 
 
 };

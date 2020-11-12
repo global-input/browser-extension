@@ -1,7 +1,4 @@
 import React, { useEffect } from 'react';
-import { ControlLayout } from '../app-layout';
-
-
 import * as rules from './rules';
 import { useLoader } from './controllers';
 
@@ -29,9 +26,9 @@ const LoadRules: React.FC<Props> = ({ back, domain, editRule, processRule }) => 
         processRule(rule);
     }, [domain, onError, processRule]);
     return (
-        <ControlLayout title="Page Control" mobile={mobile}>
+        <mobile.ControlledContainer title="Page Control" domain={domain}>
             {display}
-        </ControlLayout>
+        </mobile.ControlledContainer>
 
     );
 }

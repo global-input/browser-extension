@@ -1,5 +1,5 @@
 import React from 'react';
-import { BasicLayout, QRCodeContainer,  FormFooter, TextButton, MessageContainer } from '../app-layout';
+import { BasicLayout, FormFooter, TextButton, MessageContainer } from '../app-layout';
 
 import { useMobile } from '../mobile';
 interface Props {
@@ -30,12 +30,10 @@ const AppPairing: React.FC<Props> = ({ back }) => {
             <MessageContainer>
                 You need to pair your mobile app in order to be able to connect to your extension.
                 </MessageContainer>
-            <QRCodeContainer>
-                <mobile.PairingQR/>
-            </QRCodeContainer>
-                <FormFooter>
-                    <TextButton onClick={back} label='Done' />
-                </FormFooter>
+            {mobile.pairing}
+            <FormFooter>
+                <TextButton onClick={back} label='Done' />
+            </FormFooter>
 
         </BasicLayout>
     )
@@ -44,10 +42,10 @@ const AppPairing: React.FC<Props> = ({ back }) => {
 
 
 const FIELDS = {
-    info:{
+    info: {
         id: "info",
         type: "info",
-        value:"Please scan the QR Code displayed to pair your mobile app with the application."
+        value: "Please scan the QR Code displayed to pair your mobile app with the application."
     },
     back: {
         id: 'back',

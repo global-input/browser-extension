@@ -1,5 +1,5 @@
 import React from 'react';
-import { ControlLayout } from '../app-layout';
+
 
 import * as rules from './rules';
 import { useControl } from './controllers';
@@ -17,9 +17,9 @@ interface Props {
 const PageControl: React.FC<Props> = ({ back, domain, form, editRule, loadRule }) => {
     const { mobile, display } = useControl({ back, domain, form, editRule, loadRule })
     return (
-        <ControlLayout title="Page Control" mobile={mobile}>
+        <mobile.ControlledContainer title="Page Control" domain={domain}>
             {display}
-        </ControlLayout>
+        </mobile.ControlledContainer>
     )
 }
 

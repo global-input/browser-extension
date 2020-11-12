@@ -1,5 +1,5 @@
 import React from 'react';
-import { GlobalInputData } from '../mobile';
+
 
 import InputWithCopy from './input-with-copy';
 import InputWithLabel from './input-with-label';
@@ -79,22 +79,6 @@ export const AppFooter: React.FC = ({ children }) => (
         {children}
     </div>
 )
-/**
- * Only when the mobile connected and there isn't any error in both mobile and errorMessage passed in, then the children will be displayed
- *
- */
-interface ControlProps extends BasicLayoutProps {
-    mobile: GlobalInputData;
-    notConnected?: React.ReactNode;
-}
-export const ControlLayout: React.FC<ControlProps> = ({ title, errorMessage, mobile, domain, notConnected, children }) => (
-    <AppContainer title={title} domain={domain}>
-        {mobile.isReady && (<QRCodeContainer><mobile.ConnectQR /></QRCodeContainer>)}
-        {(errorMessage || mobile.isError) ? (<DisplayErrorMessage errorMessage={errorMessage ? errorMessage : mobile.errorMessage} />) : (mobile.isConnected && children)}
-        {(!mobile.isConnected) && notConnected}
-    </AppContainer>
-);
-
 
 interface MessageProps {
     title?: string;

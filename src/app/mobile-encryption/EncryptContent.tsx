@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useMobile } from '../mobile';
-import { MessageContainer, FormContainer, ControlLayout } from '../app-layout';
+import { MessageContainer, FormContainer } from '../app-layout';
 
 interface Props {
     content: string;
     contentOnComputer: (content: string) => void;
     showOnComputer: (content: string) => void;
+    domain: string;
 }
 
-const EncryptContent: React.FC<Props> = ({ content, contentOnComputer, showOnComputer }) => {
+const EncryptContent: React.FC<Props> = ({ domain, content, contentOnComputer, showOnComputer }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const mobile = useMobile({
         action: "input",
@@ -36,14 +37,14 @@ const EncryptContent: React.FC<Props> = ({ content, contentOnComputer, showOnCom
         }
     });
     return (
-        <ControlLayout title="Mobile Encryption" mobile={mobile} errorMessage={errorMessage}>
+        <mobile.ControlledContainer title="Mobile Encryption" domain={domain} errorMessage={errorMessage}>
             <FormContainer>
                 <MessageContainer title="Encrypting Content">
                     Follow the instruction on your mobile to encrypt content.
             </MessageContainer>
             </FormContainer>
 
-        </ControlLayout>
+        </mobile.ControlledContainer>
     );
 
 };

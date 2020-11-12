@@ -1,15 +1,16 @@
 import React, { useState, useCallback } from 'react';
 import { useMobile } from '../mobile';
-import { InputWithLabel, TextButton, DisplayErrorMessage, FormContainer, FormFooter, ControlLayout } from '../app-layout';
+import { InputWithLabel, TextButton, DisplayErrorMessage, FormContainer, FormFooter } from '../app-layout';
 
 interface PROPS {
     initialContent: string;
     contentOnComputer: (content: string) => void;
     startEncrypt: (content: string) => void;
     cancel: () => void;
+    domain: string;
 }
 
-const ContentOnMobile: React.FC<PROPS> = ({ initialContent, contentOnComputer, cancel, startEncrypt }) => {
+const ContentOnMobile: React.FC<PROPS> = ({ initialContent, contentOnComputer, cancel, startEncrypt, domain }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [content, setContent] = useState<string>(initialContent);
     const mobile = useMobile({
@@ -60,7 +61,7 @@ const ContentOnMobile: React.FC<PROPS> = ({ initialContent, contentOnComputer, c
 
 
     return (
-        <ControlLayout title="Mobile Encryption" mobile={mobile}>
+        <mobile.ControlledContainer title="Mobile Encryption" domain={domain}>
             <FormContainer title="Provide Content on Mobile">
                 <InputWithLabel label="Content to encrypt" id="content"
                     onChange={onContentChange}
@@ -73,7 +74,7 @@ const ContentOnMobile: React.FC<PROPS> = ({ initialContent, contentOnComputer, c
                     <TextButton onClick={onEncrypt} label='Encrypt' />
                 </FormFooter>
             </FormContainer>
-        </ControlLayout>
+        </mobile.ControlledContainer>
     );
 
 };

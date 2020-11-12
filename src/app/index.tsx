@@ -29,12 +29,12 @@ const App = () => {
 
     const mainPage = useCallback(() => setPage(PAGES.MAIN_PAGE), []);
     const transferFormData = useCallback(() => setPage(PAGES.TRANSFER_FORM_DATA), []);
-    const encryption=useCallback(() => setPage(PAGES.ENCRYPTION), []);
-    const decryption=useCallback(() => setPage(PAGES.DECRYPTION), []);
-    const displayCachedForm=useCallback(() => setPage(PAGES.DISPLAY_CACHED_FORM), []);
-    const pairing=useCallback(() => setPage(PAGES.PAIRING), []);
-    const pageControl=useCallback(() => setPage(PAGES.PAGE_CONTROL), []);
-    const editConnectionSettings=useCallback(() => setPage(PAGES.EDIT_CONNECTION_SETTINGS), []);
+    const encryption = useCallback(() => setPage(PAGES.ENCRYPTION), []);
+    const decryption = useCallback(() => setPage(PAGES.DECRYPTION), []);
+    const displayCachedForm = useCallback(() => setPage(PAGES.DISPLAY_CACHED_FORM), []);
+    const pairing = useCallback(() => setPage(PAGES.PAIRING), []);
+    const pageControl = useCallback(() => setPage(PAGES.PAGE_CONTROL), []);
+    const editConnectionSettings = useCallback(() => setPage(PAGES.EDIT_CONNECTION_SETTINGS), []);
 
     const onReceivedPageStatus = useCallback((message) => {
         if (message && message.status === 'success' && message.host) {
@@ -52,7 +52,7 @@ const App = () => {
             storage.clearCacheFields();
             mainPage();
         }
-    }, [displayCachedForm,mainPage]);
+    }, [displayCachedForm, mainPage]);
 
 
     switch (page) {
@@ -69,13 +69,13 @@ const App = () => {
         case PAGES.MAIN_PAGE:
             return (<MainPage domain={domain} transferFormData={transferFormData} encryption={encryption}
                 decryption={decryption} pageControl={pageControl}
-                editConnectionSettings={editConnectionSettings}/>);
+                editConnectionSettings={editConnectionSettings} />);
         case PAGES.EDIT_CONNECTION_SETTINGS:
-            return (<ConnectionSettings back={mainPage} pairing={pairing}/>);
+            return (<ConnectionSettings back={mainPage} pairing={pairing} />);
         case PAGES.PAGE_CONTROL:
             return (<PageControl back={mainPage} domain={domain} />);
         case PAGES.PAIRING:
-            return (<AppPairing back={mainPage}/>);
+            return (<AppPairing back={mainPage} />);
         default:
             return null;
     }
