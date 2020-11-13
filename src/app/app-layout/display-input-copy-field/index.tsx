@@ -6,7 +6,7 @@ interface DisplayInputCopyFieldProps {
     field: FormField;
     hideValue: boolean;
     onChange?: (value: string, id?: string) => void;
-    onCopied: () => void;
+    onCopied?: () => void;
 }
 
 const DisplayInputCopyField: React.FC<DisplayInputCopyFieldProps> = ({ field, hideValue, onChange, onCopied }) => {
