@@ -26,7 +26,7 @@ const ConnectionSettings: React.FC<Props> = ({ back, pairing }) => {
     { ...FIELDS.codeKey, value: codeKey },
     FIELDS.back,
     FIELDS.save];
-    const mobile = useMobile("Connecting Settings", fields);
+    const mobile = useMobile("Connection Settings", fields);
     mobile.setOnFieldChange((field) => {
         switch (field.id) {
             case FIELDS.url.id:
