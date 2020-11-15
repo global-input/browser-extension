@@ -6,10 +6,6 @@ import * as cache from './cache';
 
 import { FormContainer, DisplayInputCopyField, TextButton, FormFooter } from '../app-layout';
 
-const computerFormId = (domain: string, fields: FormField[]) => {
-    const id = fields.length ? '###' + fields[0].id + '###' : 'credential';
-    return id + '@' + domain;
-}
 
 const FIELDS = {
     back: {
@@ -72,27 +68,17 @@ interface Props {
 };
 const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, manageForm, back }) => {
     const [visibility, setVisibility] = useState(FIELDS.visibility.options[0]);
-    const mobile = useMobile(() => {
-        const id = computerFormId(domain, formFields);
-        return {
-            form: {
-                id,
-                title: domain,
-                label: "web",
-                domain: domain,
-                fields: [...Object.values(FIELDS),
-                ...formFields]
-            }
-        };
-    });
-    const { sendValue } = mobile;
+
+    const mobile = useMobile(domain, [...Object.values(FIELDS), ...formFields], domain);
+
     const toggleVisibility = useCallback(() => {
         const vis = visibility === FIELDS.visibility.options[0] ? FIELDS.visibility.options[1] : FIELDS.visibility.options[0];
         setVisibility(vis);
-        sendValue(FIELDS.visibility.id, vis.value);
-    }, [visibility, sendValue]);
+        mobile.sendValue(FIELDS.visibility.id, vis.value);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [visibility, mobile.sendValue]);
 
-    mobile.setOnchange(({ field }) => {
+    mobile.setOnFieldChange((field) => {
         switch (field.id) {
             case FIELDS.visibility.id:
                 toggleVisibility();
@@ -120,7 +106,7 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
             chromeExtension.sendKey(key);
         }
     };
-    const onFieldChanged=(formFields:FormField[],formField:FormField,index:number,value:string)=>{
+    const onFieldChanged = (formFields: FormField[], formField: FormField, index: number, value: string) => {
         const changedFormFields = computeChangedFormFields(formFields, formField.id, value, index);
         if (changedFormFields) {
             setFormFields(changedFormFields);
@@ -135,7 +121,7 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
                     field={formField}
                     key={formField.id}
                     onCopied={onCopied}
-                    hideValue={visibility.value === 0} onChange={value => onFieldChanged(formFields,formField,index,value)} />))}
+                    hideValue={visibility.value === 0} onChange={value => onFieldChanged(formFields, formField, index, value)} />))}
             </FormContainer>
             <FormFooter>
                 <TextButton onClick={back} label="Back" />

@@ -12,16 +12,8 @@ interface Props {
     editConnectionSettings: () => void;
 }
 const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption, decryption, pageControl, editConnectionSettings, }) => {
-    const mobile = useMobile({
-        action: "input",
-        dataType: "form",
-        form: {
-            title: "Please Select",
-            fields: Object.values(FIELDS)
-        }
-    });
-
-    mobile.setOnchange(({ field }) => {
+    const mobile = useMobile("Please Select", Object.values(FIELDS));
+    mobile.setOnFieldChange((field) => {
         switch (field.id) {
             case FIELDS.transfer.id:
                 transferFormData();

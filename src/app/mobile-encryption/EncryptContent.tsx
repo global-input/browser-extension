@@ -11,16 +11,9 @@ interface Props {
 
 const EncryptContent: React.FC<Props> = ({ domain, content, contentOnComputer, showOnComputer }) => {
     const [errorMessage, setErrorMessage] = useState('');
-    const mobile = useMobile({
-        action: "input",
-        dataType: "form",
-        form: {
-            title: "Mobile Encryption",
-            fields: [{ ...FIELDS.content, value: content }, FIELDS.info, FIELDS.back]
-        }
-    });
+    const mobile = useMobile("Mobile Encryption", [{ ...FIELDS.content, value: content }, FIELDS.info, FIELDS.back]);
 
-    mobile.setOnchange(({ field }) => {
+    mobile.setOnFieldChange((field) => {
         switch (field.id) {
             case FIELDS.content.id:
                 if (field.value) {

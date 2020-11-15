@@ -16,17 +16,11 @@ const Editor: React.FC<Props> = ({ back, domain, loadRule }) => {
         return rules.buildSelectionItems()
     }, [])
 
-    const mobile = useMobile({
-        action: "input",
-        dataType: "form",
-        form: {
-            title: "Preset Rules",
-            fields: [FIELDS.info, { ...FIELDS.editor, value: content }, FIELDS.back, FIELDS.use]
-        }
-    });
+    const mobile = useMobile("Preset Rules", [FIELDS.info, { ...FIELDS.editor, value: content }, FIELDS.back, FIELDS.use]);
+
     const onUse = () => loadRule(content);
 
-    mobile.setOnchange(({ field }) => {
+    mobile.setOnFieldChange((field) => {
         switch (field.id) {
             case FIELDS.back.id:
                 back();

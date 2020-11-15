@@ -11,16 +11,11 @@ interface Props {
     domain: string;
 }
 const ShowOnComputer: React.FC<Props> = ({ content, contentOnComputer, showOnMobile, finish, domain }) => {
-    const mobile = useMobile({
-        action: "input",
-        dataType: "form",
-        form: {
-            title: "Decryption Completed",
-            fields: Object.values(FIELDS)
-        }
-    });
+
+    const mobile = useMobile("Decryption Completed", Object.values(FIELDS));
+
     const restart = () => contentOnComputer('');
-    mobile.setOnchange(({ field }) => {
+    mobile.setOnFieldChange((field) => {
         switch (field.id) {
             case FIELDS.restart.id:
                 restart();

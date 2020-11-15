@@ -7,16 +7,8 @@ interface Props {
 }
 
 const AppPairing: React.FC<Props> = ({ back }) => {
-
-    const mobile = useMobile({
-        action: "input",
-        dataType: "form",
-        form: {
-            title: "Paring",
-            fields: Object.values(FIELDS)
-        }
-    });
-    mobile.setOnchange(({ field }) => {
+    const mobile = useMobile("Paring", Object.values(FIELDS));
+    mobile.setOnFieldChange((field) => {
         switch (field.id) {
             case FIELDS.back.id:
                 back();

@@ -12,14 +12,7 @@ interface Props {
 const Editor: React.FC<Props> = ({ back, domain, initialContent, saveRule, loadLoadFromPreset }) => {
     const [content, setContent] = useState<string>(initialContent);
     const [errorMessage, setErrorMessage] = useState('');
-    const mobile = useMobile({
-        action: "input",
-        dataType: "form",
-        form: {
-            title: "Edit Rules",
-            fields: [{ ...FIELDS.domain, value: domain }, FIELDS.info, { ...FIELDS.editor, value: content }, FIELDS.cancel, FIELDS.save, FIELDS.loadFromPreset]
-        }
-    });
+    const mobile = useMobile("Edit Rules", [{ ...FIELDS.domain, value: domain }, FIELDS.info, { ...FIELDS.editor, value: content }, FIELDS.cancel, FIELDS.save, FIELDS.loadFromPreset]);
     const onSave = () => {
         try {
             content && JSON.parse(content);
@@ -30,7 +23,7 @@ const Editor: React.FC<Props> = ({ back, domain, initialContent, saveRule, loadL
         }
         saveRule(content);
     };
-    mobile.setOnchange(({ field }) => {
+    mobile.setOnFieldChange((field) => {
         switch (field.id) {
             case FIELDS.cancel.id:
                 back();
