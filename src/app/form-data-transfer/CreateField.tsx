@@ -10,10 +10,10 @@ interface Props {
 const CreateField: React.FC<Props> = ({ formFields, onFormStructureChanged, back }) => {
     const [label, setLabel] = useState('');
     const [fieldType, setFieldType] = useState(FIELDS.type.items[0].value);
-    const initData={
-        form:{
-            title:"Creating New Field",
-            fields:Object.values(FIELDS)
+    const initData = {
+        form: {
+            title: "Creating New Field",
+            fields: Object.values(FIELDS)
         }
     }
     const mobile = useMobile(initData);
@@ -119,7 +119,7 @@ const FIELDS = {
         items: [
             { value: "single-line", label: "Single-line" },
             { value: "multi-line", label: "Multi-line" },
-            { value: "password", label: "secret" }
+            { value: "secret", label: "Password" }
 
         ]
     },
