@@ -25,7 +25,13 @@ const ManagerForm: React.FC<Props> = ({ formFields, onFormStructureChanged, back
             onFormStructureChanged(newFormFields);
             const items = createSelectableItems(newFormFields);
             setItems(items);
-            mobile.sendFormFields("Form Manager", [{ ...FIELDS.select, items }, FIELDS.back, FIELDS.delete, FIELDS.create]);
+            const initData = {
+                form: {
+                    title: "Form Manager",
+                    fields: [{ ...FIELDS.select, items }, FIELDS.back, FIELDS.delete, FIELDS.create]
+                }
+            }
+            mobile.sendInitData(initData);
         }
     };
     mobile.setOnFieldChange((field) => {

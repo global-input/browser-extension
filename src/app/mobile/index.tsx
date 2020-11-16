@@ -24,16 +24,6 @@ export const useMobile = (initData: globalInput.InitData | (() => globalInput.In
         initData, options, codeAES: connectionSettings.codeKey
     });
 
-    const sendFormFields = useCallback((title: string, fields: globalInput.FormField[]) => {
-        mobile.sendInitData({
-            form: {
-                title,
-                fields
-            }
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mobile.sendInitData]);
-
     const setOnFieldChange = useCallback((onFieldChange: (field: globalInput.FormField) => void) => {
         mobile.setOnchange(({ field }) => {
             onFieldChange(field);
@@ -73,7 +63,7 @@ export const useMobile = (initData: globalInput.InitData | (() => globalInput.In
         // eslint-disable-next-line react-hooks/exhaustive-deps
     ), [mobile.isConnectionDenied, mobile.isError, mobile.isConnected, mobile.isReady, mobile.disconnect, mobile.ConnectQR, mobile.errorMessage]);
 
-    return { ...mobile, ControlledContainer, pairing, disconnectButton, sendFormFields, setOnFieldChange };
+    return { ...mobile, ControlledContainer, pairing, disconnectButton, setOnFieldChange };
 };
 
 export const userWithDomainAsFormId = (initData: globalInput.InitData) => {
