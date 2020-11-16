@@ -33,9 +33,7 @@ export const useMobile = (initData: globalInput.InitData | (() => globalInput.In
 
     ////dev-test codeData
 
-    const pairing = (<QRCodeContainer>
-        <mobile.PairingQR />
-    </QRCodeContainer>);
+
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const restart = useCallback(() => mobile.restart(), [mobile.restart]);
@@ -63,7 +61,7 @@ export const useMobile = (initData: globalInput.InitData | (() => globalInput.In
         // eslint-disable-next-line react-hooks/exhaustive-deps
     ), [mobile.isConnectionDenied, mobile.isError, mobile.isConnected, mobile.isReady, mobile.disconnect, mobile.ConnectQR, mobile.errorMessage]);
 
-    return { ...mobile, ControlledContainer, pairing, disconnectButton, setOnFieldChange };
+    return { ...mobile, ControlledContainer, disconnectButton, setOnFieldChange };
 };
 
 export const userWithDomainAsFormId = (initData: globalInput.InitData) => {

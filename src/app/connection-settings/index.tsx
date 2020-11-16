@@ -60,7 +60,7 @@ const ConnectionSettings: React.FC<Props> = ({ back, pairing }) => {
             back();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mobile.disconnect, back, setting, mobile.pairing]);
+    }, [mobile.disconnect, back, setting]);
 
     const onURLChange = useCallback((url: string) => {
         setURL(url);
