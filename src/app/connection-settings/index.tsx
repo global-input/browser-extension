@@ -19,14 +19,18 @@ const ConnectionSettings: React.FC<Props> = ({ back, pairing }) => {
     const apikey = setting.apikey ? setting.apikey : '';
     const securityGroup = setting.securityGroup ? setting.securityGroup : '';
     const codeKey = setting.codeKey ? setting.codeKey : '';
-
-    const fields = [{ ...FIELDS.url, value: url },
-    { ...FIELDS.apikey, value: apikey },
-    { ...FIELDS.securityGroup, value: securityGroup },
-    { ...FIELDS.codeKey, value: codeKey },
-    FIELDS.back,
-    FIELDS.save];
-    const mobile = useMobile("Connection Settings", fields);
+    const initData = () => ({
+        form: {
+            title: "Connection Settings",
+            fields: [{ ...FIELDS.url, value: url },
+            { ...FIELDS.apikey, value: apikey },
+            { ...FIELDS.securityGroup, value: securityGroup },
+            { ...FIELDS.codeKey, value: codeKey },
+            FIELDS.back,
+            FIELDS.save]
+        }
+    });
+    const mobile = useMobile(initData);
     mobile.setOnFieldChange((field) => {
         switch (field.id) {
             case FIELDS.url.id:

@@ -12,7 +12,13 @@ interface Props {
 const Editor: React.FC<Props> = ({ back, domain, initialContent, saveRule, loadLoadFromPreset }) => {
     const [content, setContent] = useState<string>(initialContent);
     const [errorMessage, setErrorMessage] = useState('');
-    const mobile = useMobile("Edit Rules", [{ ...FIELDS.domain, value: domain }, FIELDS.info, { ...FIELDS.editor, value: content }, FIELDS.cancel, FIELDS.save, FIELDS.loadFromPreset]);
+    const initData = () => ({
+        form: {
+            title: "Edit Rules",
+            fields: [{ ...FIELDS.domain, value: domain }, FIELDS.info, { ...FIELDS.editor, value: content }, FIELDS.cancel, FIELDS.save, FIELDS.loadFromPreset]
+        }
+    });
+    const mobile = useMobile(initData);
     const onSave = () => {
         try {
             content && JSON.parse(content);

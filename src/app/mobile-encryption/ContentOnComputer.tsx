@@ -15,7 +15,13 @@ interface PROPS {
 const ContentOnComputer: React.FC<PROPS> = ({ initialContent, contentOnMobile, startEncrypt, cancel, domain }) => {
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [content, setContent] = useState(initialContent);
-    const mobile = useMobile("Mobile Encryption", Object.values(FIELDS));
+    const initData = {
+        form: {
+            title: "Mobile Encryption",
+            fields: Object.values(FIELDS)
+        }
+    }
+    const mobile = useMobile(initData);
 
     const onContentChange = useCallback((value: string) => {
         setErrorMessage('');

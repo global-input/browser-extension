@@ -13,7 +13,14 @@ interface PROPS {
 const ContentOnMobile: React.FC<PROPS> = ({ initialContent, contentOnComputer, cancel, startDecrypt, domain }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [content, setContent] = useState<string>(initialContent);
-    const mobile = useMobile("Content To Decrypt", [FIELDS.info, { ...FIELDS.content, value: initialContent }, FIELDS.back, FIELDS.cancel, FIELDS.decrypt]);
+
+    const initData = () => ({
+        form: {
+            title: "Content To Decrypt",
+            fields: [FIELDS.info, { ...FIELDS.content, value: initialContent }, FIELDS.back, FIELDS.cancel, FIELDS.decrypt]
+        }
+    });
+    const mobile = useMobile(initData);
 
     const onDecrypt = () => {
         if (content.trim()) {

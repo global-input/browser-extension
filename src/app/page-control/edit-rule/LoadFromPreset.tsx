@@ -16,7 +16,14 @@ const Editor: React.FC<Props> = ({ back, domain, loadRule }) => {
         return rules.buildSelectionItems()
     }, [])
 
-    const mobile = useMobile("Preset Rules", [FIELDS.info, { ...FIELDS.editor, value: content }, FIELDS.back, FIELDS.use]);
+    const initData = {
+        form: {
+            title: "Preset Rules",
+            fields: [FIELDS.info, { ...FIELDS.editor, value: content }, FIELDS.back, FIELDS.use]
+        }
+    };
+
+    const mobile = useMobile(initData);
 
     const onUse = () => loadRule(content);
 

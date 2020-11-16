@@ -12,8 +12,13 @@ interface Props {
 
 const ManagerForm: React.FC<Props> = ({ formFields, onFormStructureChanged, back, createField }) => {
     const [items, setItems] = useState(() => createSelectableItems(formFields));
-
-    const mobile = useMobile("Form Manager", [{ ...FIELDS.select, items }, FIELDS.back, FIELDS.delete, FIELDS.create]);
+    const initData = () => ({
+        form: {
+            title: "Form Manager",
+            fields: [{ ...FIELDS.select, items }, FIELDS.back, FIELDS.delete, FIELDS.create]
+        }
+    });
+    const mobile = useMobile(initData);
     const onDelete = () => {
         const newFormFields = deleteFormFields(formFields, items);
         if (newFormFields) {

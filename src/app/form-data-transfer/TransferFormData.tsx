@@ -1,64 +1,10 @@
 import React, { useState, useCallback } from 'react';
 
-import { useMobile, FormField } from '../mobile';
+import { useMobile, FormField, userWithDomainAsFormId } from '../mobile';
 import * as chromeExtension from '../chrome-extension';
 import * as cache from './cache';
 
 import { FormContainer, DisplayInputCopyField, TextButton, FormFooter } from '../app-layout';
-
-
-const FIELDS = {
-    back: {
-        id: "backToHome",
-        type: "button",
-        label: "Back",
-        viewId: "row1"
-    },
-    manage: {
-        id: "manageForm",
-        type: "button",
-        label: "Manage",
-        viewId: "row1"
-    },
-    visibility: {
-        id: "fieldValueVisibility",
-        type: 'button',
-        viewId: "row1",
-        options: [{ value: 0, label: 'Show' }, { value: 1, label: 'Hide' }],
-        value: 0
-    }
-
-};
-
-
-
-const computeChangedFormFields = (formFields: FormField[], fieldId: string | null | undefined, value: string, index: number) => {
-    let fieldModified = false;
-    const fields = formFields.map((f, ind) => {
-        if (fieldId) {
-            if (f.id === fieldId) {
-                fieldModified = true;
-                return { ...f, value };
-            }
-        }
-        else {
-            if (index >= 0 && index < formFields.length) {
-                if (ind === index) {
-                    fieldModified = true;
-                    return { ...f, value };
-                }
-            }
-        }
-        return f;
-    });
-    if (fieldModified) {
-        return fields;
-    }
-    return null;
-}
-
-
-
 interface Props {
     domain: string;
     formFields: FormField[];
@@ -68,8 +14,19 @@ interface Props {
 };
 const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, manageForm, back }) => {
     const [visibility, setVisibility] = useState(FIELDS.visibility.options[0]);
-
-    const mobile = useMobile(domain, [...Object.values(FIELDS), ...formFields], domain);
+    const initData = () => {
+        const initData = {
+            form: {
+                title: domain,
+                domain: domain,
+                label: domain,
+                fields: [...Object.values(FIELDS), ...formFields]
+            }
+        }
+        userWithDomainAsFormId(initData);
+        return initData;
+    };
+    const mobile = useMobile(initData);
 
     const toggleVisibility = useCallback(() => {
         const vis = visibility === FIELDS.visibility.options[0] ? FIELDS.visibility.options[1] : FIELDS.visibility.options[0];
@@ -133,4 +90,51 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
 
 };
 
+const FIELDS = {
+    back: {
+        id: "backToHome",
+        type: "button",
+        label: "Back",
+        viewId: "row1"
+    },
+    manage: {
+        id: "manageForm",
+        type: "button",
+        label: "Manage",
+        viewId: "row1"
+    },
+    visibility: {
+        id: "fieldValueVisibility",
+        type: 'button',
+        viewId: "row1",
+        options: [{ value: 0, label: 'Show' }, { value: 1, label: 'Hide' }],
+        value: 0
+    }
+
+};
+
+const computeChangedFormFields = (formFields: FormField[], fieldId: string | null | undefined, value: string, index: number) => {
+    let fieldModified = false;
+    const fields = formFields.map((f, ind) => {
+        if (fieldId) {
+            if (f.id === fieldId) {
+                fieldModified = true;
+                return { ...f, value };
+            }
+        }
+        else {
+            if (index >= 0 && index < formFields.length) {
+                if (ind === index) {
+                    fieldModified = true;
+                    return { ...f, value };
+                }
+            }
+        }
+        return f;
+    });
+    if (fieldModified) {
+        return fields;
+    }
+    return null;
+}
 export default TransferFormData;

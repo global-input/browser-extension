@@ -10,7 +10,13 @@ interface Props {
 const CreateField: React.FC<Props> = ({ formFields, onFormStructureChanged, back }) => {
     const [label, setLabel] = useState('');
     const [fieldType, setFieldType] = useState(FIELDS.type.items[0].value);
-    const mobile = useMobile("Creating New Field", Object.values(FIELDS));
+    const initData={
+        form:{
+            title:"Creating New Field",
+            fields:Object.values(FIELDS)
+        }
+    }
+    const mobile = useMobile(initData);
     const onCreateNew = () => {
         const newFormFields = createNewFormFields(formFields, label, fieldType);
         if (newFormFields) {

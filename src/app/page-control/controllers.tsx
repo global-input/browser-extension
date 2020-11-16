@@ -28,7 +28,13 @@ export const useLoader = ({ back, domain, editRule }: LoaderProps) => {
     const [status, setStatus] = useState(STATUS.LOADING);
     const [message, setMessage] = useState('');
 
-    const mobile = useMobile("Page Control", [{ ...FIELDS.domain, value: domain }, { ...FIELDS.message, value: messageValue(message) }, FIELDS.back, FIELDS.editRule]);
+    const initData = () => ({
+        form: {
+            title: "Page Control",
+            fields: [{ ...FIELDS.domain, value: domain }, { ...FIELDS.message, value: messageValue(message) }, FIELDS.back, FIELDS.editRule]
+        }
+    });
+    const mobile = useMobile(initData);
 
     const { sendValue } = mobile;
     const onError = useCallback((message: string) => {
@@ -75,7 +81,8 @@ interface ControlProps {
 
 
 export const useControl = ({ back, domain, form, editRule, loadRule }: ControlProps) => {
-    const mobile = useMobile(form.title, () => {
+
+    const initData = () => {
         const fields = rules.buildFormFieldsFieldRules(form, (messageField, value) => {
             chromeExtension.sendFormField(messageField.id, value);
             if (messageField.matchingRule?.next) {
@@ -84,8 +91,16 @@ export const useControl = ({ back, domain, form, editRule, loadRule }: ControlPr
                 }
             }
         });
-        return [...fields, FIELDS.message, FIELDS.back, FIELDS.editRule]
-    }, domain, form.id);
+        return {
+            form: {
+                title: form.title,
+                domain: domain,
+                id: form.id,
+                fields: [...fields, FIELDS.message, FIELDS.back, FIELDS.editRule]
+            }
+        }
+    };
+    const mobile = useMobile(initData);
 
     mobile.setOnFieldChange((field) => {
         switch (field.id) {

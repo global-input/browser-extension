@@ -184,3 +184,16 @@ export const saveFormFields = (domain: string, formFields: FormField[]) => {
         removeFormFields(domain);
     }
 }
+
+
+const DOMAIN = "iterative.globalInputApp.domain";
+export const getDomain = () => localStorage.getItem(DOMAIN);
+export const setDomain = (domain: string | null | undefined) => {
+    domain = domain?.trim();
+    if (domain) {
+        localStorage.setItem(DOMAIN, domain);
+    }
+    else {
+        localStorage.removeItem(DOMAIN);
+    }
+};
