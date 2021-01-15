@@ -62,7 +62,7 @@ ${Input}:checked ~ &:after {
 `;
 
 interface CheckBoxProps{
-    label:string;
+    label?:string;
     checked:boolean;
     onChange:(evt:ChangeEvent<HTMLInputElement>)=>void;
 }
