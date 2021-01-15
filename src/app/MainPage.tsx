@@ -1,25 +1,25 @@
 import React from 'react';
-import { useMobile } from './mobile';
+
 
 import { AppFooter, MessageContainer, MessageButton, MessageLink, RowCenter } from './app-layout';
-
+import {AppContainer,ConnectedInstruction} from './components';
+import {useMobile,ConnectWidget} from './mobile';
 interface Props {
     domain: string;
     transferFormData: () => void;
     encryption: () => void;
     decryption: () => void;
     pageControl: () => void;
-    editConnectionSettings: () => void;
 }
-const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption, decryption, pageControl, editConnectionSettings, }) => {
+const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption, decryption, pageControl}) => {
     const initData={
         form:{
             title:"Please Select",
             fields:Object.values(FIELDS)
         }
     };
-    const mobile = useMobile(initData);
-    mobile.setOnFieldChange((field) => {
+    const mobile = useMobile(initData,true);
+    mobile.setOnchange(({field}) => {
         switch (field.id) {
             case FIELDS.transfer.id:
                 transferFormData();
@@ -39,21 +39,24 @@ const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption, decry
 
     const NotConnected = () => (
         <AppFooter>
-            <MessageButton label="Settings" onClick={editConnectionSettings} />
             <MessageLink href="https://github.com/global-input/browser-extension">Source Code</MessageLink>
         </AppFooter>
     )
 
     return (
-        <mobile.ControlledContainer title="Global Input App" domain={domain} notConnected={<NotConnected />}>
-            <MessageContainer>
+        <AppContainer domain={domain} title="GlobalInput App">
+            <ConnectWidget mobile={mobile} />
+        </AppContainer>
+
+    );
+}
+/*
+<MessageContainer>
                 You can now operate on your mobile.
             </MessageContainer>
             <RowCenter>{mobile.disconnectButton}</RowCenter>
         </mobile.ControlledContainer>
-    );
-}
-
+*/
 
 const FIELDS = {
     transfer: {

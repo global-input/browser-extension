@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMobile } from '../mobile';
 import { MessageContainer, FormContainer } from '../app-layout';
-
+import {AppContainer} from '../components';
 interface Props {
     content: string;
     contentOnComputer: (content: string) => void;
@@ -19,7 +19,7 @@ const EncryptContent: React.FC<Props> = ({ domain, content, contentOnComputer, s
     });
     const mobile = useMobile(initData);
 
-    mobile.setOnFieldChange((field) => {
+    mobile.setOnchange(({field}) => {
         switch (field.id) {
             case FIELDS.content.id:
                 if (field.value) {
@@ -36,14 +36,15 @@ const EncryptContent: React.FC<Props> = ({ domain, content, contentOnComputer, s
         }
     });
     return (
-        <mobile.ControlledContainer title="Mobile Encryption" domain={domain} errorMessage={errorMessage}>
+        <AppContainer title="Mobile Encryption" domain={domain}>
             <FormContainer>
+                {errorMessage}
                 <MessageContainer title="Encrypting Content">
                     Follow the instruction on your mobile to encrypt content.
             </MessageContainer>
             </FormContainer>
 
-        </mobile.ControlledContainer>
+        </AppContainer>
     );
 
 };

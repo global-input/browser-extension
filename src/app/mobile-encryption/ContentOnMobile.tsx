@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useMobile } from '../mobile';
 import { InputWithLabel, TextButton, DisplayErrorMessage, FormContainer, FormFooter } from '../app-layout';
-
+import {AppContainer} from '../components';
 interface PROPS {
     initialContent: string;
     contentOnComputer: (content: string) => void;
@@ -33,7 +33,7 @@ const ContentOnMobile: React.FC<PROPS> = ({ initialContent, contentOnComputer, c
     const back = () => {
         contentOnComputer(content);
     }
-    mobile.setOnFieldChange((field) => {
+    mobile.setOnchange(({field}) => {
         switch (field.id) {
             case FIELDS.back.id:
                 back();
@@ -60,7 +60,7 @@ const ContentOnMobile: React.FC<PROPS> = ({ initialContent, contentOnComputer, c
 
 
     return (
-        <mobile.ControlledContainer title="Mobile Encryption" domain={domain}>
+        <AppContainer title="Mobile Encryption" domain={domain}>
             <FormContainer title="Provide Content on Mobile">
                 <InputWithLabel label="Content to encrypt" id="content"
                     onChange={onContentChange}
@@ -73,7 +73,7 @@ const ContentOnMobile: React.FC<PROPS> = ({ initialContent, contentOnComputer, c
                     <TextButton onClick={onEncrypt} label='Encrypt' />
                 </FormFooter>
             </FormContainer>
-        </mobile.ControlledContainer>
+        </AppContainer>
     );
 
 };

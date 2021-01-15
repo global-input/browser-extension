@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import * as rules from './rules';
 import { useLoader } from './controllers';
 
-
+import {AppContainer} from '../components';
 interface Props {
     back: () => void;
     domain: string;
@@ -26,9 +26,9 @@ const LoadRules: React.FC<Props> = ({ back, domain, editRule, processRule }) => 
         processRule(rule);
     }, [domain, onError, processRule]);
     return (
-        <mobile.ControlledContainer title="Page Control" domain={domain}>
+        <AppContainer title="Page Control" domain={domain}>
             {display}
-        </mobile.ControlledContainer>
+        </AppContainer>
 
     );
 }

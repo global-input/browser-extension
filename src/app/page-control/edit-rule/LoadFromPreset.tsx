@@ -27,7 +27,7 @@ const Editor: React.FC<Props> = ({ back, domain, loadRule }) => {
 
     const onUse = () => loadRule(content);
 
-    mobile.setOnFieldChange((field) => {
+    mobile.setOnchange(({field}) => {
         switch (field.id) {
             case FIELDS.back.id:
                 back();

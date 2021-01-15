@@ -1,8 +1,12 @@
 import React, { useState, useCallback } from 'react';
 
-import { useMobile, FormField, userWithDomainAsFormId } from '../mobile';
+import { useMobile, FormField } from '../mobile';
+import type {InitData} from '../mobile';
 import * as chromeExtension from '../chrome-extension';
 import * as cache from './cache';
+import {AppContainer,Form,Input,Label,Footer, DarkButton,Help,
+    ConnectContainer,DomainField} from '../components';
+
 
 import { FormContainer, DisplayInputCopyField, TextButton, FormFooter } from '../app-layout';
 interface Props {
@@ -35,7 +39,7 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visibility, mobile.sendValue]);
 
-    mobile.setOnFieldChange((field) => {
+    mobile.setOnchange(({field}) => {
         switch (field.id) {
             case FIELDS.visibility.id:
                 toggleVisibility();
@@ -72,7 +76,9 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
     }
 
     return (
-        <mobile.ControlledContainer title="Form Data Transfer" domain={domain}>
+        <AppContainer title="Form Data Transfer" domain={domain}>
+
+
             <FormContainer>
                 {formFields.map((formField, index) => (<DisplayInputCopyField
                     field={formField}
@@ -85,7 +91,9 @@ const TransferFormData: React.FC<Props> = ({ domain, formFields, setFormFields, 
                 <TextButton onClick={toggleVisibility} label={visibility.label} />
                 <TextButton onClick={manageForm} label="Manage" />
             </FormFooter>
-        </mobile.ControlledContainer>);
+
+        </AppContainer>
+        );
 
 
 };
@@ -138,3 +146,22 @@ const computeChangedFormFields = (formFields: FormField[], fieldId: string | nul
     return null;
 }
 export default TransferFormData;
+
+
+const userWithDomainAsFormId = (initData: InitData) => {
+    if (initData?.form?.domain && initData?.form?.fields?.length) {
+        const textFields = initData.form.fields.filter(f => {
+            if ((!f.type) || f.type === 'text') {
+                if (f.nLines && f.nLines > 1) {
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        });
+        if (!textFields.length) {
+            return null;
+        }
+        initData.form.id = `###${textFields[0].id}###@${initData.form.domain}`;
+    }
+};

@@ -6,9 +6,8 @@ import FormDataTransfer from './form-data-transfer';
 import MobileEncryption from './mobile-encryption';
 import MobileDecryption from './mobile-decryption';
 import MainPage from './MainPage';
-import ConnectionSettings from './connection-settings';
 import PageControl from './page-control';
-import AppPairing from './app-pairing'
+
 
 enum PAGES {
     LOADING,
@@ -17,9 +16,7 @@ enum PAGES {
     TRANSFER_FORM_DATA,
     ENCRYPTION,
     DECRYPTION,
-    PAGE_CONTROL,
-    EDIT_CONNECTION_SETTINGS,
-    PAIRING
+    PAGE_CONTROL
 }
 
 const App = () => {
@@ -32,9 +29,8 @@ const App = () => {
     const encryption = useCallback(() => setPage(PAGES.ENCRYPTION), []);
     const decryption = useCallback(() => setPage(PAGES.DECRYPTION), []);
     const displayCachedForm = useCallback(() => setPage(PAGES.DISPLAY_CACHED_FORM), []);
-    const pairing = useCallback(() => setPage(PAGES.PAIRING), []);
     const pageControl = useCallback(() => setPage(PAGES.PAGE_CONTROL), []);
-    const editConnectionSettings = useCallback(() => setPage(PAGES.EDIT_CONNECTION_SETTINGS), []);
+
 
     const onReceivedPageStatus = useCallback((message) => {
         if (message && message.status === 'success' && message.host) {
@@ -68,14 +64,9 @@ const App = () => {
             return (<MobileDecryption back={mainPage} domain={domain} />);
         case PAGES.MAIN_PAGE:
             return (<MainPage domain={domain} transferFormData={transferFormData} encryption={encryption}
-                decryption={decryption} pageControl={pageControl}
-                editConnectionSettings={editConnectionSettings} />);
-        case PAGES.EDIT_CONNECTION_SETTINGS:
-            return (<ConnectionSettings back={mainPage} pairing={pairing} />);
+                decryption={decryption} pageControl={pageControl}/>);
         case PAGES.PAGE_CONTROL:
             return (<PageControl back={mainPage} domain={domain} />);
-        case PAGES.PAIRING:
-            return (<AppPairing back={mainPage} />);
         default:
             return null;
     }

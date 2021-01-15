@@ -29,7 +29,7 @@ const Editor: React.FC<Props> = ({ back, domain, initialContent, saveRule, loadL
         }
         saveRule(content);
     };
-    mobile.setOnFieldChange((field) => {
+    mobile.setOnchange(({field}) => {
         switch (field.id) {
             case FIELDS.cancel.id:
                 back();

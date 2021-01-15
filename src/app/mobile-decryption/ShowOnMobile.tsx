@@ -2,7 +2,7 @@ import React from 'react';
 import { useMobile } from '../mobile';
 import { InputWithCopy, TextButton, FormContainer, FormFooter } from '../app-layout';
 
-
+import {AppContainer} from '../components';
 interface Props {
     content: string;
     finish: () => void;
@@ -21,7 +21,7 @@ const ShowOnMobile: React.FC<Props> = ({ content, contentOnComputer, showOnCompu
     const mobile = useMobile(initData);
 
     const restart = () => contentOnComputer('');
-    mobile.setOnFieldChange((field) => {
+    mobile.setOnchange(({field}) => {
         switch (field.id) {
             case FIELDS.restart.id:
                 restart();
@@ -38,7 +38,7 @@ const ShowOnMobile: React.FC<Props> = ({ content, contentOnComputer, showOnCompu
     });
 
     return (
-        <mobile.ControlledContainer title="Mobile Decryption" domain={domain}>
+        <AppContainer title="Mobile Decryption" domain={domain}>
             <FormContainer title="Decrypted Content">
                 <InputWithCopy id="decryptedContent" readOnly={true}
                     label="Decrypted Content"
@@ -49,7 +49,7 @@ const ShowOnMobile: React.FC<Props> = ({ content, contentOnComputer, showOnCompu
                     <TextButton onClick={finish} label='Finish' />
                 </FormFooter>
             </FormContainer>
-        </mobile.ControlledContainer>
+        </AppContainer>
 
     );
 

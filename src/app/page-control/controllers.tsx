@@ -43,7 +43,7 @@ export const useLoader = ({ back, domain, editRule }: LoaderProps) => {
         setStatus(STATUS.ERROR);
     }, [sendValue]);
 
-    mobile.setOnFieldChange((field) => {
+    mobile.setOnchange(({field}) => {
         switch (field.id) {
             case FIELDS.back.id:
                 back();
@@ -102,7 +102,7 @@ export const useControl = ({ back, domain, form, editRule, loadRule }: ControlPr
     };
     const mobile = useMobile(initData);
 
-    mobile.setOnFieldChange((field) => {
+    mobile.setOnchange(({field}) => {
         switch (field.id) {
             case FIELDS.back.id:
                 back();
