@@ -8,13 +8,8 @@ interface Props {
     decryption: () => void;
     pageControl: () => void;
 }
-const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption, decryption, pageControl}) => {
-    const initData={
-        form:{
-            title:"Please Select",
-            fields:Object.values(FIELDS)
-        }
-    };
+export const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption, decryption, pageControl}) => {
+
     const mobile = useMobile(initData,true);
     mobile.setOnchange(({field}) => {
         switch (field.id) {
@@ -57,13 +52,6 @@ const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption, decry
 
     );
 }
-/*
-<MessageContainer>
-                You can now operate on your mobile.
-            </MessageContainer>
-            <RowCenter>{mobile.disconnectButton}</RowCenter>
-        </mobile.ControlledContainer>
-*/
 
 const FIELDS = {
     transfer: {
@@ -91,5 +79,28 @@ const FIELDS = {
         viewId: "row3"
     }
 };
-
-export default MainPage;
+const initData={
+    form:{
+        title:"Please Select",
+        views: {
+            viewIds: {
+                row1:{
+                    style:{
+                        display:'flex',
+                        justifyContent:'center',
+                        width:'100%',
+                    }
+                },
+                row2:{
+                    style:{
+                        display:'flex',
+                        justifyContent:'space-between',
+                        padding:20,
+                        width:'100%',
+                    }
+                }
+            }
+        },
+        fields:Object.values(FIELDS)
+    }
+};

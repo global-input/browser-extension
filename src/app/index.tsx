@@ -5,7 +5,7 @@ import DisplayCachedFields from './form-data-transfer/DisplayCachedFields';
 import FormDataTransfer from './form-data-transfer';
 import MobileEncryption from './mobile-encryption';
 import MobileDecryption from './mobile-decryption';
-import MainPage from './MainPage';
+import {MainPage} from './MainPage';
 import PageControl from './page-control';
 
 
