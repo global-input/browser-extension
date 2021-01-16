@@ -65,16 +65,6 @@ const Container = styled.div`
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
         display: flex;
-        -moz-box-shadow: 3px 3px 5px #535353;
-        -webkit-box-shadow: 3px 3px 5px #535353;
-        box-shadow: 3px 3px 5px #535353;
-        background-color:rgb(74, 93, 126);
-        padding-bottom:10px;
-        @media only screen and (min-width:500px){
-                padding-left:10px;
-                padding-right:10px;
-
-        }
 `;
 
 const TopBar = styled.div`
@@ -101,6 +91,8 @@ const Content = styled.div`
         width:100%;
         overflow:scroll;
         background-color:white;
+        width:400px;
+        min-height:400px;
 `;
 const PopupGlass = styled.div`
         display: flex;
@@ -207,6 +199,7 @@ const TabContainer=styled.div`
     justify-content:flex-start;
     align-items:center;
     height:100%;
+    width:100%;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     align-items: flex-end;
@@ -314,6 +307,45 @@ const DisconnectIcon=styled.img.attrs({
     })`
     `;
 
+    const QRCodeContainer = styled.div`
+        flex-direction: column;
+        justify-content: flex-center;
+        align-items: flex-start;
+        margin: 0;
+        padding:0;
+        display: flex;
+   `;
+
+
+const BottomCentered=styled.div`
+    font-size=12px;
+    color:black;
+    font-family: Georgia, Times, Serif;
+    text-align:center;
+    width:100%;
+    color:green;
+
+`;
+export const GlobalInputAppLink=styled.a.attrs({
+    href:'https://globalinput.co.uk/global-input-app/get-app',
+    rel:'noopener noreferrer',
+    target:'_blank'
+})`
+    color: blue;
+`;
+export const SourceLink=styled.a.attrs({
+    href:'https://github.com/global-input/browser-extension',
+    rel:'noopener noreferrer',
+    target:'_blank'
+})`
+    color: white;
+    font-weight: 100;
+    font-family: Georgia, Times, Serif;
+    font-size: 8px;
+    flex:1;
+    text-align:center;
+    padding-bottom:10px;
+    `;
 
 
 
@@ -377,12 +409,53 @@ const Tabs:React.FC<TabProps>=(props)=>(
                 <ConnectTab {...props}/>
                 <SettingsTab {...props}/>
                 <PairingTab  {...props}/>
+                <SourceLink>Source Code</SourceLink>
     </TabContainer>
+);
+const ScanMessage=()=>(
+    <BottomCentered>Scan with <GlobalInputAppLink>Global Input App</GlobalInputAppLink></BottomCentered>
 );
 
 interface ConnectWidgetProps{
        mobile:MobileData;
 }
+const DisplayConnectQR:React.FC<ConnectWidgetProps> = ({mobile}) => {
+    if(mobile.widgetState!==WidgetState.CONNECT_QR)
+        return null;
+    if(mobile.isConnectionDenied){
+        return(<ErrorMessage>You can only use one mobile app per session. Disconnect to start a new session.</ErrorMessage>);
+    }
+    if(mobile.isError){
+        return(<ErrorMessage>{mobile.errorMessage}</ErrorMessage>);
+    }
+    if(!mobile.isShowWidget){
+        return null;
+    }
+    if (mobile.isConnected) {
+         return null;
+    }
+    return (
+    <QRCodeContainer>
+        <ConnectQR mobile={mobile} label=""/>
+        <ScanMessage/>
+    </QRCodeContainer>
+   );
+};
+const DisplayPairingQR:React.FC<ConnectWidgetProps> = ({mobile}) => {
+    if(mobile.widgetState!==WidgetState.PAIRING)
+        return null;
+    if(mobile.isError){
+        return(<ErrorMessage>{mobile.errorMessage}</ErrorMessage>);
+    }
+    return (
+    <QRCodeContainer>
+        <PairingQR mobile={mobile} label=""/>
+        <ScanMessage/>
+    </QRCodeContainer>
+   );
+};
+
+
 export const ConnectWidget:React.FC<ConnectWidgetProps>=({mobile})=>{
         const {widgetState,setWidgetState,errorMessage,onSaveSettings,loadSettings,isConnected,isShowWidget,isConnectionDenied,
                 isError}=mobile;
@@ -403,10 +476,9 @@ export const ConnectWidget:React.FC<ConnectWidgetProps>=({mobile})=>{
                     <Tabs  widgetState={widgetState} setWidgetState={setWidgetState}/>
                 </TopBar>
                 <Content>
-                    {widgetState===WidgetState.CONNECT_QR &&(<ConnectQR mobile={mobile}/>)}
-                    {widgetState===WidgetState.PAIRING && (<PairingQR mobile={mobile}/>)}
+                    <DisplayConnectQR mobile={mobile}/>
+                    <DisplayPairingQR mobile={mobile}/>
                     {widgetState===WidgetState.SETTINGS && (<SettingsEditor saveSettings={onSaveSettings} loadSettings={loadSettings}/>)}
-                    {message && (<ErrorMessage>{message}</ErrorMessage>)}
                 </Content>
             </Container >
         );

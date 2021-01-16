@@ -39,7 +39,7 @@ const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption, decry
 
     const NotConnected = () => (
         <AppFooter>
-            <MessageLink href="https://github.com/global-input/browser-extension">Source Code</MessageLink>
+                <MessageLink href="https://github.com/global-input/browser-extension">Source Code</MessageLink>
         </AppFooter>
     )
 
