@@ -2,7 +2,7 @@ import React from 'react';
 
 
 import { AppFooter, MessageContainer, MessageButton, MessageLink, RowCenter } from './app-layout';
-import {AppContainer,ConnectedInstruction} from './components';
+import {PopupWindow} from './components';
 import {useMobile,ConnectWidget} from './mobile';
 interface Props {
     domain: string;
@@ -44,9 +44,10 @@ const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption, decry
     )
 
     return (
-        <AppContainer domain={domain} title="GlobalInput App">
+        <PopupWindow>
+
             <ConnectWidget mobile={mobile} />
-        </AppContainer>
+        </PopupWindow>
 
     );
 }
