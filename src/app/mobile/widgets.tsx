@@ -88,51 +88,11 @@ const Content = styled.div`
         margin: 0;
         padding:0;
         display: flex;
-        width:100%;
         overflow:scroll;
         background-color:white;
         width:400px;
-        min-height:400px;
+        height:400px;
 `;
-const PopupGlass = styled.div`
-        display: flex;
-        margin: 0;
-        padding: 0;
-        position: fixed;
-        z-index:10;
-        width: 100vw;
-        flex-direction: column;
-        justify-content:flex-start;
-        align-items: center;
-        top:0;
-        left:0;
-        @media screen and (min-height:520px) and (min-width:520px){
-            top:20px;
-        }
-        @media screen and (min-height:580px) {
-            top:30px;
-        }
-        @media screen and (min-height:600px) {
-            top:60px;
-        }
-
-        @media screen and (min-height:700px) {
-            top:150px;
-        }
-
-
-
-
-
-
-
-
-`;
-// @media screen and (min-height:530px){
-//     top:0;
-//     height:100vh;
-//     justify-content: center;
-// }
 
  const ErrorMessage = styled.div`
         color: red;
@@ -145,52 +105,7 @@ const PopupGlass = styled.div`
         overflow: scroll;
 `;
 
-const PopUpWindow=styled.div`
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    position:relative;
 
-`;
-export const CloseIcon=styled.button`
-    position:absolute;
-    cursor:pointer;
-    color: #ffff;
-    border: 1px solid #AEAEAE;
-    border-radius:50%;
-
-    background: red;
-    font-size: 40px;
-    line-height:0;
-    font-weight: bold;
-    display: inline-block;
-
-    padding: 11px 3px;
-    width:45px;
-    height:45px;
-    top:-25px;
-    right:-25px;
-
-    @media screen and (max-height:590px){
-        position:relative;
-        align-self:flex-end;
-        top:-40px;
-    }
-    @media screen and (max-width:490px){
-        right:-0;
-    }
-
-
-
-
-    &:before {
-        content: "×";
-    }
-    &: hover{
-        transform: translateY(-3px);
-        box-shadow: 0 0 50px #ffff;
-    }
-`;
 
 
 const TabContainer=styled.div`
@@ -215,29 +130,8 @@ const TabBase=styled.div`
         flex-direction:column;
         justify-content:flex-start;
         align-items:center;
-        @media only screen and (min-width:300px){
-            min-width:50px;
-        }
+        width:80px;
 
-        @media only screen and (min-width:300px){
-            min-width:50px;
-        }
-        @media only screen and (min-width:320px){
-            min-width:60px;
-        }
-        @media only screen and (min-width:360px){
-            min-width:70px;
-        }
-        @media only screen and (min-width:400px){
-            min-width:80px;
-        }
-        @media only screen and (min-width:600px){
-            min-width:90px;
-        }
-        @media only screen and (min-width:700px){
-            min-width:100px;
-
-        }
 
 `;
 const ActiveTab=styled(TabBase)`
@@ -260,12 +154,8 @@ background-color:#DDDDDD;
 const TabText=styled.div`
     color:rgb(21,53,232);
     font-size:8px;
-    @media only screen and (min-width:280px){
-        font-size:10px;
-    }
-    @media only screen and (min-width:400px){
-        font-size:12px;
-    }
+    font-size:12px;
+
 
 `;
 
@@ -274,29 +164,25 @@ const SettingsIcon=styled.img.attrs({
     src:settingsImage,
     alt:'Settings'
 })`
-display:none;
-@media screen and (min-height:530px){
         display:block;
-}
+
 `;
 const PairingIcon=styled.img.attrs({
         src:pairingImage,
         alt:'Pair'
     })`
-    display:none;
-    @media screen and (min-height:530px){
-            display:block;
-    }
+    display:block;
+
     `;
 
 const ConnectIcon=styled.img.attrs({
     src:connectImage,
     alt:'Connect'
 })`
-display:none;
-@media screen and (min-height:530px){
+
+
         display:block;
-}
+
 `;
 
 
@@ -436,7 +322,7 @@ const DisplayConnectQR:React.FC<ConnectWidgetProps> = ({mobile}) => {
     }
     return (
     <QRCodeContainer>
-        <ConnectQR mobile={mobile} label=""/>
+        <ConnectQR mobile={mobile} label="" size={350}/>
         <ScanMessage/>
     </QRCodeContainer>
    );
@@ -484,35 +370,7 @@ export const ConnectWidget:React.FC<ConnectWidgetProps>=({mobile})=>{
         );
     };
 
-export const ConnectWindow:React.FC<ConnectWidgetProps>=({mobile})=>{
-        const {isConnected,isShowWidget}=mobile;
-        useEffect(()=>{
-                let scrollDisabled=false;
-                if (isShowWidget && (!isConnected)) {
-                        document.body.style.overflow = 'hidden';
-                        scrollDisabled=true;
-                }
-                return ()=>{
-                        if(scrollDisabled){
-                                scrollDisabled=false;
-                                document.body.style.overflow = 'unset';
-                        }
-                }
-        },[isConnected, isShowWidget]);
-        if ((!isShowWidget)||isConnected) {
-                return null;
-        }
 
-        return(
-                <PopupGlass>
-                        <PopUpWindow>
-                                <ConnectWidget mobile={mobile}/>
-                                <CloseIcon onClick={()=>mobile.setShowWidget(false)}/>
-                        </PopUpWindow>
-                </PopupGlass>
-        );
-
-};
 
 const ConnectLabel=styled.div`
      padding-left:5px;

@@ -182,7 +182,7 @@ const SecurityGroupField:React.FC<SettingsFieldProp>=({settings, setSettings,exp
                         Security Group Key is used by this client application to verify
                         the incoming connections coming from your mobile app
             in the same way that API Keys are used by server applications on the server side to identify (authenticate) incoming requests.
-            Upon modifying it, you need to pair your mobile app using the "Pair" tab so you can connect to this application. If you leave it blank,
+            Upon modifying it, you need to pair your mobile app on the "Pair" tab so you can connect to this application. If you leave it blank,
             it uses the default value that comes with the installation of Global Input App.
                         </Help>
 
@@ -197,7 +197,7 @@ const CodeKeyField:React.FC<SettingsFieldProp>=({settings, setSettings,expand,se
                         <Label htmlFor="codeKey">Code Key</Label>
                         <Help expandId='codeKey' expand={expand} setExpand={setExpand}>
                         Code Key is used by this application to encrypt the content of the QR Code it displays.
-                        Obviously, you need to pair your mobile app using the "Pair" tab when you have modified its value.
+                        Obviously, you need to pair your mobile app on the "Pair" tab when you have modified its value.
                         If you leave it blank,
             it uses the default value that comes with the installation of Global Input App.
                         </Help>
