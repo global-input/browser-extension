@@ -166,10 +166,8 @@ export const Footer = styled.div`
         justify-content: space-between;
         width: 100%;
         align-items: center;
-        padding-bottom:50px;
-        @media print {
-            display:none;
-        }
+        padding-bottom:10px;
+        min-width:200px;
 `;
 export const InputGroup=styled.div`
 display:flex;

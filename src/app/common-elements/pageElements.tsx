@@ -3,6 +3,21 @@ import styled from 'styled-components';
 import {WhenConnected} from '../mobile';
 import type {MobileData} from '../mobile';
 
+export const TopBar = styled.div`
+        display: flex;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        flex-direction: row;
+        align-items:flex-start;
+        justify-content: space-between;
+        width: 100%;
+        align-items: flex-end;
+        padding-top:10px;
+        background-color:rgb(74, 93, 126);
+        color:white;
+        padding:20px;
+`;
+
 export const AppTitle=styled.div`
     display: flex;
     flex-direction: row;
@@ -70,7 +85,6 @@ export const AppBody=styled.div`
     flex:1;
 `;
 export const AppContent=styled.div`
-    width:95%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -146,14 +160,7 @@ interface InstructionProps{
 export const Instruction=styled.div<InstructionProps>`
     font-size: 10px;
     align-self:${props=>props.center?'center':'flex-start'};
-    @media screen and (min-height:250px){
-        font-size: 16px;
-    }
-    @media screen and (min-height:380px){
-        font-size: 16px;
-        margin-bottom:10px;
-    }
-
+    font-size: 16px;
 `;
 
 

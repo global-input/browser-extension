@@ -77,9 +77,7 @@ const TopBar = styled.div`
         width: 100%;
         align-items: flex-end;
         padding-top:10px;
-
         background-color:rgb(74, 93, 126);
-
 `;
 const Content = styled.div`
         flex-direction: column;
@@ -323,7 +321,7 @@ const DisplayConnectQR:React.FC<ConnectWidgetProps> = ({mobile}) => {
     return (
     <QRCodeContainer>
         <ConnectQR mobile={mobile} label="" size={350}/>
-        <ScanMessage/>
+        {mobile.isReady &&(<ScanMessage/>)}
     </QRCodeContainer>
    );
 };
@@ -405,19 +403,10 @@ export const ConnectButton:React.FC<ButtonProps>=({mobile,label='Connect', skin}
 
 
 
-export const DisConnectButton:React.FC<ButtonProps>=({mobile,label='Disconnect',skin})=>{
+export const DisconnectButton:React.FC<ButtonProps>=({mobile,label='Disconnect',skin})=>{
         const {isConnected,isConnectionDenied, isDisconnected, restart}=mobile;
         if(isConnected || isConnectionDenied || isDisconnected){
-                if(skin==='white'){
-                        return (<BigButton onClick={()=>restart()}>{label}</BigButton>);
-                }
-                else{
-                        return(
-                        <DarkButton onClick={()=>restart()}>
-                        <DisconnectIcon/>
-                               <ConnectLabel>{label}</ConnectLabel>
-                        </DarkButton>   );
-                }
+                return (<BigButton onClick={()=>restart()}>{label}</BigButton>);
         }
         else{
                 return null;

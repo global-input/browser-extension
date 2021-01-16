@@ -1,9 +1,6 @@
 import React from 'react';
-
-
-import { AppFooter, MessageContainer, MessageButton, MessageLink, RowCenter } from './app-layout';
-import {PopupWindow} from './components';
-import {useMobile,ConnectWidget} from './mobile';
+import {PopupWindow,ConnectedInstruction,Tips,TipTitle,TopBar,Footer,AppContent} from './components';
+import {useMobile,ConnectWidget, DisconnectButton} from './mobile';
 interface Props {
     domain: string;
     transferFormData: () => void;
@@ -37,16 +34,25 @@ const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption, decry
         }
     });
 
-    const NotConnected = () => (
-        <AppFooter>
-                <MessageLink href="https://github.com/global-input/browser-extension">Source Code</MessageLink>
-        </AppFooter>
-    )
+
 
     return (
         <PopupWindow>
-
             <ConnectWidget mobile={mobile} />
+            <ConnectedInstruction mobile={mobile} center={true}>
+                <TopBar>
+                    Connected
+                </TopBar>
+                <AppContent>
+                    <Tips>
+                <TipTitle>Press the buttons displayed on your mobile</TipTitle>
+                </Tips>
+                </AppContent>
+            </ConnectedInstruction>
+            <Footer>
+            <DisconnectButton mobile={mobile}>Disconnect</DisconnectButton>
+            </Footer>
+
         </PopupWindow>
 
     );
