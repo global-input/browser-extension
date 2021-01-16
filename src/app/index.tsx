@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import * as storage from './storage';
 import LoadingContentStatus from './LoadingContentStatus';
 import DisplayCachedFields from './form-data-transfer/DisplayCachedFields';
-import FormDataTransfer from './form-data-transfer';
+import {FormDataTransfer} from './form-data-transfer';
 import MobileEncryption from './mobile-encryption';
 import MobileDecryption from './mobile-decryption';
 import {MainPage} from './MainPage';

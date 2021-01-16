@@ -9,12 +9,8 @@ export const Form = styled.div`
     justify-content:flex-start;
     align-items:flex-start;
     padding:10px;
-    width:80vw;
+    width:400px;
     overflow: scroll;
-    @media print {
-        display:none;
-    }
-
 `;
 
 

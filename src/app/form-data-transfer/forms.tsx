@@ -12,9 +12,12 @@ interface VisibilityOption{
     label:string;
 
 }
+
+type  ChangeEventHandler=(value:string)=>void;
+
 interface DisplayInputFieldProps{
     formField:FormField;
-    onChange:(evt: ChangeEvent<HTMLElement>) => void;
+    onChange:ChangeEventHandler;
     visibility:VisibilityOption;
     selectedFields:FormField[];
     setSelectedFields:(fields:FormField[])=>void;
@@ -57,7 +60,9 @@ export const DisplayInputField:React.FC<DisplayInputFieldProps> = ({
                     <Input id={formField.id} type={type}
                     value={formField.value as string}
                     placeholder={formField.label}
-                    onChange={onChange}
+                    onChange={(evt=>{
+                        onChange(evt.target.value);
+                    })}
                     onFocus={onFocus}
                     onBlur={onBlur} />
                     <Label htmlFor={formField.id}>{formField.label}</Label>
@@ -74,7 +79,9 @@ export const DisplayInputField:React.FC<DisplayInputFieldProps> = ({
             {showCheckbox && (<CheckBox checked={checked} onChange={toggleSelect} />)}
             <Field>
                 <TextArea id={formField.id} value={formField.value as string} placeholder={formField.label}
-                    onChange={onChange} />
+                    onChange={(evt=>{
+                        onChange(evt.target.value);
+                    })} />
                 <Label htmlFor={formField.id}>{formField.label}</Label>
             </Field>
             <CopyToClipboardButton value={formField.value as string} position={3}>Copy</CopyToClipboardButton>
