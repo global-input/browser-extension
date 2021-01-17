@@ -5,11 +5,11 @@ import * as storage from '../storage';
 import {useConnectMobile,getNextVisibilityValue,sendVisibility,buildFormFields,FIELDS, WhenConnected} from './mobile-ui';
 
 import type { FormField } from './mobile-ui';
-import {ConnectWidget} from './mobile-ui';
+import {ConnectWidget, DisconnectButton} from './mobile-ui';
 
 
 import {Form,Input,Label,Footer, DarkButton,Help,
-    ConnectContainer,DomainField,PopupWindow, TopBar,Content} from '../components';
+    DomainField,PopupWindow, TopBar,Content} from '../components';
 
 import {DisplayInputField,AddNewField} from './forms';
 
@@ -48,7 +48,7 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
 
 
 
-    const mobile =useConnectMobile({domain:userDomain,formFields,configId,visibility,setVisibility,onFormModified})
+    const mobile =useConnectMobile({domain:userDomain,formFields,configId,visibility,setVisibility,onFormModified,back})
 
 
     return (
@@ -99,12 +99,14 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
             <Footer>
 
                 {canDelete && (<DarkButton onClick={onDeleteSelected}>Deleted Selected</DarkButton>)}
+                <DarkButton onClick={back}>Back</DarkButton>
+
                 <DarkButton onClick={()=>{
                     const vis = getNextVisibilityValue(visibility);
                     setVisibility(vis);
                     sendVisibility(mobile,vis);
                 }}>{visibility.label}</DarkButton>
-                {mobile.isConnected && (<DarkButton onClick={()=>mobile.restart()}>Disconnect</DarkButton>)}
+                <DisconnectButton mobile={mobile}>Disconnect</DisconnectButton>
 
 
             </Footer>

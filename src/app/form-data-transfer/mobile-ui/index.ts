@@ -24,6 +24,14 @@ const userWithDomainAsFormId = (initData: InitData) => {
 };
 
 export const FIELDS = {
+    back:{
+        id:'back-to-main',
+        type:'button',
+        viewId: "row1",
+        label:'Back'
+
+
+    },
     visibility: {
         id: "fieldValueVisibility",
         type: 'button',
@@ -31,6 +39,7 @@ export const FIELDS = {
         options: [{ value: 0, label: 'Show' }, { value: 1, label: 'Hide' }],
         value: 0
     }
+
 
 };
 
@@ -47,9 +56,10 @@ interface ConnectMobileProps{
     visibility:VisibilityOption;
     setVisibility:(visibility:VisibilityOption)=>void;
     onFormModified:(formFields:FormField[],isStructureChanged:boolean)=>void;
+    back:()=>void;
 
 }
-export const useConnectMobile = ({domain,formFields,configId,visibility, setVisibility,onFormModified}:ConnectMobileProps)=>{
+export const useConnectMobile = ({domain,formFields,configId,visibility, setVisibility,onFormModified,back}:ConnectMobileProps)=>{
 
 
      const initData = () => {
@@ -72,6 +82,9 @@ export const useConnectMobile = ({domain,formFields,configId,visibility, setVisi
                 const vis = getNextVisibilityValue(visibility);
                 setVisibility(vis);
                 sendVisibility(mobile,vis);
+                break;
+            case FIELDS.back.id:
+                back();
                 break;
             default:
                 let fieldModified = false;

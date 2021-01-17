@@ -48,10 +48,11 @@ const BigButton = styled(Button)`
     border-width:0;
     font-size: 15px;
 `;
-const DarkButton = styled(BigButton)`
+export const DarkButton = styled(BigButton)`
         background-color:rgb(208, 226, 247);
-
 `;
+
+
 
 const Container = styled.div`
 
@@ -407,7 +408,7 @@ export const ConnectButton:React.FC<ButtonProps>=({mobile,label='Connect', skin}
 export const DisconnectButton:React.FC<ButtonProps>=({mobile,label='Disconnect',skin})=>{
         const {isConnected,isConnectionDenied, isDisconnected, restart}=mobile;
         if(isConnected || isConnectionDenied || isDisconnected){
-                return (<BigButton onClick={()=>restart()}>{label}</BigButton>);
+                return (<DarkButton onClick={()=>restart()}>{label}</DarkButton>);
         }
         else{
                 return null;
