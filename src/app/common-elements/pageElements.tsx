@@ -90,6 +90,7 @@ export const AppContent=styled.div`
     justify-content: center;
     align-items: center;
     padding:10px;
+    padding-top:90px;
     flex:1;
 `;
 

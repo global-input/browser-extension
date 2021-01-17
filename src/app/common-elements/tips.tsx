@@ -3,8 +3,10 @@ import styled from 'styled-components';
 export const Tips = styled.div`
     display:flex;
     flex-direction:column;
-
-
+    width:100%;
+    justify-content: flex-start;
+    align-item:center;
+    padding:20px;
 `;
 export const Tip=styled.div`
         display: flex;

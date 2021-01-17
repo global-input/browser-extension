@@ -47,4 +47,19 @@ export const PopupWindow =styled.div`
     flex-direction:column;
     justify-content:flex-start;
     align-items:center;
+
+`;
+
+
+export const Content = styled.div`
+        flex-direction: column;
+        justify-content: flex-center;
+        align-items: center;
+        margin: 0;
+        padding:0;
+        display: flex;
+        overflow:scroll;
+        background-color:white;
+        min-width:200px;
+        width:100%;
 `;

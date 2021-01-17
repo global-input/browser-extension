@@ -7,7 +7,6 @@ import {WidgetState, MobileData} from './commons';
 
 import settingsImage from './images/settings.png';
 import connectImage from './images/connect.png';
-import disconnectImage from './images/disconnect.png';
 import pairingImage from './images/pairing.png';
 
 import {SettingsEditor} from './settingsEditor';
@@ -58,13 +57,15 @@ const Container = styled.div`
 
         flex-direction: column;
         justify-content: flex-center;
-        align-items: flex-start;
+        align-items: center;
         background-color: white;
         margin: 0;
         padding:0;
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
         display: flex;
+
+        width:100%;
 `;
 
 const TopBar = styled.div`
@@ -85,6 +86,7 @@ const Content = styled.div`
         align-items: center;
         margin: 0;
         padding:0;
+        padding-top:10px;
         display: flex;
         overflow:scroll;
         background-color:white;
@@ -109,10 +111,11 @@ const Content = styled.div`
 const TabContainer=styled.div`
     display:flex;
     flex-direction:row;
-    justify-content:flex-start;
+    justify-content:space-between;
     align-items:center;
     height:100%;
     width:100%;
+    padding-right:10px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     align-items: flex-end;
@@ -185,11 +188,6 @@ const ConnectIcon=styled.img.attrs({
 
 
 
-const DisconnectIcon=styled.img.attrs({
-        src:disconnectImage,
-        alt:'Disconnect'
-    })`
-    `;
 
     const QRCodeContainer = styled.div`
         flex-direction: column;
@@ -225,10 +223,13 @@ export const SourceLink=styled.a.attrs({
     color: white;
     font-weight: 100;
     font-family: Georgia, Times, Serif;
-    font-size: 8px;
-    flex:1;
+    font-size: 10px;
     text-align:center;
     padding-bottom:10px;
+    &:hover{
+        transform: translateY(-3px);
+        color:white;
+    }
     `;
 
 

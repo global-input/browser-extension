@@ -9,7 +9,7 @@ import {ConnectWidget} from './mobile-ui';
 
 
 import {Form,Input,Label,Footer, DarkButton,Help,
-    ConnectContainer,DomainField,PopupWindow} from '../components';
+    ConnectContainer,DomainField,PopupWindow, TopBar,AppContent} from '../components';
 
 import {DisplayInputField,AddNewField} from './forms';
 
@@ -53,6 +53,10 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
 
     return (
         <PopupWindow>
+            <TopBar>
+                    Form Data Transfer
+            </TopBar>
+            <AppContent>
             <DomainField>
                 <Input id='changeDomain'  type="text"
                 value={domain} placeholder="Domain"
@@ -113,6 +117,7 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
             <ConnectContainer>
                     <ConnectWidget mobile={mobile}/>
             </ConnectContainer>
+        </AppContent>
 
 
         </PopupWindow>);

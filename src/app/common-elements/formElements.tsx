@@ -162,8 +162,7 @@ export const Footer = styled.div`
         justify-content: space-between;
         width: 100%;
         align-items: center;
-        padding-bottom:10px;
-        min-width:200px;
+        padding:10px;
 `;
 export const InputGroup=styled.div`
 display:flex;

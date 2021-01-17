@@ -1,6 +1,6 @@
 import React from 'react';
-import {PopupWindow,ConnectedInstruction,Tips,TipTitle,TopBar,Footer,AppContent} from './components';
-import {useMobile,ConnectWidget, DisconnectButton} from './mobile';
+import {PopupWindow,Tips,TipTitle,TopBar,Footer,AppContent,Content} from './components';
+import {useMobile,ConnectWidget, DisconnectButton, WhenConnected} from './mobile';
 interface Props {
     domain: string;
     transferFormData: () => void;
@@ -34,19 +34,25 @@ export const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption
     return (
         <PopupWindow>
             <ConnectWidget mobile={mobile} />
-            <ConnectedInstruction mobile={mobile} center={true}>
-                <TopBar>
+            <WhenConnected mobile={mobile}>
+            <TopBar>
                     Connected
-                </TopBar>
-                <AppContent>
-                    <Tips>
-                <TipTitle>Press the buttons displayed on your mobile</TipTitle>
+            </TopBar>
+            <Content>
+                <Tips>
+                    <TipTitle>Press the buttons displayed on your mobile</TipTitle>
                 </Tips>
-                </AppContent>
-            </ConnectedInstruction>
+
+
+            </Content>
+
+            </WhenConnected>
             <Footer>
-            <DisconnectButton mobile={mobile}>Disconnect</DisconnectButton>
-            </Footer>
+                <DisconnectButton mobile={mobile}>Disconnect</DisconnectButton>
+              </Footer>
+
+
+
 
         </PopupWindow>
 
