@@ -50,10 +50,13 @@ const HelpContainer2=styled(HelpContainer1)`
     position:relative;
     top:-25px;
     padding-right:100px;
+
 `;
 const HelpContainer3=styled(HelpContainer1)`
     position:relative;
     top:-12px;
+
+    padding-right:30px;
 `;
 const HelpContainer:React.FC<ExpandProp>=({position=1,children})=>{
     if(position===2){

@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 
 import * as storage from '../storage';
 
-import {useConnectMobile,getNextVisibilityValue,sendVisibility,buildFormFields,FIELDS} from './mobile-ui';
+import {useConnectMobile,getNextVisibilityValue,sendVisibility,buildFormFields,FIELDS, WhenConnected} from './mobile-ui';
 
 import type { FormField } from './mobile-ui';
 import {ConnectWidget} from './mobile-ui';
 
 
 import {Form,Input,Label,Footer, DarkButton,Help,
-    ConnectContainer,DomainField,PopupWindow, TopBar,AppContent} from '../components';
+    ConnectContainer,DomainField,PopupWindow, TopBar,Content} from '../components';
 
 import {DisplayInputField,AddNewField} from './forms';
 
@@ -27,7 +27,7 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
 
     const onFormModified=(formFields: FormField[], isStructureChanged:boolean) => {
         if(isStructureChanged){
-            storage.saveFormFields(domain, formFields);
+            storage.saveFormFields(userDomain, formFields);
             setConfigId(configId=>configId+1);
         }
         setSelectedFields([]);
@@ -48,30 +48,30 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
 
 
 
-    const mobile =useConnectMobile({domain,formFields,configId,visibility,setVisibility,onFormModified})
+    const mobile =useConnectMobile({domain:userDomain,formFields,configId,visibility,setVisibility,onFormModified})
 
 
     return (
         <PopupWindow>
+            <ConnectWidget mobile={mobile}/>
             <TopBar>
                     Form Data Transfer
             </TopBar>
-            <AppContent>
-            <DomainField>
+
+            <Content>
+                <Form>
+                <DomainField>
                 <Input id='changeDomain'  type="text"
-                value={domain} placeholder="Domain"
+                value={userDomain} placeholder="Domain"
                 onChange={(evt)=>changeDomain(evt.target.value)}/>
                 <Label htmlFor="changeDomain">Domain</Label>
-                <Help expand={expand} setExpand={setExpand} expandId="changeDomain">
+                <Help position={3} expand={expand} setExpand={setExpand} expandId="changeDomain">
     This value is used when locating data in your mobile secure storage.
     It is also used to identify the form structure you have created in this application.
                 </Help>
 
             </DomainField>
 
-
-
-                <Form>
                     {formFields.map((formField:FormField, index:number) => (
                     <DisplayInputField  key={formField.id}
                         formField={formField} onChange={(value:string)=>{
@@ -112,12 +112,7 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
 
 
             <AddNewField formFields={formFields} onFormModified={onFormModified}/>
-
-
-            <ConnectContainer>
-                    <ConnectWidget mobile={mobile}/>
-            </ConnectContainer>
-        </AppContent>
+        </Content>
 
 
         </PopupWindow>);

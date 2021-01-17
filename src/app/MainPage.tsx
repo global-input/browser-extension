@@ -42,18 +42,11 @@ export const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption
                 <Tips>
                     <TipTitle>Press the buttons displayed on your mobile</TipTitle>
                 </Tips>
-
-
             </Content>
-
             </WhenConnected>
             <Footer>
                 <DisconnectButton mobile={mobile}>Disconnect</DisconnectButton>
-              </Footer>
-
-
-
-
+            </Footer>
         </PopupWindow>
 
     );

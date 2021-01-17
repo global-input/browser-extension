@@ -38,7 +38,7 @@ interface AppContainerProps{
     );
 
     export const DomainField=styled(Field)`
-        max-width:300px;
+        width:100%;
 
     `;
 
@@ -56,10 +56,11 @@ export const Content = styled.div`
         justify-content: flex-center;
         align-items: center;
         margin: 0;
-        padding:0;
+        padding:10px;
         display: flex;
         overflow:scroll;
         background-color:white;
-        min-width:200px;
+        min-width:300px;
         width:100%;
+        max-height:400px;
 `;

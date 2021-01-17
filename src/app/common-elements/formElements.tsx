@@ -9,8 +9,7 @@ export const Form = styled.div`
     justify-content:flex-start;
     align-items:flex-start;
     padding:10px;
-    width:400px;
-    overflow: scroll;
+    width:100%;
 `;
 
 
