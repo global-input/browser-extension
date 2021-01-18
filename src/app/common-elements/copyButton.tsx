@@ -84,10 +84,11 @@ const Button = styled.button<CopyElementProps>`
 interface Props{
     value:string;
     position?:number;
+    onCopied?:()=>void;
 
 }
 
-export const CopyToClipboardButton:React.FC<Props>=({children,value,position=1})=>{
+export const CopyToClipboardButton:React.FC<Props>=({children,value,position=1, onCopied})=>{
     const [copying,setCopying]=useState(false);
     const timerHandler = useRef<ReturnType<typeof setTimeout> | null>(null);
     useEffect(() => {
@@ -100,13 +101,17 @@ export const CopyToClipboardButton:React.FC<Props>=({children,value,position=1})
     }, []);
 
   const onCopy=()=>{
+      if(!value){
+          return;
+      }
       setCopying(true);
-       navigator.clipboard.writeText(value);
+      navigator.clipboard.writeText(value);
       timerHandler.current && clearTimeout(timerHandler.current);
       timerHandler.current = setTimeout(() => {
       timerHandler.current=null;
       setCopying(false);
     }, 2000);
+    onCopied && onCopied();
   }
     return (
     <CopyContainer show={copying} position={position}>

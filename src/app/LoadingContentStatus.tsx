@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BasicLayout, LoadingCircle } from './app-layout';
+import {Spinner,PopupWindow,TopBar,Content} from './components';
 
 import * as chromeExtension from './chrome-extension';
 
@@ -13,7 +13,7 @@ interface Message {
 interface Props {
     onReceivedPageStatus: (message: Message) => void
 }
-const LoadingContentStatus = ({ onReceivedPageStatus }: Props) => {
+export const LoadingContentStatus = ({ onReceivedPageStatus }: Props) => {
     useEffect(() => {
         const checkPageStatus = async () => {
             const message = await chromeExtension.checkPageStatus();
@@ -23,10 +23,14 @@ const LoadingContentStatus = ({ onReceivedPageStatus }: Props) => {
     }, [onReceivedPageStatus]);
 
     return (
-        <BasicLayout title="Global Input App">
-            <LoadingCircle />
-        </BasicLayout>
+        <PopupWindow>
+        <TopBar>
+        Global Input App
+        </TopBar>
+        <Content>
+        <Spinner />
+        </Content>
+    </PopupWindow>
     );
 
 };
-export default LoadingContentStatus;

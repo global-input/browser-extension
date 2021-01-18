@@ -47,7 +47,7 @@ export const getCacheFields = (domain: string): string => {
         clearCacheFields();
         return '';
     }
-    return '';
+    return content;
 };
 
 const PAGE_CONTROL = "extension.control.";

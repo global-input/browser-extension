@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
 import * as storage from '../storage';
+import * as cache from './cache';
+import * as chromeExtension from '../chrome-extension';
 
 import {useConnectMobile,getNextVisibilityValue,sendVisibility,buildFormFields,FIELDS, WhenConnected} from './mobile-ui';
 
@@ -45,6 +47,16 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
         const newFormFields=formFields.filter((f:FormField)=>selectedFields.indexOf(f)===-1);
         onFormModified(newFormFields,true);
     };
+    const onCopied=(formField:FormField)=>{
+        const notCopiedFields=formFields.filter((f:FormField)=>f!==formField && f.value);
+        if(notCopiedFields.length){
+            const key = cache.saveCacheFields(domain, notCopiedFields);
+            if (key) {
+                chromeExtension.sendKey(key);
+            }
+        }
+
+    }
 
 
 
@@ -86,7 +98,10 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
                             onFormModified(newFormFields,false);
                             mobile.sendValue(formField.id as string, value, index);
                         }}  visibility={visibility}
-                        selectedFields={selectedFields} setSelectedFields={setSelectedFields}/>
+                        selectedFields={selectedFields} setSelectedFields={setSelectedFields} onCopied={()=>{
+                                onCopied(formField);
+
+                        }}/>
                 ))}
                 </Form>
 

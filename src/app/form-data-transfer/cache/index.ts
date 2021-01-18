@@ -20,7 +20,7 @@ const encryptWithNewKey = (content: object) => {
 };
 const decryptWithNewKey = (content: string, key: string) => {
     try {
-        decrypt(content, key + cacheKeySuffix);
+        return decrypt(content, key + cacheKeySuffix);
     }
     catch (error) {
         return null;
@@ -29,10 +29,6 @@ const decryptWithNewKey = (content: string, key: string) => {
 
 export const saveCacheFields = (domain?: string, formFields?: FormField[]) => {
     if (!domain || !formFields) {
-        return null;
-    }
-    const numberOfNotEmptyFields = formFields.reduce((count, f) => f.value ? count + 1 : count, 0);
-    if (numberOfNotEmptyFields < 2) {
         return null;
     }
     const { key, encryptedContent } = encryptWithNewKey(formFields);

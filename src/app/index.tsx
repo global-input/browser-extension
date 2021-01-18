@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import * as storage from './storage';
-import LoadingContentStatus from './LoadingContentStatus';
+import {LoadingContentStatus} from './LoadingContentStatus';
 import DisplayCachedFields from './form-data-transfer/DisplayCachedFields';
 import {FormDataTransfer} from './form-data-transfer';
 import MobileEncryption from './mobile-encryption';
@@ -35,6 +35,7 @@ const App = () => {
     const onReceivedPageStatus = useCallback((message) => {
         if (message && message.status === 'success' && message.host) {
             setDomain(message.host);
+
             if (message.content.key && message.host) {
                 setCacheKey(message.content.key);
                 displayCachedForm();

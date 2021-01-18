@@ -3,10 +3,13 @@ import React, { useEffect, useState } from "react";
 import * as chromeExtension from '../chrome-extension';
 import * as cache from './cache';
 import * as storage from '../storage';
-import { FormField } from '../mobile'; //types;
+import type { FormField } from '../mobile';
 
-import { DisplayInputCopyField, TextButton, BasicLayout, FormContainer } from '../app-layout';
 
+import {Form,Input,Label,Footer, DarkButton,Help,
+   DomainField,PopupWindow, TopBar,Content} from '../components';
+
+import {DisplayCacheField} from './forms';
 interface Props {
    cacheKey: string | null;
    domain: string;
@@ -14,10 +17,11 @@ interface Props {
 }
 const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
    const [fields, setFields] = useState<FormField[]>([]);
-   useEffect(() => () => storage.clearCacheFields(), []);
    useEffect(() => {
       if (cacheKey && domain) {
          const cachedFields = cache.loadCacheFields(domain, cacheKey);
+
+         storage.clearCacheFields();
          if (!cachedFields || !cachedFields.length) {
             back();
             return;
@@ -25,33 +29,43 @@ const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
          setFields(cachedFields);
       }
    }, [cacheKey, back, domain]);
-   const onCopied = () => {
-      if (!domain) {
-         storage.clearCacheFields();
-         return;
+   const onCopied=(formField:FormField)=>{
+      const notCopiedFields=fields.filter((f:FormField)=>f!==formField && f.value);
+      if(notCopiedFields.length){
+          const key = cache.saveCacheFields(domain, notCopiedFields);
+          if (key) {
+              chromeExtension.sendKey(key);
+          }
       }
-      const key = cache.saveCacheFields(domain, fields);
-      if (key) {
-         chromeExtension.sendKey(key);
-      }
-   };
+
+  }
    if (!fields) {
       return null;
    }
 
 
    return (
-      <BasicLayout title="Global Input App" domain={domain}>
-         <FormContainer title="Cached Values">
-            {fields.map(formField => (<DisplayInputCopyField
-               field={formField}
-               hideValue={true}
-               onCopied={onCopied}
-               key={formField.id} />))}
-            <TextButton onClick={back} label={'Back'} />
+      <PopupWindow>
+         <TopBar>
+               Cached Values
+         </TopBar>
+         <Content>
+         <Form>
+         {fields.map((formField:FormField, index:number) => (
+                    <DisplayCacheField  key={formField.id}
+                        formField={formField}
+                        onCopied={()=>{
+                               onCopied(formField);
+                        }}/>
+                ))}
 
-         </FormContainer>
-      </BasicLayout>
+         </Form>
+
+         </Content>
+
+      </PopupWindow>
+
+
    );
 
 };

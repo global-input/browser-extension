@@ -21,11 +21,12 @@ interface DisplayInputFieldProps{
     visibility:VisibilityOption;
     selectedFields:FormField[];
     setSelectedFields:(fields:FormField[])=>void;
+    onCopied:()=>void;
 
 }
 export const DisplayInputField:React.FC<DisplayInputFieldProps> = ({
     formField, onChange, visibility,
-    selectedFields, setSelectedFields }) => {
+    selectedFields, setSelectedFields,onCopied }) => {
 
     const [focused, setFocused] = useState(false);
     const checked = isFieldChecked(formField,selectedFields);
@@ -58,7 +59,7 @@ export const DisplayInputField:React.FC<DisplayInputFieldProps> = ({
                 {showCheckbox && (<CheckBox checked={checked} onChange={toggleSelect} />)}
                 <Field>
                     <Input id={formField.id} type={type}
-                    value={formField.value as string}
+                    value={formField.value?formField.value as string:''}
                     placeholder={formField.label}
                     onChange={(evt=>{
                         onChange(evt.target.value);
@@ -67,7 +68,7 @@ export const DisplayInputField:React.FC<DisplayInputFieldProps> = ({
                     onBlur={onBlur} />
                     <Label htmlFor={formField.id}>{formField.label}</Label>
                 </Field>
-                <CopyToClipboardButton value={formField.value as string} position={3}>Copy</CopyToClipboardButton>
+                <CopyToClipboardButton value={formField.value as string} position={3} onCopied={onCopied}>Copy</CopyToClipboardButton>
             </InputGroup>
         );
 
@@ -78,7 +79,7 @@ export const DisplayInputField:React.FC<DisplayInputFieldProps> = ({
             <InputGroup>
             {showCheckbox && (<CheckBox checked={checked} onChange={toggleSelect} />)}
             <Field>
-                <TextArea id={formField.id} value={formField.value as string} placeholder={formField.label}
+                <TextArea id={formField.id} value={formField.value?formField.value as string:''} placeholder={formField.label}
                     onChange={(evt=>{
                         onChange(evt.target.value);
                     })} />
@@ -92,6 +93,26 @@ export const DisplayInputField:React.FC<DisplayInputFieldProps> = ({
     }
 };
 
+
+interface DisplayCacheFieldProps{
+    formField:FormField;
+    onCopied:()=>void;
+}
+
+export const DisplayCacheField:React.FC<DisplayCacheFieldProps> = ({
+    formField, onCopied }) => {
+        return (
+            <InputGroup>
+                <Field>
+                    <Input id={formField.id} type='password'
+                    value={formField.value as string}
+                    placeholder={formField.label} readOnly={true}/>
+                    <Label htmlFor={formField.id}>{formField.label}</Label>
+                </Field>
+                <CopyToClipboardButton value={formField.value as string} position={3} onCopied={onCopied}>Copy</CopyToClipboardButton>
+            </InputGroup>
+        );
+};
 
 
 
@@ -153,4 +174,4 @@ export const AddNewField:React.FC<AddNewFieldProps>=({formFields,onFormModified}
         </Form>
 
     );
-}
+};
