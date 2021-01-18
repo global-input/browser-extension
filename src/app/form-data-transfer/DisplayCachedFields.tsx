@@ -15,7 +15,7 @@ interface Props {
    domain: string;
    back: () => void;
 }
-const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
+export const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
    const [fields, setFields] = useState<FormField[]>([]);
    useEffect(() => {
       if (cacheKey && domain) {
@@ -69,5 +69,3 @@ const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
    );
 
 };
-
-export default DisplayCachedFields;
