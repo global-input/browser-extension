@@ -2,18 +2,18 @@ import { useMobile } from '../../../mobile';
 export const FIELDS = {
     info: {
         type: "info",
-        value: "You can now check the connected application, which should have received the encrypted content."
+        value: "You can now check the connected application, which should have received the decrypted content."
     },
     restart: {
         id: "restart",
-        label: "Encrypt Again",
+        label: "Decrypt Again",
         type: "button",
         viewId: "row1"
     },
     contentOnMobile: {
         id: "contentOnMobile",
         type: "button",
-        label: "Press here to load the encrypted content into your mobile app",
+        label: "Press here to load the decrypted content into your mobile app",
         viewId: "row2",
         style:{
             maxWidth:200,
@@ -33,7 +33,7 @@ export const FIELDS = {
 
 const initData = {
     form: {
-        title: "Encrypted content has been sent",
+        title: "Decrypted content has been sent",
         views: {
             viewIds: {
                 info: {
@@ -62,13 +62,13 @@ const initData = {
         fields: Object.values(FIELDS)
     }
 };
-
 interface UseConnectMobileProps{
     restart:()=>void;
     onShowOnMobile:()=>void;
     finish:()=>void;
 
 }
+
 export const useConnectMobile = ({restart,onShowOnMobile,finish}:UseConnectMobileProps) =>{
     const mobile = useMobile(initData, true);
     mobile.setOnchange(({ field }) => {

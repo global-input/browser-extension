@@ -1,19 +1,22 @@
 import { useMobile } from '../../../mobile';
 export const FIELDS = {
     info: {
-        type: "info",
-        value: "You can now check the connected application, which should have received the encrypted content."
+        id: "info",
+        type: 'info',
+        value: ['Waiting for content from the connected application.'],
+        viewId:'info'
     },
-    restart: {
-        id: "restart",
-        label: "Encrypt Again",
+    cancel: {
+        id: "cancel",
         type: "button",
-        viewId: "row1"
+        label: "Cancel",
+        viewId: "row1",
+        icon:'cancel'
     },
     contentOnMobile: {
         id: "contentOnMobile",
         type: "button",
-        label: "Press here to load the encrypted content into your mobile app",
+        label: "Press here to use your mobile to input content",
         viewId: "row2",
         style:{
             maxWidth:200,
@@ -22,26 +25,28 @@ export const FIELDS = {
         },
 
     },
-
-    finish: {
-        id: "finish",
-        label: "Finish",
+    startDecrypt: {
+        id: "startDecrypt",
         type: "button",
+        icon:'decrypt',
+        label: "Decrypt",
         viewId: "row1"
-    },
-};
-
+    }
+}
 const initData = {
     form: {
-        title: "Encrypted content has been sent",
+        title: "Mobile Decryption",
         views: {
             viewIds: {
                 info: {
                     style: {
+
                         marginBottom:20,
                         display:'flex',
                         flexDirection:'column',
                         justifyContent:'center'
+
+
                     }
                 },
                 row1:{
@@ -62,25 +67,23 @@ const initData = {
         fields: Object.values(FIELDS)
     }
 };
-
 interface UseConnectMobileProps{
-    restart:()=>void;
-    onShowOnMobile:()=>void;
-    finish:()=>void;
-
+    cancel:()=>void;
+    onContentOnMobile:()=>void;
+    onDecrypt:()=>void;
 }
-export const useConnectMobile = ({restart,onShowOnMobile,finish}:UseConnectMobileProps) =>{
+export const useConnectMobile = ({cancel,onContentOnMobile,onDecrypt}:UseConnectMobileProps) =>{
     const mobile = useMobile(initData, true);
     mobile.setOnchange(({ field }) => {
         switch (field.id) {
-            case FIELDS.restart.id:
-                restart();
+            case FIELDS.cancel.id:
+                cancel();
                 break;
             case FIELDS.contentOnMobile.id:
-                onShowOnMobile();
+                onContentOnMobile();
                 break;
-            case FIELDS.finish.id:
-                finish();
+            case FIELDS.startDecrypt.id:
+                onDecrypt();
                 break;
             default:
         }
