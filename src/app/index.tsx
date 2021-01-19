@@ -6,7 +6,9 @@ import {FormDataTransfer} from './form-data-transfer';
 import {MobileEncryption} from './mobile-encryption';
 import {MobileDecryption} from './mobile-decryption';
 import {MainPage} from './MainPage';
-import {PageControlHome} from './page-control';
+import {PageControl} from './page-control';
+import EditRule from './edit-rule';
+import LoadFromPreset from './load-from-preset';
 
 
 enum PAGES {
@@ -16,12 +18,17 @@ enum PAGES {
     TRANSFER_FORM_DATA,
     ENCRYPTION,
     DECRYPTION,
-    PAGE_CONTROL
+    PAGE_CONTROL,
+    EDIT_RULE,
+    LOAD_FROM_PRESET
 }
 
 const App = () => {
     const [page, setPage] = useState(PAGES.LOADING);
     const [domain, setDomain] = useState<string>('');
+    const [ruleContentToEdit,setRuleContentToEdit]=useState<string>('');
+
+
     const [cacheKey, setCacheKey] = useState(null);
 
     const mainPage = useCallback(() => setPage(PAGES.MAIN_PAGE), []);
@@ -30,11 +37,19 @@ const App = () => {
     const decryption = useCallback(() => setPage(PAGES.DECRYPTION), []);
     const displayCachedForm = useCallback(() => setPage(PAGES.DISPLAY_CACHED_FORM), []);
     const pageControl = useCallback(() => setPage(PAGES.PAGE_CONTROL), []);
+    const editRule = (content?: string) => {
+          if(content){
+            setRuleContentToEdit(content);
+          }
+          setPage(PAGES.EDIT_RULE);
+    };
+
 
 
     const onReceivedPageStatus = useCallback((message) => {
         if (message && message.status === 'success' && message.host) {
             setDomain(message.host);
+
 
             if (message.content.key && message.host) {
                 setCacheKey(message.content.key);
@@ -67,7 +82,11 @@ const App = () => {
             return (<MainPage domain={domain} transferFormData={transferFormData} encryption={encryption}
                 decryption={decryption} pageControl={pageControl}/>);
         case PAGES.PAGE_CONTROL:
-            return (<PageControlHome back={mainPage} domain={domain} />);
+            return (<PageControl back={mainPage} domain={domain} editRule={editRule}/>);
+        case PAGES.EDIT_RULE:
+             return (<EditRule back={mainPage} domain={domain} />);
+        case PAGES.LOAD_FROM_PRESET:
+             return (<LoadFromPreset editRule={editRule} domain={domain} />)
         default:
             return null;
     }

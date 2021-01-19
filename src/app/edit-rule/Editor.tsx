@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { TextButton, Title, DisplayErrorMessage, InputWithLabel, FormFooter, FormContainer, BasicLayout } from '../../app-layout';
-import { useMobile } from '../../mobile';
+import { TextButton, Title, DisplayErrorMessage, InputWithLabel, FormFooter, FormContainer, BasicLayout } from '../app-layout';
+import { useMobile } from '../mobile';
 interface Props {
     back: () => void;
     domain: string;

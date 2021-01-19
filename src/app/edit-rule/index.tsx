@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Editor from './Editor';
-import LoadFromPreset from './LoadFromPreset';
-import * as rules from '../rules';
+import LoadFromPreset from '../load-from-preset';
+import * as rules from '../page-control/rules';
 
 enum PAGES {
     EDIT,
@@ -35,8 +35,8 @@ export const EditRule: React.FC<Props> = ({ back, domain }) => {
     switch (page) {
         case PAGES.EDIT:
             return (<Editor back={back} domain={domain} initialContent={content} saveRule={saveRule} loadLoadFromPreset={loadLoadFromPreset} />);
-        case PAGES.LOAD_FROM_PRESET:
-            return (<LoadFromPreset back={toEdit} domain={domain} loadRule={loadRule} />)
+        // case PAGES.LOAD_FROM_PRESET:
+        //     return (<LoadFromPreset back={toEdit} domain={domain} loadRule={loadRule} />)
         default:
     }
     return null;

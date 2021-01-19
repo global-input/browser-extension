@@ -1,5 +1,5 @@
 import React from 'react';
-import {PopupWindow,Tips,TipTitle,TopBar,Footer,AppContent,Content} from './components';
+import {PopupWindow,Tips,TipTitle,TopBar,Footer,AppContent,Content,Domain} from './components';
 import {useMobile,ConnectWidget, DisconnectButton, WhenConnected} from './mobile';
 interface Props {
     domain: string;
@@ -39,6 +39,7 @@ export const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption
                     Connected
             </TopBar>
             <Content>
+                <Domain>{domain}</Domain>
                 <Tips>
                     <TipTitle>Press the buttons displayed on your mobile</TipTitle>
                 </Tips>

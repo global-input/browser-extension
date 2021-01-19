@@ -1,47 +1,75 @@
-import React, { useState, useCallback } from 'react';
-import PageControl from './PageControl';
-import {LoadRules} from './load-rule';
-import ProcessRule from './ProcessRule';
-import EditRule from './edit-rule';
+import React, { useEffect,useState } from 'react';
+import { PopupWindow, Error, TopBar, Content, Footer, DarkButton, Spinner, Domain } from '../components';
+import * as rules from './rules';
+import * as chromeExtension from '../chrome-extension';
+import type { PageRule } from './rules';
 
-import { PageRule, FormRule } from './rules';
-
-enum PAGES {
-    LOAD_RULE,
-    PROCESS_RULE,
-    PAGE_CONTROL,
-    EDIT_RULE,
+export enum STATUS {
+    LOADING,
+    ERROR,
+    SUCCESS
 };
+
 interface Props {
-    domain: string;
     back: () => void;
+    domain: string;
+    editRule: () => void;
 }
-export const PageControlHome: React.FC<Props> = ({ domain, back }) => {
-    const [page, setPage] = useState(PAGES.LOAD_RULE);
-    const [form, setForm] = useState<FormRule | null>(null);
-    const [rule, setRule] = useState<PageRule | null>(null);
 
-    const processRule = useCallback((rule: PageRule) => {
-        setRule(rule);
-        setPage(PAGES.PROCESS_RULE);
-    }, []);
+export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
+    const [status, setStatus] = useState(STATUS.LOADING);
+    const [errorMessage, setErrorMessage]=useState('');
+    useEffect(() => {
+        const onError=(errorMessage:string)=>{
+            setErrorMessage(errorMessage);
+            setStatus(STATUS.ERROR);
+        };
+        const processRule = async (rule: PageRule) => {
+            const message = await chromeExtension.getPageControlConfig(rule);
+            if (message.status !== "success") {
+                onError("The rule does not match the loaded page.");
+                return;
+            }
+            if (message.content?.form?.fields?.length) {
+                const fields = rules.buildFormFieldsFieldRules(message.content?.form, (messageField, value) => {
+                    chromeExtension.sendFormField(messageField.id, value);
+                    if (messageField.matchingRule?.next) {
+                        if (messageField.matchingRule?.next.type === 'refresh') {
+                            setStatus(STATUS.LOADING);
+                        }
+                    }
+                });
 
-    const editRule = useCallback(() => setPage(PAGES.EDIT_RULE), []);
-    const pageControl = useCallback((form: FormRule) => {
-        setForm(form);
-        setPage(PAGES.PAGE_CONTROL);
-    }, []);
-    const loadRule = useCallback(() => setPage(PAGES.LOAD_RULE), []);
-    switch (page) {
-        case PAGES.LOAD_RULE:
-            return (<LoadRules back={back} domain={domain} processRule={processRule} editRule={editRule} />)
-        case PAGES.PROCESS_RULE:
-            return rule ? (<ProcessRule back={back} domain={domain} rule={rule} editRule={editRule} pageControl={pageControl} />) : null;
-        case PAGES.PAGE_CONTROL:
-            return form ? (<PageControl back={back} domain={domain} form={form} editRule={editRule} loadRule={loadRule} />) : null;
-        case PAGES.EDIT_RULE:
-            return (<EditRule back={loadRule} domain={domain} />);
-        default:
-    }
-    return null;
-};
+            }
+            else {
+                onError("The rule does not set up controllable elements for the page loaded");
+                return;
+            }
+        };
+        if (!domain) {
+            onError("The domain of the loaded page cannot be identified.");
+            return;
+        }
+        let rule = rules.findRuleByDomain(domain);
+        if (!rule) {
+            onError("No matching rules found for the loaded page.");
+            return;
+        }
+        processRule(rule);
+    }, [domain]);
+
+    return (
+        <PopupWindow>
+            <TopBar>Page Control</TopBar>
+            <Content>
+                <Domain>{domain}</Domain>
+                {status===STATUS.LOADING && (<Spinner/>)}
+                {status===STATUS.ERROR && <Error>{errorMessage}</Error>}
+            </Content>
+            <Footer>
+                <DarkButton onClick={back} >Back</DarkButton>
+                <DarkButton onClick={editRule}>Edit Rule</DarkButton>
+            </Footer>
+        </PopupWindow>
+    );
+}

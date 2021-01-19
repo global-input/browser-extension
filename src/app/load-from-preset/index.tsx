@@ -1,15 +1,14 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { TextButton, SelectItems, InputWithLabel, FormFooter, FormContainer, BasicLayout } from '../../app-layout';
-import { useMobile } from '../../mobile';
-import * as rules from '../rules';
+import { TextButton, SelectItems, InputWithLabel, FormFooter, FormContainer, BasicLayout } from '../app-layout';
+import { useMobile } from '../mobile';
+import * as rules from '../page-control/rules';
 
 
 interface Props {
-    back: () => void;
     domain: string;
-    loadRule: (content: string) => void;
+    editRule: (content?: string) => void;
 }
-const Editor: React.FC<Props> = ({ back, domain, loadRule }) => {
+const Editor: React.FC<Props> = ({ editRule, domain}) => {
     const [selectedValue, setSelectedValue] = useState('0');
     const [content, setContent] = useState<string>(() => rules.getPresetRuleByIndexForEdit(0));
     const selectionItems = useMemo(() => {
@@ -25,12 +24,12 @@ const Editor: React.FC<Props> = ({ back, domain, loadRule }) => {
 
     const mobile = useMobile(initData);
 
-    const onUse = () => loadRule(content);
+    const onUse = () => editRule(content);
 
     mobile.setOnchange(({field}) => {
         switch (field.id) {
             case FIELDS.back.id:
-                back();
+                editRule();
                 break;
             case FIELDS.editor.id:
                 setContent(field.value as string);
@@ -70,7 +69,7 @@ const Editor: React.FC<Props> = ({ back, domain, loadRule }) => {
 
 
                 <FormFooter>
-                    <TextButton onClick={back} label='Cancel' />
+                    <TextButton onClick={editRule} label='Cancel' />
                     <TextButton onClick={onUse} label='Use' />
                 </FormFooter>
 
