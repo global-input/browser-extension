@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import PageControl from './PageControl';
-import LoadRule from './LoadRule';
+import {LoadRules} from './load-rule';
 import ProcessRule from './ProcessRule';
 import EditRule from './edit-rule';
 
@@ -16,7 +16,7 @@ interface Props {
     domain: string;
     back: () => void;
 }
-const PageControlHome: React.FC<Props> = ({ domain, back }) => {
+export const PageControlHome: React.FC<Props> = ({ domain, back }) => {
     const [page, setPage] = useState(PAGES.LOAD_RULE);
     const [form, setForm] = useState<FormRule | null>(null);
     const [rule, setRule] = useState<PageRule | null>(null);
@@ -34,7 +34,7 @@ const PageControlHome: React.FC<Props> = ({ domain, back }) => {
     const loadRule = useCallback(() => setPage(PAGES.LOAD_RULE), []);
     switch (page) {
         case PAGES.LOAD_RULE:
-            return (<LoadRule back={back} domain={domain} processRule={processRule} editRule={editRule} />)
+            return (<LoadRules back={back} domain={domain} processRule={processRule} editRule={editRule} />)
         case PAGES.PROCESS_RULE:
             return rule ? (<ProcessRule back={back} domain={domain} rule={rule} editRule={editRule} pageControl={pageControl} />) : null;
         case PAGES.PAGE_CONTROL:
@@ -45,6 +45,3 @@ const PageControlHome: React.FC<Props> = ({ domain, back }) => {
     }
     return null;
 };
-
-
-export default PageControlHome;

@@ -7,15 +7,11 @@ export const Domain=styled.div`
     color: #153E85;
     font-weight: 100;
     font-family: Georgia, Times, Serif;
-    font-size: 8px;
-    float:right;
+    font-size: 12px;
+    width:100%;
+    text-align:right;
 
-    @media screen and (min-height:150px){
-        font-size:12px;
-    }
-    @media screen and (min-height:400px){
-        font-size:16px;
-    }
+
     `;
 
 interface AppContainerProps{

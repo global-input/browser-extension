@@ -3,10 +3,10 @@ import * as storage from './storage';
 import {LoadingContentStatus} from './LoadingContentStatus';
 import {DisplayCachedFields} from './form-data-transfer/DisplayCachedFields';
 import {FormDataTransfer} from './form-data-transfer';
-import MobileEncryption from './mobile-encryption';
-import MobileDecryption from './mobile-decryption';
+import {MobileEncryption} from './mobile-encryption';
+import {MobileDecryption} from './mobile-decryption';
 import {MainPage} from './MainPage';
-import PageControl from './page-control';
+import {PageControlHome} from './page-control';
 
 
 enum PAGES {
@@ -67,7 +67,7 @@ const App = () => {
             return (<MainPage domain={domain} transferFormData={transferFormData} encryption={encryption}
                 decryption={decryption} pageControl={pageControl}/>);
         case PAGES.PAGE_CONTROL:
-            return (<PageControl back={mainPage} domain={domain} />);
+            return (<PageControlHome back={mainPage} domain={domain} />);
         default:
             return null;
     }
