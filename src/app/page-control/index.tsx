@@ -1,8 +1,10 @@
 import React, { useEffect,useState } from 'react';
-import { PopupWindow, Error, TopBar, Content, Footer, DarkButton, Spinner, Domain } from '../components';
+import { PopupWindow, Error, TopBar, Content, Footer, DarkButton, TipTitle,Spinner, Domain } from '../components';
 import * as rules from './rules';
 import * as chromeExtension from '../chrome-extension';
-import type { PageRule } from './rules';
+import type { PageRule,FormRule} from './rules';
+import type {FormField} from './mobile-ui';
+import {useConnectToPageControl} from './mobile-ui';
 
 export enum STATUS {
     LOADING,
@@ -19,6 +21,8 @@ interface Props {
 export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
     const [status, setStatus] = useState(STATUS.LOADING);
     const [errorMessage, setErrorMessage]=useState('');
+    const [formFields, setFormFields]=useState<FormField[]|null>(null);
+    const [formRule, setFormRule]=useState<FormRule|null>(null)
     useEffect(() => {
         const onError=(errorMessage:string)=>{
             setErrorMessage(errorMessage);
@@ -31,14 +35,23 @@ export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
                 return;
             }
             if (message.content?.form?.fields?.length) {
+                setFormRule(message.content.form);
                 const fields = rules.buildFormFieldsFieldRules(message.content?.form, (messageField, value) => {
                     chromeExtension.sendFormField(messageField.id, value);
                     if (messageField.matchingRule?.next) {
                         if (messageField.matchingRule?.next.type === 'refresh') {
-                            setStatus(STATUS.LOADING);
+                            processRule(rule);
                         }
                     }
                 });
+                if(fields && fields.length){
+                    setFormFields(fields);
+                    setStatus(STATUS.SUCCESS);
+                }
+                else{
+                    onError("The matched rule returned should at least contain one form field.");
+                }
+
 
             }
             else {
@@ -63,8 +76,11 @@ export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
             <TopBar>Page Control</TopBar>
             <Content>
                 <Domain>{domain}</Domain>
-                {status===STATUS.LOADING && (<Spinner/>)}
-                {status===STATUS.ERROR && <Error>{errorMessage}</Error>}
+                {status===STATUS.LOADING && (<DisplayLoading/>)}
+
+                {status===STATUS.ERROR && <DisplayError>{errorMessage}</DisplayError>}
+                {status===STATUS.SUCCESS && formRule && formFields && <DisplayPageControl domain={domain} formFields={formFields} formRule={formRule}>You can use your mobile to operate on the page.</DisplayPageControl>}
+
             </Content>
             <Footer>
                 <DarkButton onClick={back} >Back</DarkButton>
@@ -72,4 +88,24 @@ export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
             </Footer>
         </PopupWindow>
     );
+}
+
+const DisplayLoading:React.FC=()=>{
+    return (<Spinner/>);
+};
+
+
+const DisplayError:React.FC=({children})=>{
+    return (<Error>{children}</Error>);
+};
+
+interface DisplayPageControlProps{
+    domain:string;
+    formFields:FormField[];
+    formRule:FormRule;
+}
+const DisplayPageControl:React.FC<DisplayPageControlProps>=({domain,formFields,formRule,children})=>{
+    const mobile=useConnectToPageControl(domain,formFields,formRule);
+    return (<TipTitle>{children}</TipTitle>);
+
 }
