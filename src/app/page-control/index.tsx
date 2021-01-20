@@ -79,7 +79,8 @@ export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
                 {status===STATUS.LOADING && (<DisplayLoading/>)}
 
                 {status===STATUS.ERROR && <DisplayError>{errorMessage}</DisplayError>}
-                {status===STATUS.SUCCESS && formRule && formFields && <DisplayPageControl domain={domain} formFields={formFields} formRule={formRule}>You can use your mobile to operate on the page.</DisplayPageControl>}
+                {status===STATUS.SUCCESS && formRule && formFields && <DisplayPageControl domain={domain} formFields={formFields} formRule={formRule}
+                    back={back} editRule={editRule}>You can use your mobile to operate on the page.</DisplayPageControl>}
 
             </Content>
             <Footer>
@@ -103,9 +104,11 @@ interface DisplayPageControlProps{
     domain:string;
     formFields:FormField[];
     formRule:FormRule;
+    back:()=>void;
+    editRule:()=>void;
 }
-const DisplayPageControl:React.FC<DisplayPageControlProps>=({domain,formFields,formRule,children})=>{
-    const mobile=useConnectToPageControl(domain,formFields,formRule);
+const DisplayPageControl:React.FC<DisplayPageControlProps>=({domain,formFields,formRule,children, back, editRule})=>{
+    const mobile=useConnectToPageControl(domain,formFields,formRule,back,editRule);
     return (<TipTitle>{children}</TipTitle>);
 
 }

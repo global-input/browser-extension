@@ -39,7 +39,18 @@ const initData = (domain:string,fields:FormField[],formRule:FormRule) => {
         }
     }
 };
-export const useConnectToPageControl = (domain:string,fields:FormField[],formRule:FormRule) =>{
+export const useConnectToPageControl = (domain:string,fields:FormField[],formRule:FormRule,back:()=>void, editRule:()=>void) =>{
     const mobile=useMobile(()=>initData(domain,fields,formRule), true);
+    mobile.setOnchange(({field}) => {
+        switch (field.id) {
+            case FIELDS.back.id:
+                back();
+                break;
+            case FIELDS.editRule.id:
+                editRule();
+                break;
+            default:
+        }
+    });
     return mobile;
 }
