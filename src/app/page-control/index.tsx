@@ -4,7 +4,7 @@ import * as rules from './rules';
 import * as chromeExtension from '../chrome-extension';
 import type { PageRule,FormRule} from './rules';
 import type {FormField} from './mobile-ui';
-import {useConnectToPageControl} from './mobile-ui';
+import {useConnectToPageControl,useConnectErrorControl} from './mobile-ui';
 
 export enum STATUS {
     LOADING,
@@ -21,6 +21,7 @@ interface Props {
 export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
     const [status, setStatus] = useState(STATUS.LOADING);
     const [errorMessage, setErrorMessage]=useState('');
+    const [errorTitle,setErrorTitle]=useState('');
     const [formFields, setFormFields]=useState<FormField[]|null>(null);
     const [formRule, setFormRule]=useState<FormRule|null>(null)
     useEffect(() => {
@@ -78,7 +79,7 @@ export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
                 <Domain>{domain}</Domain>
                 {status===STATUS.LOADING && (<DisplayLoading/>)}
 
-                {status===STATUS.ERROR && <DisplayError>{errorMessage}</DisplayError>}
+                {status===STATUS.ERROR && <DisplayError  back={back} errorTitle={errorTitle} errorMessage={errorMessage} domain={domain} editRule={editRule}/>}
                 {status===STATUS.SUCCESS && formRule && formFields && <DisplayPageControl domain={domain} formFields={formFields} formRule={formRule}
                     back={back} editRule={editRule}>You can use your mobile to operate on the page.</DisplayPageControl>}
 
@@ -95,9 +96,17 @@ const DisplayLoading:React.FC=()=>{
     return (<Spinner/>);
 };
 
+interface ErrorProps{
+    domain:string;
+    back:()=>void;
+    editRule:()=>void;
+    errorTitle:string;
+    errorMessage:string;
+}
 
-const DisplayError:React.FC=({children})=>{
-    return (<Error>{children}</Error>);
+const DisplayError:React.FC<ErrorProps>=({domain,back,editRule, errorTitle, errorMessage})=>{
+    const mobile=useConnectErrorControl(domain,back,editRule,errorTitle);
+    return (<Error>{errorMessage}</Error>);
 };
 
 interface DisplayPageControlProps{

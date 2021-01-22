@@ -40,10 +40,10 @@ export const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption
                         <AppTitle>Connected to Your Mobile</AppTitle>
                     </TopBar>
                     <AppContent>
-                    <Domain>{domain}</Domain>
-                    <Tips>
-                        <TipTitle>Press the buttons displayed on your mobile</TipTitle>
-                    </Tips>
+                        <Domain>{domain}</Domain>
+                        <Tips>
+                            <TipTitle>Press the buttons displayed on your mobile</TipTitle>
+                        </Tips>
 
                     </AppContent>
 
