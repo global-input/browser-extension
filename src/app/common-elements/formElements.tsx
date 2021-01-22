@@ -10,6 +10,7 @@ export const Form = styled.div`
     align-items:flex-start;
     padding:10px;
     width:100%;
+    max-height:400px;
 `;
 
 

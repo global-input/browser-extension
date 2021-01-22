@@ -4,14 +4,14 @@ import * as storage from '../storage';
 import * as cache from './cache';
 import * as chromeExtension from '../chrome-extension';
 
-import {useConnectMobile,getNextVisibilityValue,sendVisibility,buildFormFields,FIELDS, WhenConnected} from './mobile-ui';
+import {useConnectMobile,getNextVisibilityValue,sendVisibility,buildFormFields,FIELDS} from './mobile-ui';
 
 import type { FormField } from './mobile-ui';
 import {ConnectWidget, DisconnectButton} from './mobile-ui';
 
 
 import {Form,Input,Label,Footer, DarkButton,Help,
-    DomainField,PopupWindow, TopBar,Content} from '../components';
+    DomainField,PopupWindow, TopBar,Content,FormPage} from '../components';
 
 import {DisplayInputField,AddNewField} from './forms';
 
@@ -64,15 +64,8 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
 
 
     return (
-        <PopupWindow>
-            <ConnectWidget mobile={mobile}/>
-            <TopBar>
-                    Form Data Transfer
-            </TopBar>
-
-            <Content>
-                <Form>
-                <DomainField>
+        <FormPage title="Form Data Transfer" mobile={mobile}>
+            <DomainField>
                 <Input id='changeDomain'  type="text"
                 value={userDomain} placeholder="Domain"
                 onChange={(evt)=>changeDomain(evt.target.value)}/>
@@ -103,36 +96,29 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
 
                         }}/>
                 ))}
-                </Form>
+                <Footer>
+
+{canDelete && (<DarkButton onClick={onDeleteSelected}>Deleted Selected</DarkButton>)}
+<DarkButton onClick={back}>Back</DarkButton>
+
+<DarkButton onClick={()=>{
+    const vis = getNextVisibilityValue(visibility);
+    setVisibility(vis);
+    sendVisibility(mobile,vis);
+}}>{visibility.label}</DarkButton>
+<DisconnectButton mobile={mobile}>Disconnect</DisconnectButton>
+
+
+</Footer>
 
 
 
+<AddNewField formFields={formFields} onFormModified={onFormModified}/>
 
 
+        </FormPage>
 
-
-            <Footer>
-
-                {canDelete && (<DarkButton onClick={onDeleteSelected}>Deleted Selected</DarkButton>)}
-                <DarkButton onClick={back}>Back</DarkButton>
-
-                <DarkButton onClick={()=>{
-                    const vis = getNextVisibilityValue(visibility);
-                    setVisibility(vis);
-                    sendVisibility(mobile,vis);
-                }}>{visibility.label}</DarkButton>
-                <DisconnectButton mobile={mobile}>Disconnect</DisconnectButton>
-
-
-            </Footer>
-
-
-
-            <AddNewField formFields={formFields} onFormModified={onFormModified}/>
-        </Content>
-
-
-        </PopupWindow>);
+        );
 
 
 

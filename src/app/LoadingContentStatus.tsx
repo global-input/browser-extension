@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import {Spinner,PopupWindow,TopBar,Content} from './components';
+import {NoMobilePage,Spinner} from './components';
 
 import * as chromeExtension from './chrome-extension';
 
@@ -17,20 +17,15 @@ export const LoadingContentStatus = ({ onReceivedPageStatus }: Props) => {
     useEffect(() => {
         const checkPageStatus = async () => {
             const message = await chromeExtension.checkPageStatus();
-            onReceivedPageStatus(message);
+             onReceivedPageStatus(message);
         };
         checkPageStatus();
     }, [onReceivedPageStatus]);
 
     return (
-        <PopupWindow>
-        <TopBar>
-        Global Input App
-        </TopBar>
-        <Content>
-        <Spinner />
-        </Content>
-    </PopupWindow>
+        <NoMobilePage title="Loading..." domain="">
+                <Spinner />
+        </NoMobilePage>
     );
 
 };

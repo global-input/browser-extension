@@ -7,8 +7,9 @@ const Input=styled.input.attrs({
     position: absolute;
     opacity: 0;
     cursor: pointer;
-    height: 0;
-    width: 0;
+    height: 10px;
+    width: 10px;
+    border:1ox solid red;
 `;
 const Label=styled.label`
 display: block;

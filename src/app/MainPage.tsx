@@ -1,5 +1,5 @@
 import React from 'react';
-import {PopupWindow,Tips,TipTitle,TopBar,Footer,AppContent,Content,Domain,AppTitle} from './components';
+import {ConnectedPage, PopupWindow,Tips,TipTitle,TopBar,Footer,AppContent,Content,Domain,AppTitle,Title,MoreInfo} from './components';
 import {useMobile,ConnectWidget, DisconnectButton, WhenConnected} from './mobile';
 interface Props {
     domain: string;
@@ -29,32 +29,15 @@ export const MainPage: React.FC<Props> = ({ domain, transferFormData, encryption
         }
     });
 
-
+    const footer=(
+        <DisconnectButton mobile={mobile}>Disconnect</DisconnectButton>
+    );
 
     return (
-        <PopupWindow>
-            <ConnectWidget mobile={mobile} />
-            <WhenConnected mobile={mobile}>
-            <Content>
-                    <TopBar>
-                        <AppTitle>Connected to Your Mobile</AppTitle>
-                    </TopBar>
-                    <AppContent>
-                        <Domain>{domain}</Domain>
-                        <Tips>
-                            <TipTitle>Press the buttons displayed on your mobile</TipTitle>
-                        </Tips>
-
-                    </AppContent>
-
-                <Footer>
-                    <DisconnectButton mobile={mobile}>Disconnect</DisconnectButton>
-                </Footer>
-            </Content>
-            </WhenConnected>
-
-        </PopupWindow>
-
+        <ConnectedPage mobile={mobile} domain={domain} title="This extension is now connected to your mobile"
+        footer={footer}>
+            <MoreInfo>Press the buttons displayed on your mobile to operate.</MoreInfo>
+        </ConnectedPage>
     );
 }
 

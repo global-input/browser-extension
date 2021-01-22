@@ -8,10 +8,10 @@ export const TopBar = styled.div`
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
         flex-direction: row;
-        align-items:flex-start;
-        justify-content: space-between;
+        align-items:center;
+        justify-content: center;
         width: 100%;
-        align-items: flex-end;
+        align-items: center;
         background-color:rgb(74, 93, 126);
         color:white;
         padding-top:10px;
@@ -66,10 +66,6 @@ export const AppContent=styled.div`
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    width:100%;
-    padding:10px;
-
-
 
 `;
 
@@ -91,16 +87,9 @@ export const Title=styled.div`
     color: #445566;
     align-self:flex-start;
     font-family: Georgia, Times, Serif;
-    @media screen and (min-height:150px){
-        font-size:16px;
-    }
-    @media screen and (min-height:400px){
-        font-size:20px;
-        margin-bottom:10px;
-    }
-    @media print{
-        display:none;
-    }
+    font-size:20px;
+    margin-top:10px;
+    margin-bottom:10px;
 `;
 
 export const FormTitle=styled.div`
@@ -124,15 +113,8 @@ export const FormTitle=styled.div`
 
 
 export const MoreInfo = styled.div`
-    font-size: 16px;
+    font-size: 14px;
     align-self:flex-start;
-    @media screen and (min-height:310px){
-         margin-bottom:10px;
-
-    }
-    @media print {
-        display:none;
-    }
 `;
 interface InstructionProps{
     center?:boolean;
@@ -170,6 +152,7 @@ export const Error = styled.div`
         padding-bottom: 10px;
         max-width:  350px;
         max-height: 100px;
+        margin-top:10px;
         overflow: scroll;
 `;
 
