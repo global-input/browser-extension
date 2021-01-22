@@ -1,6 +1,6 @@
 import presetRules from './preset.json';
 import * as storage from '../../storage';
-import { FormField, FieldValue } from '../../mobile'
+import type { FormField, FieldValue } from '../../mobile'
 
 interface NextRule {
     type: string;

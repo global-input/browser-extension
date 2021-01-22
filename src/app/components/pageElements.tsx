@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import {Field,SourceLinkElement,AppContainerElement,AppTitleSection,AppTitle,AppBody,AppContent} from '../common-elements';
+import {Field} from '../common-elements';
 
 
 export const Domain=styled.div`
@@ -18,20 +18,7 @@ interface AppContainerProps{
     domain:string;
     title:string;
 }
-    export  const AppContainer:React.FC<AppContainerProps>=({domain, title, children})=>(
-        <AppContainerElement>
-                <AppTitleSection>
-                    <AppTitle>{title}</AppTitle>
-                    <Domain>{domain}</Domain>
-                </AppTitleSection>
-                <AppBody>
-                    <AppContent>
-                    {children}
-                    </AppContent>
 
-                </AppBody>
-        </AppContainerElement>
-    );
 
     export const DomainField=styled(Field)`
         width:100%;
@@ -52,11 +39,12 @@ export const Content = styled.div`
         justify-content: flex-center;
         align-items: center;
         margin: 0;
-        padding:10px;
         display: flex;
         overflow:scroll;
         background-color:white;
         min-width:300px;
         width:100%;
         max-height:400px;
+n
+
 `;

@@ -12,11 +12,14 @@ export const TopBar = styled.div`
         justify-content: space-between;
         width: 100%;
         align-items: flex-end;
-        padding-top:10px;
         background-color:rgb(74, 93, 126);
         color:white;
-        padding:20px;
+        padding-top:10px;
+        padding-bottom:10px;
 `;
+
+
+
 
 export const AppTitle=styled.div`
     display: flex;
@@ -24,21 +27,9 @@ export const AppTitle=styled.div`
     justify-content: center;
     text-align: center;
     font-size: 12px;
-    color: #445566;
+    color: white;
+    margin-left:10px;
     font-family: Georgia, Times, Serif;
-
-
-    @media screen and (min-height:150px){
-        font-size:26px;
-    }
-
-    @media screen and (min-height:400px){
-        font-size:32px;
-        margin-bottom:10px;
-    }
-    @media print{
-        display:none;
-    }
 },`;
 
 export const SourceLinkElement=styled.a`
@@ -69,29 +60,17 @@ export const AppContainerElement =styled.div`
     backgroundColor: rgb(219,240,240);
 `;
 
-export const AppBody=styled.div`
-    width:100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding:10px;
-    flex:1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding:10px;
-    flex:1;
-`;
+
 export const AppContent=styled.div`
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width:100%;
     padding:10px;
-    padding-top:90px;
-    flex:1;
+
+
+
 `;
 
 

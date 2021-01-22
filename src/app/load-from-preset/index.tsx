@@ -1,5 +1,8 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { TextButton, SelectItems, InputWithLabel, FormFooter, FormContainer, BasicLayout } from '../app-layout';
+
+import {Form,Input,Label,Footer, DarkButton,Help,
+    DomainField,PopupWindow, TopBar,Content,Domain, Field, TextArea,Error,Select,Option} from '../components';
+
 import { useMobile } from '../mobile';
 import * as rules from '../page-control/rules';
 
@@ -57,26 +60,35 @@ const Editor: React.FC<Props> = ({ editRule, domain}) => {
 
 
     return (
+    <PopupWindow>
+            <TopBar>Preset Rules</TopBar>
+            <Content>
+            <Form>
+            <Field>
+                <Select value={selectedValue} onChange={onSelectionChange}>
+                {selectionItems.map(f=>( <Option key={f.value} value={f.value}>{f.label}</Option>))}
+              </Select>
+            </Field>
+              <Field>
+                <TextArea id="ruleContent"
+                value={content}
 
-        <BasicLayout title="Preset Rules">
-            <FormContainer>
-                <SelectItems id="rulSelection" items={selectionItems} value={selectedValue} label="Select:" onChange={onSelectionChange} />
-                <InputWithLabel label="Rule" id="content"
-                    onChange={onContentChange}
-                    type="textarea"
-                    value={content} />
+                placeholder="Rules"
+                    onChange={(evt=>{
+                        onContentChange(evt.target.value);
+                    })} />
+                <Label htmlFor="ruleContent">Rules</Label>
+            </Field>
 
 
+            </Form>
+            </Content>
+            <Footer>
+            <DarkButton onClick={onUse}>Use</DarkButton>
 
-                <FormFooter>
-                    <TextButton onClick={editRule} label='Cancel' />
-                    <TextButton onClick={onUse} label='Use' />
-                </FormFooter>
-
-            </FormContainer>
-
-
-        </BasicLayout>);
+            </Footer>
+            </PopupWindow>
+        );
 
 }
 

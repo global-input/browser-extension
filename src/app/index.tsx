@@ -7,7 +7,7 @@ import {MobileEncryption} from './mobile-encryption';
 import {MobileDecryption} from './mobile-decryption';
 import {MainPage} from './MainPage';
 import {PageControl} from './page-control';
-import EditRule from './edit-rule';
+import {EditRule} from './edit-rule';
 import LoadFromPreset from './load-from-preset';
 
 
@@ -37,6 +37,7 @@ const App = () => {
     const decryption = useCallback(() => setPage(PAGES.DECRYPTION), []);
     const displayCachedForm = useCallback(() => setPage(PAGES.DISPLAY_CACHED_FORM), []);
     const pageControl = useCallback(() => setPage(PAGES.PAGE_CONTROL), []);
+    const loadFromPreset=useCallback(() => setPage(PAGES.LOAD_FROM_PRESET), []);
     const editRule = (content?: string) => {
           if(content){
             setRuleContentToEdit(content);
@@ -84,7 +85,7 @@ const App = () => {
         case PAGES.PAGE_CONTROL:
             return (<PageControl back={mainPage} domain={domain} editRule={editRule}/>);
         case PAGES.EDIT_RULE:
-             return (<EditRule back={mainPage} domain={domain} />);
+             return (<EditRule back={mainPage} domain={domain} loadFromPreset={loadFromPreset}/>);
         case PAGES.LOAD_FROM_PRESET:
              return (<LoadFromPreset editRule={editRule} domain={domain} />)
         default:
