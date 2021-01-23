@@ -2,7 +2,7 @@ import React, { ChangeEvent, useState } from 'react';
 import type {FormField} from './mobile-ui';
 import {
     Field, Input, TextArea, Label, CopyToClipboardButton,
-    InputGroup, CheckBox,Form,Form2,Title,Select,Option,DarkButton,Footer2
+    InputGroup, CheckBox,Form,Form2,Title,Select,Option,DarkButton,Footer
 } from '../components';
 
 const isFieldChecked= (formField:FormField,selectedFields:FormField[]) => !!selectedFields.filter(s => s === formField).length;
@@ -154,7 +154,6 @@ export const AddNewField:React.FC<AddNewFieldProps>=({formFields,onFormModified}
     }
 
     return (
-        <Form>
         <Form2>
             <Title>Add new field</Title>
             <Field>
@@ -164,14 +163,21 @@ export const AddNewField:React.FC<AddNewFieldProps>=({formFields,onFormModified}
                         onChange={onChange}/>
                         <Label htmlFor="addFieldLabel">Field Name</Label>
             </Field>
+            <Field>
             <Select value={fieldType.value} onChange={onSelectChange}>
                 {FIELD_TYPES.map(f=>( <Option key={f.value} value={f.value}>{f.label}</Option>))}
               </Select>
-              <Footer2>
+
+            </Field>
+
+
+
+
+            <Footer>
             <DarkButton onClick={onAddNewField}>Add</DarkButton>
-            </Footer2>
+            </Footer>
+
         </Form2>
-        </Form>
 
     );
 };

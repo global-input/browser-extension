@@ -8,7 +8,6 @@ export const Form2 = styled.div`
     align-items:flex-start;
     padding:10px;
     width:90%;
-    max-width:300px;
     border:1px dashed blue;
 `;
 
@@ -20,8 +19,7 @@ export const Select=styled.select`
 	color: #444;
 	line-height: 1.3;
 	padding: .6em 1.4em .5em .8em;
-	width: 100%;
-	max-width: 100%;
+	width: 90%;
 	box-sizing: border-box;
 	margin: 0;
 	border: 1px solid #aaa;

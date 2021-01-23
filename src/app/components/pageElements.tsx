@@ -43,7 +43,7 @@ export const Content = styled.div`
         background-color:white;
         height:100%;
         min-height:200px;
-        width:400px;
+        min-width:400px;
         padding:10px;
 `;
 

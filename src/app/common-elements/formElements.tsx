@@ -160,9 +160,11 @@ export const Footer = styled.div`
         margin:0;
         flex-direction: row;
         justify-content: space-between;
-        width: 100%;
+        width: 90%;
         align-items: center;
         padding:10px;
+        padding-right:20px;
+        padding-left:20px;
 `;
 export const InputGroup=styled.div`
 display:flex;
