@@ -4,6 +4,25 @@ import {Field,TopBar,AppTitle,AppContent,Title,Footer,Form} from '../common-elem
 import {ConnectWidget,WhenConnected} from '../mobile';
 import type {MobileData} from '../mobile';
 
+const minWidth=300;
+const maxWidth=500;
+const maxHeight=500;
+
+export const PopupWindow =styled.div`
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    align-items:center;
+    width:100%;
+    height:100%;
+    min-width:${minWidth}px;
+    max-width:${maxWidth}px;
+    max-height:${maxHeight};
+`;
+
+
+
+
 
 export const Domain=styled.div`
     color: #153E85;
@@ -23,28 +42,19 @@ export const Domain=styled.div`
 
     `;
 
-export const PopupWindow =styled.div`
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    align-items:center;
-    width:100%;
-    height:100%;
-`;
 
 
 export const Content = styled.div`
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         margin: 0;
         display: flex;
         overflow:scroll;
         background-color:white;
         height:100%;
-        min-height:200px;
-        min-width:400px;
-        padding:10px;
+        width:94%;
+        padding:5px;
 `;
 
 export const MessageContent=styled.div`
@@ -75,12 +85,12 @@ export const NoMobilePage:React.FC<BasicPageProps>=({domain,title, children,foot
             <AppTitle>Global Input App</AppTitle>
         </TopBar>
         <Content>
-                <AppContent>
-                    {domain && (<Domain>{domain}</Domain>)}
+
                 <Title>{title}</Title>
+                {domain && (<Domain>{domain}</Domain>)}
                 {children}
-                {footer&&(<Footer>{Footer}</Footer>)}
-                </AppContent>
+                {footer&&(<Footer>{footer}</Footer>)}
+
         </Content>
     </PopupWindow>
 
@@ -101,12 +111,10 @@ export const ConnectedPage:React.FC<OnlyConnectedProps>=({mobile,domain, title, 
                 <AppTitle>Global Input App</AppTitle>
             </TopBar>
             <Content>
-               <AppContent>
                   <Domain>{domain}</Domain>
                   <Title>{title}</Title>
                   {children}
                  {footer && (<Footer>{footer}</Footer>)}
-               </AppContent>
             </Content>
         </WhenConnected>
 </PopupWindow>

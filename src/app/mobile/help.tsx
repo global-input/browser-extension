@@ -40,7 +40,7 @@ const ExpandIcon =styled.div<ExpandProp>`
 
 const HelpContainer=styled.div`
  position:relative;
- top:-30px;
+ top:-10px;
  display:flex;
  flex-direction:row;
  justify-content:flex-start;

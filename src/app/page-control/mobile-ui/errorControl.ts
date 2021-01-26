@@ -29,17 +29,17 @@ const FIELDS = {
 };
 
 
-const initData = (domain:string, title:string) => {
+const initData = (domain:string, errorTitle:string, errorMessage:string) => {
     return {
         form: {
-            title: title,
+            title: errorTitle,
             domain: domain,
-            fields: [FIELDS.message, FIELDS.back, FIELDS.editRule]
+            fields: [{...FIELDS.domain, domain},{...FIELDS.message, value:errorMessage}, FIELDS.back, FIELDS.editRule]
         }
     }
 };
-export const useConnectErrorControl = (domain:string,back:()=>void, editRule:()=>void, title:string) =>{
-    const mobile=useMobile(()=>initData(domain,title), true);
+export const useConnectErrorControl = (domain:string,back:()=>void, editRule:()=>void, errorTitle:string, errorMessage:string) =>{
+    const mobile=useMobile(()=>initData(domain,errorTitle,errorMessage), true);
     mobile.setOnchange(({field}) => {
         switch (field.id) {
             case FIELDS.back.id:

@@ -40,7 +40,7 @@ const Form = styled.div`
     align-items:flex-start;
     padding-left:10px;
     padding-right:10px;
-    width:100%;
+    width:95%;
     background-color:white;
     overflow: scroll;
     height:400px;

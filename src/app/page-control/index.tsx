@@ -1,5 +1,5 @@
-import React, { useEffect,useState, useCallback} from 'react';
-import { PopupWindow, Error, AppContent,TopBar, Content, Message, Footer, DarkButton,AppTitle,Title, TipTitle,Spinner, Domain } from '../components';
+import React, { useEffect,useState} from 'react';
+import { NoMobilePage,Error,  Message, DarkButton,AppTitle,Title, TipTitle,Spinner} from '../components';
 import * as rules from './rules';
 import * as chromeExtension from '../chrome-extension';
 import type { PageRule,FormRule} from './rules';
@@ -25,14 +25,16 @@ export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
     const [formFields, setFormFields]=useState<FormField[]|null>(null);
     const [formRule, setFormRule]=useState<FormRule|null>(null)
 
-    const onError=(errorMessage:string)=>{
+    const onError=(errorTitle:string, errorMessage:string)=>{
         setErrorMessage(errorMessage);
+        setErrorTitle(errorTitle);
         setStatus(STATUS.ERROR);
     };
     const processRule = async (rule: PageRule) => {
         const message = await chromeExtension.getPageControlConfig(rule);
+
         if (message.status !== "success") {
-            onError("The rule does not match the loaded page.");
+            onError("Not Found Error", "Failed to find elements matching what is specified in the rule. Please edit the rule and make it match the content of the page loaded on the current tab.");
             return;
         }
         if (message.content?.form?.fields?.length) {
@@ -45,18 +47,19 @@ export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
                     }
                 }
             });
+
             if(fields && fields.length){
                 setFormFields(fields);
                 setStatus(STATUS.SUCCESS);
             }
             else{
-                onError("The matched rule returned should at least contain one form field.");
+                onError("Empty Field Error","At least one controllable field should be specified. Please edit the rule and define a controllable element in the page.");
             }
 
 
         }
         else {
-            onError("The rule does not set up controllable elements for the page loaded");
+            onError("Not Found Error","The loaded page does not contain the matching elements specified in the rule. Please edit the rule specifying the elements in the loaded page.");
             return;
         }
     };
@@ -64,46 +67,38 @@ export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
 
     useEffect(() => {
         if (!domain) {
-            onError("The domain of the loaded page cannot be identified.");
+            onError("Domain Missing", "Failed to identify the domain of page loaded on the current tab.");
             return;
         }
         let rule = rules.findRuleByDomain(domain);
-        // rule=null;
-        // if (!rule) {
-        //     onError("No matching rules found for the loaded page.");
-        //     return;
-        // }
-        // processRule(rule);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        if (!rule) {
+            onError("Empty Rule",`There is no rule specified for ${domain}. Click on the 'Edit' button to define one.`);
+            return;
+        }
+        processRule(rule);
+    //eslint-disable-next-line react-hooks/exhaustive-deps
     }, [domain]);
+    const footer=(<>
+        <DarkButton onClick={back} >Back</DarkButton>
+                <DarkButton onClick={editRule}>Edit Rule</DarkButton>
+        </>);
 
     return (
-        <PopupWindow>
-            <TopBar><AppTitle>Global Input App</AppTitle></TopBar>
-            <Content>
-                <AppContent>
-                <Title>Page Control</Title>
-                <Domain>{domain}</Domain>
-                {status===STATUS.LOADING && (<DisplayLoading/>)}
 
-                {status===STATUS.ERROR && <DisplayError  back={back} errorTitle={errorTitle} errorMessage={errorMessage} domain={domain} editRule={editRule}/>}
-                {status===STATUS.SUCCESS && formRule && formFields && <DisplayPageControl domain={domain} formFields={formFields} formRule={formRule}
-                    back={back} editRule={editRule}>You can use your mobile to operate on the page.</DisplayPageControl>}
-                <Footer>
-                <DarkButton onClick={back} >Back</DarkButton>
-                <DarkButton onClick={editRule}>Edit Rule</DarkButton>
-            </Footer>
-                </AppContent>
-            </Content>
+        <NoMobilePage domain={domain} title="Page Control" footer={footer}>
+            {status===STATUS.LOADING && (<DisplayLoading/>)}
 
-        </PopupWindow>
+            {status===STATUS.ERROR && <DisplayError  back={back} errorTitle={errorTitle} errorMessage={errorMessage} domain={domain} editRule={editRule}/>}
+            {status===STATUS.SUCCESS && formRule && formFields && <DisplayPageControl domain={domain} formFields={formFields} formRule={formRule}
+                back={back} editRule={editRule}>You can use your mobile to operate on the page.</DisplayPageControl>}
+        </NoMobilePage>
     );
 }
 
 const DisplayLoading:React.FC=()=>{
     return (
         <>
-    <Message>Processing rules for identifying parts of the page that you can control using your mobile.</Message>
+    <Message>Processing rules for identifying elements in the loaded page to control using your mobile.</Message>
     <Spinner/>
     </>
     );
@@ -118,7 +113,7 @@ interface ErrorProps{
 }
 
 const DisplayError:React.FC<ErrorProps>=({domain,back,editRule, errorTitle, errorMessage})=>{
-    const mobile=useConnectErrorControl(domain,back,editRule,errorTitle);
+    const mobile=useConnectErrorControl(domain,back,editRule,errorTitle,errorMessage);
     return (<Error>{errorMessage}</Error>);
 };
 

@@ -30,12 +30,25 @@ const FIELDS = {
 
 
 const initData = (domain:string,fields:FormField[],formRule:FormRule) => {
+
     return {
         form: {
             title: formRule.title,
             domain: domain,
             id: formRule.id,
-            fields: [...fields, FIELDS.message, FIELDS.back, FIELDS.editRule]
+            views: {
+                viewIds: {
+                    row1:{
+                        style:{
+                            display:'flex',
+                            justifyContent:'space-between',
+                            padding:20,
+                            width:'100%',
+                        }
+                    }
+                }
+            },
+            fields: [{...FIELDS.domain,value:domain}, ...fields, FIELDS.message, FIELDS.back, FIELDS.editRule]
         }
     }
 };
