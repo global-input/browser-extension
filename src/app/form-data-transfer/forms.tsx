@@ -2,7 +2,7 @@ import React, { ChangeEvent, useState } from 'react';
 import type {FormField} from './mobile-ui';
 import {
     Field, Input, TextArea, Label, CopyToClipboardButton,
-    InputGroup, CheckBox,Form,Form2,Title,Select,Option,DarkButton,Footer
+    InputGroup, CheckBox,Form,Form2,Title,Select,Option,DarkButton,Footer,NoMobilePage
 } from '../components';
 
 const isFieldChecked= (formField:FormField,selectedFields:FormField[]) => !!selectedFields.filter(s => s === formField).length;

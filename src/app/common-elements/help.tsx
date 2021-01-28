@@ -36,7 +36,7 @@ const ExpandIcon =styled.div<ExpandProp>`
         top: 6px;
     }
     position:relative;
-    top:-18px;
+    top:0px;
 
 `;
 
@@ -45,30 +45,21 @@ const HelpContainer1=styled.div`
  flex-direction:column;
  justify-content:flex-start;
  align-items:flex-start;
+ position:relative;
+ width:90%;
 `;
 const HelpContainer2=styled(HelpContainer1)`
-    position:relative;
-    top:-25px;
-    padding-right:100px;
+    top:-30px;
 
 `;
 const HelpContainer3=styled(HelpContainer1)`
-    position:relative;
-    top:-12px;
 
-    padding-right:30px;
 `;
 const HelpContainer4=styled(HelpContainer1)`
-    position:relative;
-    top:-5px;
 
-    padding-right:50px;
 `;
 const HelpContainer5=styled(HelpContainer1)`
-    position:relative;
-    top:15px;
 
-    padding-right:50px;
 `;
 const HelpContainer:React.FC<ExpandProp>=({position=1,children})=>{
     if(position===2){
@@ -95,15 +86,10 @@ font-family: Avenir;
     white-space: wrap;
     font-size: 12px;
     display:${props=>props.expand?'inline':'none'};
-    @media only screen and (min-width:500px){
-        font-size: 14px;
-    }
     position:relative;
-    top:-35px;
-    left:30px;
-
-
-
+    top:-5px;
+    left:20px;
+    width:90%;
 `;
 
 interface Prop{

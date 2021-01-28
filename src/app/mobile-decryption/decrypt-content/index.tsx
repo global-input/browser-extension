@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-import { useMobile,ConnectWidget} from '../../mobile';
-import {Error,Footer, DarkButton,PopupWindow,Content, TopBar,ConnectedInstruction,DecryptIcon,
-    ShowIcon,SendIcon} from '../../components';
+import { useMobile} from '../../mobile';
+import {Error,DarkButton,ConnectedInstruction,DecryptIcon,
+    ShowIcon,SendIcon,FormPage} from '../../components';
 interface Props {
     content: string;
     contentOnComputer: (content: string) => void;
@@ -38,12 +38,9 @@ export const DecryptContent: React.FC<Props> = ({ domain, content, contentOnComp
                 break;
         }
     });
+    const footer=(<DarkButton onClick={back}>Back</DarkButton>);
     return (
-        <PopupWindow>
-            <ConnectWidget mobile={mobile}/>
-            <TopBar>Decrypting Content On your Mobile</TopBar>
-            <Content>
-
+        <FormPage title="Decrypting Content On your Mobile" mobile={mobile} footer={footer}>
 
             {errorMessage && (<Error>{errorMessage}</Error>)}
             <ConnectedInstruction mobile={mobile}>
@@ -53,11 +50,7 @@ export const DecryptContent: React.FC<Props> = ({ domain, content, contentOnComp
                     In the next screen on your mobile, you will be presented with the decrypted content,
                     you can press <ShowIcon/> to inspect the decrypted content before pressing <SendIcon/> to send it to this application.
             </ConnectedInstruction>
-    </Content>
-            <Footer>
-                <DarkButton onClick={back}>Back</DarkButton>
-            </Footer>
-            </PopupWindow>
+        </FormPage>
     );
 
 };

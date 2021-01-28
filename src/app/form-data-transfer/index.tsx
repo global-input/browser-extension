@@ -7,11 +7,11 @@ import * as chromeExtension from '../chrome-extension';
 import {useConnectMobile,getNextVisibilityValue,sendVisibility,buildFormFields,FIELDS} from './mobile-ui';
 
 import type { FormField } from './mobile-ui';
-import {ConnectWidget, DisconnectButton} from './mobile-ui';
+import {DisconnectButton} from './mobile-ui';
 
 
-import {Form,Input,Label,Footer, DarkButton,Help,
-    DomainField,PopupWindow, TopBar,Content,FormPage} from '../components';
+import {Input,Label,Footer, DarkButton,Help,
+    DomainField,FormPage} from '../components';
 
 import {DisplayInputField,AddNewField} from './forms';
 

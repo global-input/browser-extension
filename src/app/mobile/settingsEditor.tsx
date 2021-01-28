@@ -133,7 +133,8 @@ interface SettingsFieldProp{
 const ProxyField:React.FC<SettingsFieldProp>=({settings, setSettings,expand,setExpand})=>(
     <Field>
                         <Input id="url" onChange={evt=>{
-                          setSettings(setting => ({ ...setting, url:evt.target.value}));
+                            const url=evt.target.value;
+                          setSettings(setting => ({ ...setting, url}));
                         }} value={settings.url ? settings.url : ''} placeholder="Websocket Server URL"
                         onFocus={()=>setExpand('url')}/>
                         <Label htmlFor="url">
@@ -152,7 +153,8 @@ const ProxyField:React.FC<SettingsFieldProp>=({settings, setSettings,expand,setE
  const APIKeyField:React.FC<SettingsFieldProp>=({settings, setSettings,expand,setExpand}) =>(
     <Field>
                         <Input id="apiKey" onChange={evt=>{
-                          setSettings(setting => ({ ...setting, apikey:evt.target.value}));
+                            const apikey=evt.target.value;
+                            setSettings(setting => ({ ...setting, apikey}));
                         }} value={settings.apikey ? settings.apikey : ''} placeholder="API Key"
                         onFocus={()=>setExpand('apikey')}/>
                         <Label htmlFor="apiKey">
@@ -174,7 +176,8 @@ If you leave it blank, it uses the default value set by our WebSocket server.
 const SecurityGroupField:React.FC<SettingsFieldProp>=({settings, setSettings,expand,setExpand})=>(
     <Field>
                         <Input id="securityGroup" onChange={evt=>{
-                          setSettings(setting => ({ ...setting, securityGroup:evt.target.value}));
+                          const securityGroup=evt.target.value;
+                          setSettings(setting => ({ ...setting, securityGroup}));
                         }} value={settings.securityGroup?settings.securityGroup:''} placeholder="Security Group Key"
                         onFocus={()=>setExpand('securityGroup')}/>
                         <Label htmlFor="securityGroup">Security Group Key</Label>
@@ -191,7 +194,8 @@ const SecurityGroupField:React.FC<SettingsFieldProp>=({settings, setSettings,exp
 const CodeKeyField:React.FC<SettingsFieldProp>=({settings, setSettings,expand,setExpand})=>(
                 <Field>
                         <Input id="codeKey" onChange={evt=>{
-                          setSettings(setting => ({ ...setting, codeKey:evt.target.value}));
+                            const codeKey=evt.target.value;
+                          setSettings(setting => ({ ...setting, codeKey}));
                         }} value={settings.codeKey?settings.codeKey:''} placeholder="Code Key"
                         onFocus={()=>setExpand('codeKey')}/>
                         <Label htmlFor="codeKey">Code Key</Label>

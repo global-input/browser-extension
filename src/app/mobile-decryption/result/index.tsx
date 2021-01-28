@@ -2,7 +2,7 @@ import React,{useState} from 'react';
 import * as onComputer from './mobile-ui/onComputer';
 import * as onMobile from './mobile-ui/onMobile';
 
-import {DarkButton,Footer, Field,TextArea, Label,CopyToClipboardButton, Help,PopupWindow,TopBar,Content,Form} from '../../components';
+import {DarkButton,NoMobilePage,Field,TextArea, Label,CopyToClipboardButton, Help} from '../../components';
 interface Props {
     domain: string;
     content: string;
@@ -12,8 +12,7 @@ interface Props {
 
 }
 export const ShowResultOnMobile: React.FC<Props> = ({ content, contentOnComputer, finish, domain }) => {
-    const restart = () => contentOnComputer('');
-
+     const restart = () => contentOnComputer('');
      onMobile.useConnectMobile({content,restart,finish});
         return (
             <RenderContentForm content={content} restart={restart} finish={finish}/>
@@ -46,10 +45,11 @@ interface ContentFormProps{
 
 const RenderContentForm:React.FC<ContentFormProps>=({content,restart,finish})=>{
     const [expand,setExpand]=useState('decryptedContent');
-    return ( <PopupWindow>
-        <TopBar>Decrypted Content Received</TopBar>
-        <Content>
-        <Form>
+    const footer=(<>
+        <DarkButton onClick={restart}>Decrypt Another Content</DarkButton>
+        <DarkButton onClick={finish}>Finish</DarkButton>
+    </>);
+    return ( <NoMobilePage title="Decrypted Content Received" footer={footer}>
         <Field>
                     <TextArea id="decryptedContent"  value={content} placeholder="Empty"
                     onFocus={()=>setExpand('decryptedContent')} readOnly={true}/>
@@ -59,13 +59,7 @@ const RenderContentForm:React.FC<ContentFormProps>=({content,restart,finish})=>{
                         This decrypted content is received from your mobile app as it is.
                     </Help>
         </Field>
-        </Form>
-        </Content>
-        <Footer>
-            <DarkButton onClick={restart}>Decrypt Another Content</DarkButton>
-            <DarkButton onClick={finish}>Finish</DarkButton>
-        </Footer>
-    </PopupWindow>
+    </NoMobilePage>
 )
 
 };

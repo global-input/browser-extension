@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useMobile,ConnectWidget} from '../../mobile';
-import {Error,Footer, DarkButton,PopupWindow,Content, TopBar,ConnectedInstruction} from '../../components';
+import { useMobile} from '../../mobile';
+import {Error,FormPage, DarkButton,ConnectedInstruction} from '../../components';
 
 import encryptImage from './images/encrypt-icon.png';
 import showImage from './images/show-icon.png';
@@ -45,11 +45,13 @@ export const EncryptContent: React.FC<Props> = ({ domain, content, contentOnComp
                 break;
         }
     });
+    const footer=(
+
+                <DarkButton onClick={back}>Back</DarkButton>
+
+    );
     return (
-        <PopupWindow>
-            <ConnectWidget mobile={mobile}/>
-            <TopBar>Encrypting Content On your Mobile</TopBar>
-            <Content>
+        <FormPage mobile={mobile} title="Encrypting Content On your Mobile" footer={footer}>
             {errorMessage && (<Error>{errorMessage}</Error>)}
             <ConnectedInstruction mobile={mobile}>
                     The content is now sent to your mobile app for encryption.
@@ -58,11 +60,7 @@ export const EncryptContent: React.FC<Props> = ({ domain, content, contentOnComp
                     In the next screen on your mobile, you will be presented with the encrypted content,
                     you can press <ShowIcon/> to inspect the encrypted content before pressing <SendIcon/> to send it to this application.
             </ConnectedInstruction>
-        </Content>
-            <Footer>
-                <DarkButton onClick={back}>Back</DarkButton>
-            </Footer>
-        </PopupWindow>
+        </FormPage>
     );
 
 };

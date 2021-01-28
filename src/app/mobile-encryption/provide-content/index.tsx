@@ -2,8 +2,8 @@ import React, { useCallback, useState } from 'react';
 import * as onComputer from './mobile-ui/onComputer';
 import * as onMobile from './mobile-ui/onMobile';
 import type {MobileData} from '../../mobile';
-import {PopupWindow,Content,TopBar,Form,
-    Footer,DarkButton, Field,TextArea, Label,Help} from '../../components';
+import {NoMobilePage,
+    DarkButton, Field,TextArea, Label,Help} from '../../components';
 
 interface PROPS{
     initialContent: string;
@@ -76,10 +76,13 @@ interface ContentFormProps{
 }
 const RenderContentForm:React.FC<ContentFormProps>=({content,onContentChanged,cancel,onEncrypt})=>{
     const [expand,setExpand]=useState('contentToEncrypt');
-    return (<PopupWindow>
-            <TopBar>Content To Encrypt</TopBar>
-            <Content>
-            <Form>
+    const footer=(
+        <>
+        <DarkButton onClick={cancel}>Cancel</DarkButton>
+        <DarkButton onClick={onEncrypt}>Encrypt</DarkButton>
+        </>
+    );
+    return (<NoMobilePage title="Content To Encrypt" footer={footer}>
 
 
             <Field>
@@ -94,14 +97,7 @@ const RenderContentForm:React.FC<ContentFormProps>=({content,onContentChanged,ca
                         You mobile app will encrypt it and send back the result to this application.
                         </Help>
             </Field>
-            </Form>
-            </Content>
-
-            <Footer>
-                <DarkButton onClick={cancel}>Cancel</DarkButton>
-                <DarkButton onClick={onEncrypt}>Encrypt</DarkButton>
-            </Footer>
-    </PopupWindow>
+    </NoMobilePage>
 );
 
 }

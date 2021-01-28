@@ -1,6 +1,6 @@
 import React from 'react';
-import {ConnectedPage, PopupWindow,Tips,TipTitle,TopBar,Footer,AppContent,Content,Domain,AppTitle,Title,MoreInfo} from './components';
-import {useMobile,ConnectWidget, DisconnectButton, WhenConnected} from './mobile';
+import {ConnectedPage, MoreInfo} from './components';
+import {useMobile, DisconnectButton} from './mobile';
 interface Props {
     domain: string;
     transferFormData: () => void;

@@ -2,7 +2,7 @@ import React,{useState} from 'react';
 import * as onComputer from './mobile-ui/onComputer';
 import * as onMobile from './mobile-ui/onMobile';
 
-import {DarkButton,Footer, Field,TextArea, Label,CopyToClipboardButton, Help,PopupWindow,TopBar,Content,Form} from '../../components';
+import {DarkButton,NoMobilePage, Field,TextArea, Label,CopyToClipboardButton, Help} from '../../components';
 interface Props {
     domain: string;
     content: string;
@@ -45,11 +45,14 @@ interface ContentFormProps{
 }
 const RenderContentForm:React.FC<ContentFormProps>=({content,restart,finish})=>{
     const [expand,setExpand]=useState('encryptedContent');
+    const footer=(
+        <>
+            <DarkButton onClick={restart}>Encrypt Another Content</DarkButton>
+            <DarkButton onClick={finish}>Finish</DarkButton>
+        </>
+    )
     return (
-    <PopupWindow>
-        <TopBar>Encrypted Content Received</TopBar>
-        <Content>
-        <Form>
+    <NoMobilePage title="Encrypted Content Received" footer={footer}>
         <Field>
                     <TextArea id="encryptedContent"  value={content} placeholder="Empty"
                     onFocus={()=>setExpand('encryptedContent')} readOnly={true}/>
@@ -65,14 +68,9 @@ const RenderContentForm:React.FC<ContentFormProps>=({content,restart,finish})=>{
                     </Help>
 
         </Field>
-        </Form>
-        </Content>
 
-        <Footer>
-            <DarkButton onClick={restart}>Encrypt Another Content</DarkButton>
-            <DarkButton onClick={finish}>Finish</DarkButton>
-        </Footer>
-    </PopupWindow>
+
+    </NoMobilePage>
 )
 
 };

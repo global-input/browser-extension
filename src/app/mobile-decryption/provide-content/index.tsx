@@ -2,8 +2,8 @@ import React, { useCallback, useState } from 'react';
 import * as onComputer from './mobile-ui/onComputer';
 import * as onMobile from './mobile-ui/onMobile';
 import type {MobileData} from '../../mobile';
-import {PopupWindow,Content,TopBar,Form,
-    Footer,DarkButton, Field,TextArea, Label,Help} from '../../components';
+import {
+    Footer,DarkButton, Field,TextArea, Label,Help, NoMobilePage} from '../../components';
 
 interface PROPS{
     initialContent: string;
@@ -77,30 +77,22 @@ interface ContentFormProps{
 
 const RenderContentForm:React.FC<ContentFormProps>=({content,onContentChanged,cancel,onDecrypt})=>{
     const [expand,setExpand]=useState('contentToDecrypt');
-    return (<PopupWindow>
-            <TopBar>Content To Decrypt</TopBar>
-            <Content>
-            <Form>
-
-            <Field>
-                    <TextArea id="contentToDecrypt" onChange={evt=>{
-                      onContentChanged(evt.target.value);
-                    }} value={content} placeholder="Place here the content to decrypt."
-                    onFocus={()=>setExpand('contentToDecrypt')}/>
-                    <Label htmlFor="contentToDecrypt">Content to Decrypt</Label>
-                    <Help expandId='contentToDecrypt' expand={expand} setExpand={setExpand}>
-                    The content you have provided will be sent to your mobile app.
-                    You mobile app will decrypt it and send back the result to this application.
-                    </Help>
-
-            </Field>
-            </Form>
-            </Content>
-            <Footer>
-                <DarkButton onClick={cancel}>Cancel</DarkButton>
-                <DarkButton onClick={onDecrypt}>Decrypt</DarkButton>
-            </Footer>
-    </PopupWindow>
-);
+    const footer=(<>
+        <DarkButton onClick={cancel}>Cancel</DarkButton>
+        <DarkButton onClick={onDecrypt}>Decrypt</DarkButton>
+    </>);
+    return (<NoMobilePage title="Content To Decrypt" footer={footer}>
+                <Field>
+                        <TextArea id="contentToDecrypt" onChange={evt=>{
+                        onContentChanged(evt.target.value);
+                        }} value={content} placeholder="Place here the content to decrypt."
+                        onFocus={()=>setExpand('contentToDecrypt')}/>
+                        <Label htmlFor="contentToDecrypt">Content to Decrypt</Label>
+                        <Help expandId='contentToDecrypt' expand={expand} setExpand={setExpand}>
+                        The content you have provided will be sent to your mobile app.
+                        You mobile app will decrypt it and send back the result to this application.
+                        </Help>
+                </Field>
+    </NoMobilePage>);
 
 }

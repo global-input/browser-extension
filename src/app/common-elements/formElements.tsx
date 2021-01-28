@@ -44,14 +44,14 @@ export const TextArea = styled.textarea`
         border: 1px solid #2c7ac9;
     }
     &:placeholder-shown + .control-label {
-        visibility: hidden;
+        display: none;
         z-index: -1;
         transition: 0.2s ease-in-out;
 
     }
     &:not(:placeholder-shown) + .control-label,
     .form-control:focus:not(:placeholder-shown) + .control-label {
-        visibility: visible;
+        display: block;
         z-index: 1;
         opacity: 1;
         position:absolute;

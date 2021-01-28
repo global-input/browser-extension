@@ -6,8 +6,7 @@ import * as storage from '../storage';
 import type { FormField } from '../mobile';
 
 
-import {Form,Input,Label,Footer, DarkButton,Help,
-   DomainField,PopupWindow, TopBar,Content} from '../components';
+import {NoMobilePage,DarkButton} from '../components';
 
 import {DisplayCacheField} from './forms';
 interface Props {
@@ -29,6 +28,7 @@ export const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
          setFields(cachedFields);
       }
    }, [cacheKey, back, domain]);
+
    const onCopied=(formField:FormField)=>{
       const notCopiedFields=fields.filter((f:FormField)=>f!==formField && f.value);
       if(notCopiedFields.length){
@@ -42,15 +42,12 @@ export const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
    if (!fields) {
       return null;
    }
-
+const footer=(
+   <DarkButton onClick={back}>Discard</DarkButton>
+)
 
    return (
-      <PopupWindow>
-         <TopBar>
-               Cached Values
-         </TopBar>
-         <Content>
-         <Form>
+      <NoMobilePage title="Cached Values" domain={domain} footer={footer}>
          {fields.map((formField:FormField, index:number) => (
                     <DisplayCacheField  key={formField.id}
                         formField={formField}
@@ -58,14 +55,7 @@ export const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
                                onCopied(formField);
                         }}/>
                 ))}
-
-         </Form>
-
-         </Content>
-
-      </PopupWindow>
-
-
+      </NoMobilePage>
    );
 
 };
