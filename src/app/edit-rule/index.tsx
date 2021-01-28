@@ -10,10 +10,18 @@ interface Props {
     back: () => void;
     domain: string;
     loadFromPreset:()=>void;
+    contentToEdit?:string|null;
 }
 
-export const EditRule: React.FC<Props> = ({ back, domain,loadFromPreset }) => {
-    const [content, setContent] = useState<string>(() => rules.getRulesForEdit(domain));
+export const EditRule: React.FC<Props> = ({ back, domain,loadFromPreset,contentToEdit }) => {
+    const [content, setContent] = useState<string>(() => {
+        if(contentToEdit){
+            return contentToEdit;
+        }
+        else{
+            return rules.getRulesForEdit(domain)}
+        }
+    );
     const [errorMessage, setErrorMessage] = useState('');
     const saveRule = (content: string) => {
         if (content) {

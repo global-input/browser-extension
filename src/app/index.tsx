@@ -11,7 +11,7 @@ import {EditRule} from './edit-rule';
 import LoadFromPreset from './load-from-preset';
 
 
-enum PAGES {
+enum PAGE_NAME {
     LOADING,
     DISPLAY_CACHED_FORM,
     MAIN_PAGE,
@@ -22,27 +22,26 @@ enum PAGES {
     EDIT_RULE,
     LOAD_FROM_PRESET
 }
+interface Page{
+    name:PAGE_NAME;
+    content?:string|null;
+}
 
 const App = () => {
-    const [page, setPage] = useState(PAGES.LOADING);
+    const [page, setPage] = useState<Page>({name:PAGE_NAME.LOADING,content:null});
     const [domain, setDomain] = useState<string>('');
-    const [ruleContentToEdit,setRuleContentToEdit]=useState<string>('');
-
 
     const [cacheKey, setCacheKey] = useState(null);
 
-    const mainPage = useCallback(() => setPage(PAGES.MAIN_PAGE), []);
-    const transferFormData = useCallback(() => setPage(PAGES.TRANSFER_FORM_DATA), []);
-    const encryption = useCallback(() => setPage(PAGES.ENCRYPTION), []);
-    const decryption = useCallback(() => setPage(PAGES.DECRYPTION), []);
-    const displayCachedForm = useCallback(() => setPage(PAGES.DISPLAY_CACHED_FORM), []);
-    const pageControl = useCallback(() => setPage(PAGES.PAGE_CONTROL), []);
-    const loadFromPreset=useCallback(() => setPage(PAGES.LOAD_FROM_PRESET), []);
+    const mainPage = useCallback(() => setPage({name:PAGE_NAME.MAIN_PAGE}), []);
+    const transferFormData = useCallback(() => setPage({name:PAGE_NAME.TRANSFER_FORM_DATA}), []);
+    const encryption = useCallback(() => setPage({name:PAGE_NAME.ENCRYPTION}), []);
+    const decryption = useCallback(() => setPage({name:PAGE_NAME.DECRYPTION}), []);
+    const displayCachedForm = useCallback(() => setPage({name:PAGE_NAME.DISPLAY_CACHED_FORM}), []);
+    const pageControl = useCallback(() => setPage({name:PAGE_NAME.PAGE_CONTROL}), []);
+    const loadFromPreset=useCallback(() => setPage({name:PAGE_NAME.LOAD_FROM_PRESET}), []);
     const editRule = (content?: string) => {
-          if(content){
-            setRuleContentToEdit(content);
-          }
-          setPage(PAGES.EDIT_RULE);
+          setPage({name:PAGE_NAME.EDIT_RULE, content});
     };
 
 
@@ -68,25 +67,25 @@ const App = () => {
     }, [displayCachedForm, mainPage]);
 
 
-    switch (page) {
-        case PAGES.LOADING:
+    switch (page.name) {
+        case PAGE_NAME.LOADING:
             return (<LoadingContentStatus onReceivedPageStatus={onReceivedPageStatus} />);
-        case PAGES.DISPLAY_CACHED_FORM:
+        case PAGE_NAME.DISPLAY_CACHED_FORM:
             return (<DisplayCachedFields cacheKey={cacheKey} domain={domain} back={mainPage} />);
-        case PAGES.TRANSFER_FORM_DATA:
+        case PAGE_NAME.TRANSFER_FORM_DATA:
             return (<FormDataTransfer domain={domain} back={mainPage} />);
-        case PAGES.ENCRYPTION:
+        case PAGE_NAME.ENCRYPTION:
             return (<MobileEncryption back={mainPage} domain={domain} />);
-        case PAGES.DECRYPTION:
+        case PAGE_NAME.DECRYPTION:
             return (<MobileDecryption back={mainPage} domain={domain} />);
-        case PAGES.MAIN_PAGE:
+        case PAGE_NAME.MAIN_PAGE:
             return (<MainPage domain={domain} transferFormData={transferFormData} encryption={encryption}
                 decryption={decryption} pageControl={pageControl}/>);
-        case PAGES.PAGE_CONTROL:
+        case PAGE_NAME.PAGE_CONTROL:
             return (<PageControl back={mainPage} domain={domain} editRule={editRule}/>);
-        case PAGES.EDIT_RULE:
-             return (<EditRule back={mainPage} domain={domain} loadFromPreset={loadFromPreset}/>);
-        case PAGES.LOAD_FROM_PRESET:
+        case PAGE_NAME.EDIT_RULE:
+             return (<EditRule back={mainPage} domain={domain} loadFromPreset={loadFromPreset} contentToEdit={page.content}/>);
+        case PAGE_NAME.LOAD_FROM_PRESET:
              return (<LoadFromPreset editRule={editRule} domain={domain} />)
         default:
             return null;
