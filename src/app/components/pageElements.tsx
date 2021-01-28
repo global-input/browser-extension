@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import {Field,TopBar,AppTitle,AppContent,Title,Footer,Form} from '../common-elements';
+import {Field,TopBar,AppTitle,Title,Footer,Form} from '../common-elements';
 import {ConnectWidget,WhenConnected} from '../mobile';
 import type {MobileData} from '../mobile';
 
