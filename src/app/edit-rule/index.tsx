@@ -53,6 +53,7 @@ export const EditRule: React.FC<Props> = ({ back, domain,loadFromPreset }) => {
     return (
     <NoMobilePage title="Edit Rules" domain={domain} footer={footer}>
             <Field>
+
                 <TextArea id="ruleContent"
                 value={content}
 
@@ -60,7 +61,9 @@ export const EditRule: React.FC<Props> = ({ back, domain,loadFromPreset }) => {
                     onChange={(evt=>{
                         onContentChange(evt.target.value);
                     })} />
-                <Label htmlFor="ruleContent">Rules</Label>
+                 <Label htmlFor="ruleContent">Rules</Label>
+
+
             </Field>
                 {errorMessage && (
             <Error>{errorMessage}errorMessage</Error>)}

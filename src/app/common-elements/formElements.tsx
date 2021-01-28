@@ -54,7 +54,8 @@ export const TextArea = styled.textarea`
         visibility: visible;
         z-index: 1;
         opacity: 1;
-        transform: translateX(10px) translateY(-110px);
+        position:absolute;
+        transform: translateX(10px) translateY(-10px);
         transition: 0.2s ease-in-out transform;
         background-color:white;
     }

@@ -41,6 +41,18 @@ const FIELDS = {
     const initData = (domain:string, content:string) => ({
         form: {
             title: "Edit Rules",
+            views: {
+                viewIds: {
+                    row4:{
+                        style:{
+                            display:'flex',
+                            justifyContent:'space-between',
+                            padding:20,
+                            width:'100%',
+                        }
+                    }
+                }
+            },
             fields: [{ ...FIELDS.domain, value: domain }, FIELDS.info, { ...FIELDS.editor, value: content },
                 FIELDS.cancel, FIELDS.save, FIELDS.loadFromPreset]
         }

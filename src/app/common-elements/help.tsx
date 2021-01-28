@@ -58,6 +58,18 @@ const HelpContainer3=styled(HelpContainer1)`
 
     padding-right:30px;
 `;
+const HelpContainer4=styled(HelpContainer1)`
+    position:relative;
+    top:-5px;
+
+    padding-right:50px;
+`;
+const HelpContainer5=styled(HelpContainer1)`
+    position:relative;
+    top:15px;
+
+    padding-right:50px;
+`;
 const HelpContainer:React.FC<ExpandProp>=({position=1,children})=>{
     if(position===2){
         return (<HelpContainer2>{children}</HelpContainer2>)
@@ -65,6 +77,13 @@ const HelpContainer:React.FC<ExpandProp>=({position=1,children})=>{
     else if(position===3){
         return (<HelpContainer3>{children}</HelpContainer3>)
     }
+    else if(position===4){
+        return (<HelpContainer4>{children}</HelpContainer4>)
+    }
+    else if(position===5){
+        return (<HelpContainer5>{children}</HelpContainer5>)
+    }
+
     else{
         return (<HelpContainer1>{children}</HelpContainer1>)
     }

@@ -48,6 +48,7 @@ export const Select=styled.select`
         color: #222;
         outline: none;
     }
+    margin-bottom:20px;
 
 `;
 export const Option=styled.option`

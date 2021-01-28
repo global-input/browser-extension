@@ -17,7 +17,7 @@ export const PopupWindow =styled.div`
     height:100%;
     min-width:${minWidth}px;
     max-width:${maxWidth}px;
-    max-height:${maxHeight};
+    max-height:${maxHeight}px;
 `;
 
 
@@ -73,12 +73,12 @@ export const Message=styled.div`
 
 `;
 
-interface BasicPageProps{
+interface NoMobilePageProps{
     domain?:string;
     title:string;
     footer?:React.ReactNode;
 }
-export const NoMobilePage:React.FC<BasicPageProps>=({domain,title, children,footer})=>(
+export const NoMobilePage:React.FC<NoMobilePageProps>=({domain,title, children,footer})=>(
 
     <PopupWindow>
         <TopBar>

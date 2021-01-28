@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState , useMemo} from 'react';
 
-import {Form,Input,Label,Footer, DarkButton,Help,
-    DomainField,PopupWindow, TopBar,Content,Domain, Field, TextArea,Error,Select,Option} from '../components';
+import {NoMobilePage,Footer,Label, DarkButton,
+    Field, TextArea,Select,Option,MoreInfo, Help} from '../components';
 
 import { useMobile } from '../mobile';
 import * as rules from '../page-control/rules';
@@ -13,6 +13,7 @@ interface Props {
 }
 const Editor: React.FC<Props> = ({ editRule, domain}) => {
     const [selectedValue, setSelectedValue] = useState('0');
+    const [expand,setExpand]=useState("selection");
     const [content, setContent] = useState<string>(() => rules.getPresetRuleByIndexForEdit(0));
     const selectionItems = useMemo(() => {
         return rules.buildSelectionItems()
@@ -21,7 +22,7 @@ const Editor: React.FC<Props> = ({ editRule, domain}) => {
     const initData = {
         form: {
             title: "Preset Rules",
-            fields: [FIELDS.info, { ...FIELDS.editor, value: content }, FIELDS.back, FIELDS.use]
+            fields: [FIELDS.info, FIELDS.back]
         }
     };
 
@@ -34,60 +35,45 @@ const Editor: React.FC<Props> = ({ editRule, domain}) => {
             case FIELDS.back.id:
                 editRule();
                 break;
-            case FIELDS.editor.id:
-                setContent(field.value as string);
-                break;
-            case FIELDS.use.id:
-                onUse();
-                break;
         }
     });
-    const { sendValue } = mobile;
-    const onContentChange = useCallback((content: string) => {
-        setContent(content);
-        sendValue(FIELDS.editor.id, content);
-    }, [sendValue]);
-    const onChangeContent = (content: string) => {
-        setContent(content);
-        mobile.sendValue(FIELDS.editor.id, content);
-    }
 
     const onSelectionChange = (evt: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedValue(evt.target.value);
         const rule = rules.getPresetRuleByIndexForEdit(parseInt(evt.target.value));
-        onChangeContent(rule);
+        setContent(rule);
     }
-
+const footer=(<Footer>
+<DarkButton onClick={()=>{
+    editRule();
+}}>Back</DarkButton>
+<DarkButton onClick={onUse}>Use</DarkButton>
+</Footer>);
 
     return (
-    <PopupWindow>
-            <TopBar>Preset Rules</TopBar>
-            <Content>
-            <Form>
+    <NoMobilePage title="Preset Rules" domain={domain} footer={footer}>
+
             <Field>
                 <Select value={selectedValue} onChange={onSelectionChange}>
                 {selectionItems.map(f=>( <Option key={f.value} value={f.value}>{f.label}</Option>))}
               </Select>
+              <Help expand={expand} expandId="selection" setExpand={setExpand} position={4}>
+              You can select one of the preset rule to starts with for defining the elements in the page that you can control using your mobile
+              </Help>
             </Field>
               <Field>
                 <TextArea id="ruleContent"
                 value={content}
-
+                readOnly={true}
                 placeholder="Rules"
-                    onChange={(evt=>{
-                        onContentChange(evt.target.value);
-                    })} />
+                     />
                 <Label htmlFor="ruleContent">Rules</Label>
+                <Help expand={expand} expandId="rule" setExpand={setExpand} position={5}>
+                    If you press "Use" button to load the content in the above text box to the editor to edit to define the elements in the page that you can control using your mobile.
+              </Help>
             </Field>
 
-
-            </Form>
-            </Content>
-            <Footer>
-            <DarkButton onClick={onUse}>Use</DarkButton>
-
-            </Footer>
-            </PopupWindow>
+            </NoMobilePage>
         );
 
 }
@@ -98,23 +84,11 @@ const FIELDS = {
         type: "info",
         value: "Please operate in the extension window on your computer"
     },
-    editor: {
-        id: 'editor',
-        type: 'text',
-        nLines: 5,
-        value: '',
-        viewId: "row3"
-    },
+
     back: {
         id: "back-to-edit",
         type: "button",
         label: "Back",
-        viewId: "row4"
-    },
-    use: {
-        id: "use",
-        type: "button",
-        label: "Use",
         viewId: "row4"
     }
 };
