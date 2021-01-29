@@ -1,16 +1,16 @@
 import React, { useEffect,useState} from 'react';
-import { NoMobilePage,Error,  Message, DarkButton,AppTitle,Title, TipTitle,Spinner} from '../components';
+import { NoMobilePage,Error,  Message, DarkButton,TipTitle,Spinner} from '../components';
 import * as rules from './rules';
 import * as chromeExtension from '../chrome-extension';
-import type { PageRule,FormRule} from './rules';
-import type {FormField} from './mobile-ui';
+import type { PageRule,ProcessData} from './rules';
+import {ProcessStep,processRule} from './rules';
+
 import {useConnectToPageControl,useConnectErrorControl} from './mobile-ui';
 
-export enum STATUS {
-    LOADING,
-    ERROR,
-    SUCCESS
-};
+
+
+
+
 
 interface Props {
     back: () => void;
@@ -18,66 +18,37 @@ interface Props {
     editRule: () => void;
 }
 
+
+
 export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
-    const [status, setStatus] = useState(STATUS.LOADING);
-    const [errorMessage, setErrorMessage]=useState('');
-    const [errorTitle,setErrorTitle]=useState('');
-    const [formFields, setFormFields]=useState<FormField[]|null>(null);
-    const [formRule, setFormRule]=useState<FormRule|null>(null)
+    const [processData, setProcessData] = useState<ProcessData>({step:ProcessStep.LOADING});
 
-
-    const onError=(errorTitle:string, errorMessage:string)=>{
-        setErrorMessage(errorMessage);
-        setErrorTitle(errorTitle);
-        setStatus(STATUS.ERROR);
-    };
     const onEditRule=()=>editRule();
-    const processRule = async (rule: PageRule) => {
-        const message = await chromeExtension.getPageControlConfig(rule);
 
-        if (message.status !== "success") {
-            onError("Not Found Error", "Failed to find elements matching what is specified in the rule. Please edit the rule and make it match the content of the page loaded on the current tab.");
-            return;
-        }
-        if (message.content?.form?.fields?.length) {
-            setFormRule(message.content.form);
-            const fields = rules.buildFormFieldsFieldRules(message.content?.form, (messageField, value) => {
-                chromeExtension.sendFormField(messageField.id, value);
-                if (messageField.matchingRule?.next) {
-                    if (messageField.matchingRule?.next.type === 'refresh') {
-                        processRule(rule);
-                    }
-                }
-            });
-
-            if(fields && fields.length){
-                setFormFields(fields);
-                setStatus(STATUS.SUCCESS);
-            }
-            else{
-                onError("Empty Field Error","At least one controllable field should be specified. Please edit the rule and define a controllable element in the page.");
-            }
-
-
-        }
-        else {
-            onError("Not Found Error","The loaded page does not contain the matching elements specified in the rule. Please edit the rule specifying the elements in the loaded page.");
-            return;
-        }
+    const sendRuleToPage = async (rule:PageRule) => {
+        const message = chromeExtension.getPageControlConfig(rule);
+        return message;
     };
 
+    const sendFieldValueToPage = (fieldId:string,value:string) => {
+        chromeExtension.sendFormField(fieldId, value);
+    };
 
     useEffect(() => {
         if (!domain) {
-            onError("Domain Missing", "Failed to identify the domain of page loaded on the current tab.");
+            setProcessData({step:ProcessStep.ERROR,
+                errorTitle:'Domain Missing',
+                errorMessage:'Failed to identify the domain of page loaded on the current tab.'});
             return;
         }
         let rule = rules.findRuleByDomain(domain);
         if (!rule) {
-            onError("Empty Rule",`There is no rule specified for ${domain}. Click on the 'Edit' button to define one.`);
+            setProcessData({step:ProcessStep.ERROR,
+                errorTitle:'Empty Rule',
+                errorMessage:`There is no rule specified for ${domain}. Click on the 'Edit' button to define one.`});
             return;
         }
-        processRule(rule);
+        processRule({setProcessData, rule, domain, sendRuleToPage,sendFieldValueToPage});
     //eslint-disable-next-line react-hooks/exhaustive-deps
     }, [domain]);
     const footer=(<>
@@ -88,11 +59,11 @@ export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
     return (
 
         <NoMobilePage domain={domain} title="Page Control" footer={footer}>
-            {status===STATUS.LOADING && (<DisplayLoading/>)}
+            {processData.step===ProcessStep.LOADING && (<DisplayLoading/>)}
 
-            {status===STATUS.ERROR && <DisplayError  back={back} errorTitle={errorTitle} errorMessage={errorMessage} domain={domain} editRule={onEditRule}/>}
-            {status===STATUS.SUCCESS && formRule && formFields && <DisplayPageControl domain={domain} formFields={formFields} formRule={formRule}
-                back={back} editRule={onEditRule}>You can use your mobile to operate on the page.</DisplayPageControl>}
+            {processData.step===ProcessStep.ERROR && <DisplayError  back={back} errorTitle={processData.errorTitle} errorMessage={processData.errorMessage} domain={domain} editRule={onEditRule}/>}
+            {processData.step===ProcessStep.SUCCESS && (<DisplayPageControl processData={processData}
+                back={back} editRule={onEditRule}>You can use your mobile to operate on the page.</DisplayPageControl>)}
         </NoMobilePage>
     );
 }
@@ -110,24 +81,23 @@ interface ErrorProps{
     domain:string;
     back:()=>void;
     editRule:()=>void;
-    errorTitle:string;
-    errorMessage:string;
+    errorTitle?:string;
+    errorMessage?:string;
 }
 
 const DisplayError:React.FC<ErrorProps>=({domain,back,editRule, errorTitle, errorMessage})=>{
-    const mobile=useConnectErrorControl(domain,back,editRule,errorTitle,errorMessage);
+    useConnectErrorControl(domain,back,editRule,errorTitle?errorTitle:'Error',errorMessage?errorMessage:'Unknown Error');
     return (<Error>{errorMessage}</Error>);
 };
 
 interface DisplayPageControlProps{
-    domain:string;
-    formFields:FormField[];
-    formRule:FormRule;
+    processData:ProcessData
     back:()=>void;
     editRule:()=>void;
 }
-const DisplayPageControl:React.FC<DisplayPageControlProps>=({domain,formFields,formRule,children, back, editRule})=>{
-    const mobile=useConnectToPageControl(domain,formFields,formRule,back,editRule);
+const DisplayPageControl:React.FC<DisplayPageControlProps>=({processData,children, back, editRule})=>{
+
+    useConnectToPageControl(processData,back,editRule);
     return (<TipTitle>{children}</TipTitle>);
 
-}
+};

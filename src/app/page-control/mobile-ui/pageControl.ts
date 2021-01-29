@@ -29,13 +29,13 @@ const FIELDS = {
 };
 
 
-const initData = (domain:string,fields:FormField[],formRule:FormRule) => {
+const initData = (domain:string,fields:FormField[],formRule?:FormRule) => {
 
     return {
         form: {
-            title: formRule.title,
+            title: formRule?.title,
             domain: domain,
-            id: formRule.id,
+            id: formRule?.id,
             views: {
                 viewIds: {
                     row1:{
@@ -52,8 +52,16 @@ const initData = (domain:string,fields:FormField[],formRule:FormRule) => {
         }
     }
 };
-export const useConnectToPageControl = (domain:string,fields:FormField[],formRule:FormRule,back:()=>void, editRule:()=>void) =>{
-    const mobile=useMobile(()=>initData(domain,fields,formRule), true);
+
+interface PageData{
+    fields?:FormField[];
+    formRule?:FormRule;
+    domain?:string;
+    configId?:number;
+}
+export const useConnectToPageControl = (pageData:PageData,back:()=>void, editRule:()=>void) =>{
+
+    const mobile=useMobile(()=>initData(pageData.domain?pageData.domain:'',pageData.fields?pageData.fields:[],pageData.formRule), true,pageData.configId);
     mobile.setOnchange(({field}) => {
         switch (field.id) {
             case FIELDS.back.id:

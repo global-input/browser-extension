@@ -200,3 +200,77 @@ export const buildSelectionItems = (): RuleSelectionItem[] => {
         }
     });
 };
+
+
+
+
+export enum ProcessStep {
+    LOADING,
+    ERROR,
+    SUCCESS
+};
+
+export interface ProcessData{
+    step:ProcessStep;
+    errorMessage?:string;
+    errorTitle?:string;
+    fields?:FormField[];
+    formRule?:FormRule;
+    domain?:string;
+    configId?:number;
+}
+
+type SetProcessDataInputFunction=(status:ProcessData)=>ProcessData;
+interface ProcessRule{
+    setProcessData:(status:ProcessData|SetProcessDataInputFunction)=>void;
+    rule: PageRule;
+    domain:string;
+    sendRuleToPage:(rule:PageRule)=>any;
+    sendFieldValueToPage:(fieldId:string,value:string)=>void;
+}
+
+export const processRule = async ({setProcessData, rule, domain, sendRuleToPage,sendFieldValueToPage}:ProcessRule) => {
+    const message = await sendRuleToPage(rule); //send rule to the page to find controllable part.
+    if (message.status !== "success") {
+        setProcessData({step:ProcessStep.ERROR,
+        errorTitle:'Not Found Error',
+        errorMessage:'Failed to find elements matching what is specified in the rule. Please edit the rule and make it match the content of the page loaded on the current tab.'});
+        return;
+    }
+    if (message.content?.form?.fields?.length) {
+
+        const fields = buildFormFieldsFieldRules(message.content?.form, (messageField, value) => {
+            sendFieldValueToPage(messageField.id, value as string);
+            if (messageField.matchingRule?.next) {
+                if (messageField.matchingRule?.next.type === 'refresh') {
+                    setTimeout(()=>{
+                        processRule({setProcessData, rule, domain,sendRuleToPage,sendFieldValueToPage});
+                    },1000);
+
+                }
+            }
+        });
+        if(fields && fields.length){
+            setProcessData(processData=>{
+                const configId=processData.configId?processData.configId+1:1;
+                console.log("configId:"+configId+" ::"+JSON.stringify(fields));
+                return {step:ProcessStep.SUCCESS, fields,
+                formRule:message.content.form,configId,domain};
+            });
+
+        }
+        else{
+            setProcessData({step:ProcessStep.ERROR,
+                errorTitle:'Empty Field Error',
+                errorMessage:'At least one controllable field should be specified. Please edit the rule and define a controllable element in the page.'});
+        }
+
+
+    }
+    else {
+        setProcessData({step:ProcessStep.ERROR,
+            errorTitle:'Not Found Error',
+            errorMessage:'The loaded page does not contain the matching elements specified in the rule. Please edit the rule specifying the elements in the loaded page.'});
+        return;
+    }
+};
