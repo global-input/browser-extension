@@ -11,7 +11,7 @@ import {DisconnectButton} from './mobile-ui';
 
 
 import {Input,Label,Footer, DarkButton,Help,
-    DomainField,FormPage} from '../components';
+    DomainField,FormPage,Important} from '../components';
 
 import {DisplayInputField,AddNewField} from './forms';
 
@@ -21,11 +21,14 @@ interface Props {
 }
 export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
     const [userDomain, setUserDomain] = useState(domain);
+
     const [configId,setConfigId]=useState(0);
     const [selectedFields, setSelectedFields]=useState<FormField[]>([]);
     const [formFields, setFormFields] = useState(() => buildFormFields(domain));
     const [visibility, setVisibility] = useState(FIELDS.visibility.options[0]);
     const [expand,setExpand]=useState('');
+    const [message,setMessage]=useState('');
+
 
     const onFormModified=(formFields: FormField[], isStructureChanged:boolean) => {
         if(isStructureChanged){
@@ -48,19 +51,18 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
         onFormModified(newFormFields,true);
     };
     const onCopied=(formField:FormField)=>{
-        const notCopiedFields=formFields.filter((f:FormField)=>f!==formField && f.value);
-        if(notCopiedFields.length){
-            const key = cache.saveCacheFields(domain, notCopiedFields);
-            if (key) {
+        const {key,message}=cache.saveRemainingFieldsToCache(domain,formField,formFields);
+        if(key){
                 chromeExtension.sendKey(key);
-            }
+                console.log("----message:"+message);
+                message && setMessage(message);
         }
 
     }
 
 
 
-    const mobile =useConnectMobile({domain:userDomain,formFields,configId,visibility,setVisibility,onFormModified,back})
+    const mobile =useConnectMobile({domain:userDomain,formFields,configId,visibility,setVisibility,onFormModified,back},)
 
 
     return (
@@ -76,6 +78,7 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
                 </Help>
 
             </DomainField>
+            {message && (<Important>{message}</Important>)}
 
                     {formFields.map((formField:FormField, index:number) => (
                     <DisplayInputField  key={formField.id}

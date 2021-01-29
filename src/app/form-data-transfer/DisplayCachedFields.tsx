@@ -6,16 +6,17 @@ import * as storage from '../storage';
 import type { FormField } from '../mobile';
 
 
-import {NoMobilePage,DarkButton} from '../components';
+import {NoMobilePage,DarkButton,Important} from '../components';
 
 import {DisplayCacheField} from './forms';
 interface Props {
-   cacheKey: string | null;
+   cacheKey: string | null | undefined;
    domain: string;
    back: () => void;
 }
 export const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
    const [fields, setFields] = useState<FormField[]>([]);
+   const [message,setMessage]=useState('');
    useEffect(() => {
       if (cacheKey && domain) {
          const cachedFields = cache.loadCacheFields(domain, cacheKey);
@@ -30,25 +31,21 @@ export const DisplayCachedFields = ({ cacheKey, domain, back }: Props) => {
    }, [cacheKey, back, domain]);
 
    const onCopied=(formField:FormField)=>{
-      const notCopiedFields=fields.filter((f:FormField)=>f!==formField && f.value);
-      if(notCopiedFields.length){
-          const key = cache.saveCacheFields(domain, notCopiedFields);
-          if (key) {
-              chromeExtension.sendKey(key);
-          }
-      }
+      const {key,message}=cache.saveRemainingFieldsToCache(domain,formField,fields);
+        if(key){
+                chromeExtension.sendKey(key);
+                message && setMessage(message);
+        }
 
   }
-   if (!fields) {
-      return null;
-   }
 const footer=(
-   <DarkButton onClick={back}>Discard</DarkButton>
+   <DarkButton onClick={back}>Back</DarkButton>
 )
 
    return (
       <NoMobilePage title="Cached Values" domain={domain} footer={footer}>
-         {fields.map((formField:FormField, index:number) => (
+         {message && (<Important>{message}</Important>)}
+         {fields && fields.map((formField:FormField, index:number) => (
                     <DisplayCacheField  key={formField.id}
                         formField={formField}
                         onCopied={()=>{

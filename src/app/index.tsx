@@ -30,14 +30,14 @@ interface Page{
 const App = () => {
     const [page, setPage] = useState<Page>({name:PAGE_NAME.LOADING,content:null});
     const [domain, setDomain] = useState<string>('');
-
-    const [cacheKey, setCacheKey] = useState(null);
-
-    const mainPage = useCallback(() => setPage({name:PAGE_NAME.MAIN_PAGE}), []);
+    const mainPage = useCallback(() => {
+        storage.clearCacheFields();
+        setPage({name:PAGE_NAME.MAIN_PAGE})
+    }, []);
     const transferFormData = useCallback(() => setPage({name:PAGE_NAME.TRANSFER_FORM_DATA}), []);
     const encryption = useCallback(() => setPage({name:PAGE_NAME.ENCRYPTION}), []);
     const decryption = useCallback(() => setPage({name:PAGE_NAME.DECRYPTION}), []);
-    const displayCachedForm = useCallback(() => setPage({name:PAGE_NAME.DISPLAY_CACHED_FORM}), []);
+    const displayCachedForm = useCallback((cacheKey:string) => setPage({name:PAGE_NAME.DISPLAY_CACHED_FORM, content:cacheKey}), []);
     const pageControl = useCallback(() => setPage({name:PAGE_NAME.PAGE_CONTROL}), []);
     const loadFromPreset=useCallback(() => setPage({name:PAGE_NAME.LOAD_FROM_PRESET}), []);
     const editRule = (content?: string) => {
@@ -52,16 +52,13 @@ const App = () => {
 
 
             if (message.content.key && message.host) {
-                setCacheKey(message.content.key);
-                displayCachedForm();
+                displayCachedForm(message.content.key);
             }
             else {
-                storage.clearCacheFields();
                 mainPage();
             }
         }
         else {
-            storage.clearCacheFields();
             mainPage();
         }
     }, [displayCachedForm, mainPage]);
@@ -71,7 +68,7 @@ const App = () => {
         case PAGE_NAME.LOADING:
             return (<LoadingContentStatus onReceivedPageStatus={onReceivedPageStatus} />);
         case PAGE_NAME.DISPLAY_CACHED_FORM:
-            return (<DisplayCachedFields cacheKey={cacheKey} domain={domain} back={mainPage} />);
+            return (<DisplayCachedFields cacheKey={page.content} domain={domain} back={mainPage} />);
         case PAGE_NAME.TRANSFER_FORM_DATA:
             return (<FormDataTransfer domain={domain} back={mainPage} />);
         case PAGE_NAME.ENCRYPTION:

@@ -75,7 +75,7 @@ export const useConnectMobile = ({domain,formFields,configId,visibility, setVisi
         userWithDomainAsFormId(initData);
         return initData;
     };
-    const mobile = useMobile(initData, true,configId);
+    const mobile = useMobile(initData, false,configId);
     mobile.setOnchange(({ field }) => {
         switch (field.id) {
             case FIELDS.visibility.id:

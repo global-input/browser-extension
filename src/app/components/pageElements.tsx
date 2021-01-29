@@ -72,6 +72,11 @@ export const Message=styled.div`
         max-width:400px;
 
 `;
+export const Important=styled(Message)`
+font-weight: 200;
+margin-bottom:20px;
+margin-top:20px;
+`;
 
 interface NoMobilePageProps{
     domain?:string;
@@ -137,4 +142,5 @@ export const FormPage:React.FC<OnlyConnectedProps>=({mobile,domain, title, child
                         {footer && (<Footer>{footer}</Footer>)}
                 </Form>
         </Content>
+
         </PopupWindow>);

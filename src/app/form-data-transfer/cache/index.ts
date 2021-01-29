@@ -49,3 +49,41 @@ export const loadCacheFields = (domain: string, key: string): FormField[] => {
     }
     return JSON.parse(contentBlob);
 };
+
+export const saveRemainingFieldsToCache=(domain:string,formField:FormField, formFields:FormField[])=>{
+
+    let fieldListInString="";
+    const notCopiedFields:FormField[]=[];
+    formFields.forEach(f=>{
+        if(f!==formField && f.value){
+            notCopiedFields.push(f);
+            if(fieldListInString){
+                fieldListInString+=", ";
+
+            }
+            fieldListInString+=f.label;
+        }
+    });
+    if(notCopiedFields.length){
+        const key = saveCacheFields(domain, notCopiedFields);
+        let message='Considering that the browser will close the extension window when you interact with the current page to paste the content in your clipboard, ';
+        if(notCopiedFields.length>1){
+            message+=`the values of ${fieldListInString} are `
+        }
+        else{
+            message+=`the value of ${fieldListInString} is `
+        }
+        message+='cached (persisted) to make ';
+        if(notCopiedFields.length>1){
+            message+='them ';
+        }
+        else{
+            message+='it ';
+        }
+        message+='available when you re-open the extension window. Press the "Back" button if you want to clear the cache.';
+        return {key,message};
+    }
+    else{
+        return {key:null,message:null};
+    }
+}
