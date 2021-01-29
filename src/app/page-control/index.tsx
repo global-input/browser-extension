@@ -25,11 +25,13 @@ export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
     const [formFields, setFormFields]=useState<FormField[]|null>(null);
     const [formRule, setFormRule]=useState<FormRule|null>(null)
 
+
     const onError=(errorTitle:string, errorMessage:string)=>{
         setErrorMessage(errorMessage);
         setErrorTitle(errorTitle);
         setStatus(STATUS.ERROR);
     };
+    const onEditRule=()=>editRule();
     const processRule = async (rule: PageRule) => {
         const message = await chromeExtension.getPageControlConfig(rule);
 
@@ -80,7 +82,7 @@ export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
     }, [domain]);
     const footer=(<>
         <DarkButton onClick={back} >Back</DarkButton>
-                <DarkButton onClick={editRule}>Edit Rule</DarkButton>
+                <DarkButton onClick={onEditRule}>Edit Rule</DarkButton>
         </>);
 
     return (
@@ -88,9 +90,9 @@ export const PageControl: React.FC<Props> = ({ back, domain, editRule}) => {
         <NoMobilePage domain={domain} title="Page Control" footer={footer}>
             {status===STATUS.LOADING && (<DisplayLoading/>)}
 
-            {status===STATUS.ERROR && <DisplayError  back={back} errorTitle={errorTitle} errorMessage={errorMessage} domain={domain} editRule={editRule}/>}
+            {status===STATUS.ERROR && <DisplayError  back={back} errorTitle={errorTitle} errorMessage={errorMessage} domain={domain} editRule={onEditRule}/>}
             {status===STATUS.SUCCESS && formRule && formFields && <DisplayPageControl domain={domain} formFields={formFields} formRule={formRule}
-                back={back} editRule={editRule}>You can use your mobile to operate on the page.</DisplayPageControl>}
+                back={back} editRule={onEditRule}>You can use your mobile to operate on the page.</DisplayPageControl>}
         </NoMobilePage>
     );
 }
