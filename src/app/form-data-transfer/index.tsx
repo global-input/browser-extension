@@ -54,7 +54,6 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
         const {key,message}=cache.saveRemainingFieldsToCache(domain,formField,formFields);
         if(key){
                 chromeExtension.sendKey(key);
-                console.log("----message:"+message);
                 message && setMessage(message);
         }
 
