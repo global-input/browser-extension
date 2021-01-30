@@ -450,7 +450,7 @@
     getSignInForm: function () {
       return {
         form: {
-          id: `"###username###@${window.location.host}`, // unique id for saving the form content in mobile automating the form-filling process.
+          id: `###username###@${window.location.host}`, // unique id for saving the form content in mobile automating the form-filling process.
           title: `${window.location.host} Sign In`,  //Title of the form displayed on the mobile
           fields: [],  //the fields to be displayed on the mobile screen, this will be populated in the next step
           setFormFieldValue: function (fieldId, newValue) {
