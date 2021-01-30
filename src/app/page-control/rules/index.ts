@@ -253,7 +253,6 @@ export const processRule = async ({setProcessData, rule, domain, sendRuleToPage,
         if(fields && fields.length){
             setProcessData(processData=>{
                 const configId=processData.configId?processData.configId+1:1;
-                console.log("configId:"+configId+" ::"+JSON.stringify(fields));
                 return {step:ProcessStep.SUCCESS, fields,
                 formRule:message.content.form,configId,domain};
             });
