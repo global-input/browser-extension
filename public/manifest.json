@@ -7,9 +7,9 @@
     "24": "images/globalInput24.png",
     "16": "images/globalInput16.png"
   },
-  "version": "3.1.2",
+  "version": "3.1.3",
   "manifest_version": 2,
-  "description": "Mobile authentication, mobile input & control, transfer content securely between your mobile and your computer.",
+  "description": "Use your mobile to operate on web pages in your computer browser to login, subscribe, encrypt, or control any element in the page.",
   "homepage_url": "https://globalinput.co.uk/",
   "browser_action": {
     "default_icon": {
