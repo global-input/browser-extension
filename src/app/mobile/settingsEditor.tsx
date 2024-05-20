@@ -38,12 +38,29 @@ const Form = styled.div`
     flex-direction:column;
     justify-content:flex-start;
     align-items:flex-start;
-    padding-left:10px;
-    padding-right:10px;
-    width:95%;
+    padding:10px;
+    width:80vw;
+    max-width:390px;
     background-color:white;
     overflow: scroll;
-    height:400px;
+    height:65vh;
+    @media screen and (min-height:370px){
+        height:300px;
+    }
+    @media screen and (min-height:400px){
+        height:320px;
+
+    }
+    @media screen and (min-height:450px){
+        height:350px;
+
+    }
+    @media screen and (min-height:600px){
+        height:425px;
+    }
+
+
+
 `;
 
 

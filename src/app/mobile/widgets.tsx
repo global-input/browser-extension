@@ -7,6 +7,7 @@ import {WidgetState, MobileData} from './commons';
 
 import settingsImage from './images/settings.png';
 import connectImage from './images/connect.png';
+import disconnectImage from './images/disconnect.png';
 import pairingImage from './images/pairing.png';
 
 import {SettingsEditor} from './settingsEditor';
@@ -48,25 +49,32 @@ const BigButton = styled(Button)`
     border-width:0;
     font-size: 15px;
 `;
-export const DarkButton = styled(BigButton)`
+const DarkButton = styled(BigButton)`
         background-color:rgb(208, 226, 247);
+
 `;
-
-
 
 const Container = styled.div`
 
         flex-direction: column;
         justify-content: flex-center;
-        align-items: center;
+        align-items: flex-start;
         background-color: white;
         margin: 0;
         padding:0;
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
         display: flex;
+        -moz-box-shadow: 3px 3px 5px #535353;
+        -webkit-box-shadow: 3px 3px 5px #535353;
+        box-shadow: 3px 3px 5px #535353;
+        background-color:rgb(74, 93, 126);
+        padding-bottom:10px;
+        @media only screen and (min-width:500px){
+                padding-left:10px;
+                padding-right:10px;
 
-        width:100%;
+        }
 `;
 
 const TopBar = styled.div`
@@ -79,7 +87,9 @@ const TopBar = styled.div`
         width: 100%;
         align-items: flex-end;
         padding-top:10px;
+
         background-color:rgb(74, 93, 126);
+
 `;
 const Content = styled.div`
         flex-direction: column;
@@ -87,13 +97,50 @@ const Content = styled.div`
         align-items: center;
         margin: 0;
         padding:0;
-        padding-top:10px;
         display: flex;
+        width:100%;
         overflow:scroll;
         background-color:white;
-        width:400px;
-        height:400px;
 `;
+const PopupGlass = styled.div`
+        display: flex;
+        margin: 0;
+        padding: 0;
+        position: fixed;
+        z-index:10;
+        width: 100vw;
+        flex-direction: column;
+        justify-content:flex-start;
+        align-items: center;
+        top:0;
+        left:0;
+        @media screen and (min-height:520px) and (min-width:520px){
+            top:20px;
+        }
+        @media screen and (min-height:580px) {
+            top:30px;
+        }
+        @media screen and (min-height:600px) {
+            top:60px;
+        }
+
+        @media screen and (min-height:700px) {
+            top:150px;
+        }
+
+
+
+
+
+
+
+
+`;
+// @media screen and (min-height:530px){
+//     top:0;
+//     height:100vh;
+//     justify-content: center;
+// }
 
  const ErrorMessage = styled.div`
         color: red;
@@ -106,17 +153,60 @@ const Content = styled.div`
         overflow: scroll;
 `;
 
+const PopUpWindow=styled.div`
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    position:relative;
 
+`;
+export const CloseIcon=styled.button`
+    position:absolute;
+    cursor:pointer;
+    color: #ffff;
+    border: 1px solid #AEAEAE;
+    border-radius:50%;
+
+    background: red;
+    font-size: 40px;
+    line-height:0;
+    font-weight: bold;
+    display: inline-block;
+
+    padding: 11px 3px;
+    width:45px;
+    height:45px;
+    top:-25px;
+    right:-25px;
+
+    @media screen and (max-height:590px){
+        position:relative;
+        align-self:flex-end;
+        top:-40px;
+    }
+    @media screen and (max-width:490px){
+        right:-0;
+    }
+
+
+
+
+    &:before {
+        content: "×";
+    }
+    &: hover{
+        transform: translateY(-3px);
+        box-shadow: 0 0 50px #ffff;
+    }
+`;
 
 
 const TabContainer=styled.div`
     display:flex;
     flex-direction:row;
-    justify-content:space-between;
+    justify-content:flex-start;
     align-items:center;
     height:100%;
-    width:100%;
-    padding-right:10px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     align-items: flex-end;
@@ -132,8 +222,29 @@ const TabBase=styled.div`
         flex-direction:column;
         justify-content:flex-start;
         align-items:center;
-        width:80px;
+        @media only screen and (min-width:300px){
+            min-width:50px;
+        }
 
+        @media only screen and (min-width:300px){
+            min-width:50px;
+        }
+        @media only screen and (min-width:320px){
+            min-width:60px;
+        }
+        @media only screen and (min-width:360px){
+            min-width:70px;
+        }
+        @media only screen and (min-width:400px){
+            min-width:80px;
+        }
+        @media only screen and (min-width:600px){
+            min-width:90px;
+        }
+        @media only screen and (min-width:700px){
+            min-width:100px;
+
+        }
 
 `;
 const ActiveTab=styled(TabBase)`
@@ -156,8 +267,12 @@ background-color:#DDDDDD;
 const TabText=styled.div`
     color:rgb(21,53,232);
     font-size:8px;
-    font-size:12px;
-
+    @media only screen and (min-width:280px){
+        font-size:10px;
+    }
+    @media only screen and (min-width:400px){
+        font-size:12px;
+    }
 
 `;
 
@@ -166,72 +281,39 @@ const SettingsIcon=styled.img.attrs({
     src:settingsImage,
     alt:'Settings'
 })`
+display:none;
+@media screen and (min-height:530px){
         display:block;
-
+}
 `;
 const PairingIcon=styled.img.attrs({
         src:pairingImage,
         alt:'Pair'
     })`
-    display:block;
-
+    display:none;
+    @media screen and (min-height:530px){
+            display:block;
+    }
     `;
 
 const ConnectIcon=styled.img.attrs({
     src:connectImage,
     alt:'Connect'
 })`
-
-
+display:none;
+@media screen and (min-height:530px){
         display:block;
-
+}
 `;
 
 
 
-
-    const QRCodeContainer = styled.div`
-        flex-direction: column;
-        justify-content: flex-center;
-        align-items: flex-start;
-        margin: 0;
-        padding:0;
-        display: flex;
-   `;
-
-
-const BottomCentered=styled.div`
-    font-size=12px;
-    color:black;
-    font-family: Georgia, Times, Serif;
-    text-align:center;
-    width:100%;
-    color:green;
-
-`;
-export const GlobalInputAppLink=styled.a.attrs({
-    href:'https://globalinput.co.uk/global-input-app/get-app',
-    rel:'noopener noreferrer',
-    target:'_blank'
-})`
-    color: blue;
-`;
-export const SourceLink=styled.a.attrs({
-    href:'https://github.com/global-input/browser-extension',
-    rel:'noopener noreferrer',
-    target:'_blank'
-})`
-    color: white;
-    font-weight: 100;
-    font-family: Georgia, Times, Serif;
-    font-size: 10px;
-    text-align:center;
-    padding-bottom:10px;
-    &:hover{
-        transform: translateY(-3px);
-        color:white;
-    }
+const DisconnectIcon=styled.img.attrs({
+        src:disconnectImage,
+        alt:'Disconnect'
+    })`
     `;
+
 
 
 
@@ -295,53 +377,12 @@ const Tabs:React.FC<TabProps>=(props)=>(
                 <ConnectTab {...props}/>
                 <SettingsTab {...props}/>
                 <PairingTab  {...props}/>
-                <SourceLink>Source Code</SourceLink>
     </TabContainer>
-);
-const ScanMessage=()=>(
-    <BottomCentered>Scan with <GlobalInputAppLink>Global Input App</GlobalInputAppLink></BottomCentered>
 );
 
 interface ConnectWidgetProps{
        mobile:MobileData;
 }
-const DisplayConnectQR:React.FC<ConnectWidgetProps> = ({mobile}) => {
-    if(mobile.widgetState!==WidgetState.CONNECT_QR)
-        return null;
-    if(mobile.isConnectionDenied){
-        return(<ErrorMessage>You can only use one mobile app per session. Disconnect to start a new session.</ErrorMessage>);
-    }
-    if(mobile.isError){
-        return(<ErrorMessage>{mobile.errorMessage}</ErrorMessage>);
-    }
-    if(!mobile.isShowWidget){
-        return null;
-    }
-    if (mobile.isConnected) {
-         return null;
-    }
-    return (
-    <QRCodeContainer>
-        <ConnectQR mobile={mobile} label="" size={350}/>
-        {mobile.isReady &&(<ScanMessage/>)}
-    </QRCodeContainer>
-   );
-};
-const DisplayPairingQR:React.FC<ConnectWidgetProps> = ({mobile}) => {
-    if(mobile.widgetState!==WidgetState.PAIRING)
-        return null;
-    if(mobile.isError){
-        return(<ErrorMessage>{mobile.errorMessage}</ErrorMessage>);
-    }
-    return (
-    <QRCodeContainer>
-        <PairingQR mobile={mobile} label=""/>
-        <ScanMessage/>
-    </QRCodeContainer>
-   );
-};
-
-
 export const ConnectWidget:React.FC<ConnectWidgetProps>=({mobile})=>{
         const {widgetState,setWidgetState,errorMessage,onSaveSettings,loadSettings,isConnected,isShowWidget,isConnectionDenied,
                 isError}=mobile;
@@ -362,15 +403,44 @@ export const ConnectWidget:React.FC<ConnectWidgetProps>=({mobile})=>{
                     <Tabs  widgetState={widgetState} setWidgetState={setWidgetState}/>
                 </TopBar>
                 <Content>
-                    <DisplayConnectQR mobile={mobile}/>
-                    <DisplayPairingQR mobile={mobile}/>
+                    {widgetState===WidgetState.CONNECT_QR &&(<ConnectQR mobile={mobile}/>)}
+                    {widgetState===WidgetState.PAIRING && (<PairingQR mobile={mobile}/>)}
                     {widgetState===WidgetState.SETTINGS && (<SettingsEditor saveSettings={onSaveSettings} loadSettings={loadSettings}/>)}
+                    {message && (<ErrorMessage>{message}</ErrorMessage>)}
                 </Content>
             </Container >
         );
     };
 
+export const ConnectWindow:React.FC<ConnectWidgetProps>=({mobile})=>{
+        const {isConnected,isShowWidget}=mobile;
+        useEffect(()=>{
+                let scrollDisabled=false;
+                if (isShowWidget && (!isConnected)) {
+                        document.body.style.overflow = 'hidden';
+                        scrollDisabled=true;
+                }
+                return ()=>{
+                        if(scrollDisabled){
+                                scrollDisabled=false;
+                                document.body.style.overflow = 'unset';
+                        }
+                }
+        },[isConnected, isShowWidget]);
+        if ((!isShowWidget)||isConnected) {
+                return null;
+        }
 
+        return(
+                <PopupGlass>
+                        <PopUpWindow>
+                                <ConnectWidget mobile={mobile}/>
+                                <CloseIcon onClick={()=>mobile.setShowWidget(false)}/>
+                        </PopUpWindow>
+                </PopupGlass>
+        );
+
+};
 
 const ConnectLabel=styled.div`
      padding-left:5px;
@@ -408,7 +478,16 @@ export const ConnectButton:React.FC<ButtonProps>=({mobile,label='Connect', skin}
 export const DisconnectButton:React.FC<ButtonProps>=({mobile,label='Disconnect',skin})=>{
         const {isConnected,isConnectionDenied, isDisconnected, restart}=mobile;
         if(isConnected || isConnectionDenied || isDisconnected){
-                return (<DarkButton onClick={()=>restart()}>{label}</DarkButton>);
+                if(skin==='white'){
+                        return (<BigButton onClick={()=>restart()}>{label}</BigButton>);
+                }
+                else{
+                        return(
+                        <DarkButton onClick={()=>restart()}>
+                        <DisconnectIcon/>
+                               <ConnectLabel>{label}</ConnectLabel>
+                        </DarkButton>   );
+                }
         }
         else{
                 return null;
