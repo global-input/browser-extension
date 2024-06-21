@@ -403,7 +403,7 @@ export const ConnectWidget:React.FC<ConnectWidgetProps>=({mobile})=>{
                     <Tabs  widgetState={widgetState} setWidgetState={setWidgetState}/>
                 </TopBar>
                 <Content>
-                    {widgetState===WidgetState.CONNECT_QR &&(<ConnectQR mobile={mobile}/>)}
+                    {widgetState===WidgetState.CONNECT_QR &&(<ConnectQR mobile={mobile} size={200}/>)}
                     {widgetState===WidgetState.PAIRING && (<PairingQR mobile={mobile}/>)}
                     {widgetState===WidgetState.SETTINGS && (<SettingsEditor saveSettings={onSaveSettings} loadSettings={loadSettings}/>)}
                     {message && (<ErrorMessage>{message}</ErrorMessage>)}
