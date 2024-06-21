@@ -454,6 +454,7 @@ interface ButtonProps{
         label?:string;
         skin?:string;
         mobile:MobileData;
+        children?:React.ReactNode;
 }
 export const ConnectButton:React.FC<ButtonProps>=({mobile,label='Connect', skin})=>{
         const {setShowWidget, isConnected, isShowWidget}=mobile;
@@ -497,6 +498,7 @@ export const DisconnectButton:React.FC<ButtonProps>=({mobile,label='Disconnect',
 
 interface WhenProps{
         mobile:MobileData;
+        children:React.ReactNode;
 }
 export const WhenConnected:React.FC<WhenProps> = ({mobile,children})=>{
      if(mobile.isConnected){

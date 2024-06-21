@@ -82,6 +82,7 @@ interface NoMobilePageProps{
     domain?:string;
     title:string;
     footer?:React.ReactNode;
+    children?:React.ReactNode;
 }
 export const NoMobilePage:React.FC<NoMobilePageProps>=({domain,title, children,footer})=>(
 
@@ -107,6 +108,9 @@ interface OnlyConnectedProps{
     domain?:string;
     title:string;
     footer?:React.ReactNode;
+    children?:React.ReactNode;
+
+
 }
 export const ConnectedPage:React.FC<OnlyConnectedProps>=({mobile,domain, title, children,footer})=>(
     <PopupWindow>

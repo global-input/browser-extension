@@ -26,7 +26,7 @@ export const useMobile = (initData: InitData | (() => InitData), showWidgetOnSta
     }, isShowWidget, `${settingsConfig}-${configId}`);
     ////dev-test codeData
     const {close}=mobile;
-    const onSaveSettings=useCallback((settings)=>{
+    const onSaveSettings=useCallback((settings:any)=>{
         if (storage.saveConnectionSettings(settings)) {
             setWidgetState(WidgetState.PAIRING);
         }

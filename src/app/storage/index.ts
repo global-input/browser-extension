@@ -18,7 +18,7 @@ export const clearCacheFields = (domain?: string) => {
             }
         }
     }
-    catch (error) {
+    catch (error: any) {
         console.error("failed to clear the cache:" + error);
         console.error(error.stack);
     }

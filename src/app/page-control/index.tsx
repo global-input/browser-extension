@@ -94,6 +94,7 @@ interface DisplayPageControlProps{
     processData:ProcessData
     back:()=>void;
     editRule:()=>void;
+    children:React.ReactNode;
 }
 const DisplayPageControl:React.FC<DisplayPageControlProps>=({processData,children, back, editRule})=>{
 

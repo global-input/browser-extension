@@ -46,7 +46,7 @@ const App = () => {
 
 
 
-    const onReceivedPageStatus = useCallback((message) => {
+    const onReceivedPageStatus = useCallback((message:any) => {
         if (message && message.status === 'success' && message.host) {
             setDomain(message.host);
 

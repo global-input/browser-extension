@@ -63,6 +63,7 @@ interface Props{
     expandId:string;
     expand:string;
     setExpand:(expand:string)=>void;
+    children:React.ReactNode;
 }
 export const Help:React.FC<Props>=({children,expandId, expand,setExpand})=>{
     const isExpanded=expand===expandId;
