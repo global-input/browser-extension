@@ -61,7 +61,7 @@ export const DisplayInputField:React.FC<DisplayInputFieldProps> = ({
                     <Input id={formField.id} type={type}
                     value={formField.value?formField.value as string:''}
                     placeholder={formField.label}
-                    onChange={(evt=>{
+                    onChange={((evt:any)=>{
                         onChange(evt.target.value);
                     })}
                     onFocus={onFocus}
@@ -80,7 +80,7 @@ export const DisplayInputField:React.FC<DisplayInputFieldProps> = ({
             {showCheckbox && (<CheckBox checked={checked} onChange={toggleSelect} />)}
             <Field>
                 <TextArea id={formField.id} value={formField.value?formField.value as string:''} placeholder={formField.label}
-                    onChange={(evt=>{
+                    onChange={((evt:any)=>{
                         onChange(evt.target.value);
                     })} />
                 <Label htmlFor={formField.id}>{formField.label}</Label>

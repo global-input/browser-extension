@@ -66,7 +66,7 @@ export const EditRule: React.FC<Props> = ({ back, domain,loadFromPreset,contentT
                 value={content}
 
                 placeholder="Rules"
-                    onChange={(evt=>{
+                    onChange={((evt:any)=>{
                         onContentChange(evt.target.value);
                     })} />
                  <Label htmlFor="ruleContent">Rules</Label>

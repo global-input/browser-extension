@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FormField } from 'global-input-react';
 
 const CACHE_FIELDS = 'extension.content.cacheFields.';

@@ -83,7 +83,7 @@ const RenderContentForm:React.FC<ContentFormProps>=({content,onContentChanged,ca
     </>);
     return (<NoMobilePage title="Content To Decrypt" footer={footer}>
                 <Field>
-                        <TextArea id="contentToDecrypt" onChange={evt=>{
+                        <TextArea id="contentToDecrypt" onChange={(evt:any)=>{
                         onContentChanged(evt.target.value);
                         }} value={content} placeholder="Place here the content to decrypt."
                         onFocus={()=>setExpand('contentToDecrypt')}/>

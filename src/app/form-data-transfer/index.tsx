@@ -69,7 +69,7 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
             <DomainField>
                 <Input id='changeDomain'  type="text"
                 value={userDomain} placeholder="Domain"
-                onChange={(evt)=>changeDomain(evt.target.value)}/>
+                onChange={(evt:any)=>changeDomain(evt.target.value)}/>
                 <Label htmlFor="changeDomain">Domain</Label>
                 <Help position={3} expand={expand} setExpand={setExpand} expandId="changeDomain">
     This value is used when locating data in your mobile secure storage.

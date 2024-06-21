@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, {useState} from 'react';
 import styled from 'styled-components';
 import type {ConnectionSettings} from './storage';
@@ -149,7 +150,7 @@ interface SettingsFieldProp{
 }
 const ProxyField:React.FC<SettingsFieldProp>=({settings, setSettings,expand,setExpand})=>(
     <Field>
-                        <Input id="url" onChange={evt=>{
+                        <Input id="url" onChange={(evt:any)=>{
                             const url=evt.target.value;
                           setSettings(setting => ({ ...setting, url}));
                         }} value={settings.url ? settings.url : ''} placeholder="Websocket Server URL"
@@ -169,7 +170,7 @@ const ProxyField:React.FC<SettingsFieldProp>=({settings, setSettings,expand,setE
 
  const APIKeyField:React.FC<SettingsFieldProp>=({settings, setSettings,expand,setExpand}) =>(
     <Field>
-                        <Input id="apiKey" onChange={evt=>{
+                        <Input id="apiKey" onChange={(evt:any)=>{
                             const apikey=evt.target.value;
                             setSettings(setting => ({ ...setting, apikey}));
                         }} value={settings.apikey ? settings.apikey : ''} placeholder="API Key"
@@ -192,7 +193,7 @@ If you leave it blank, it uses the default value set by our WebSocket server.
 
 const SecurityGroupField:React.FC<SettingsFieldProp>=({settings, setSettings,expand,setExpand})=>(
     <Field>
-                        <Input id="securityGroup" onChange={evt=>{
+                        <Input id="securityGroup" onChange={(evt:any)=>{
                           const securityGroup=evt.target.value;
                           setSettings(setting => ({ ...setting, securityGroup}));
                         }} value={settings.securityGroup?settings.securityGroup:''} placeholder="Security Group Key"

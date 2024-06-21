@@ -86,7 +86,7 @@ const RenderContentForm:React.FC<ContentFormProps>=({content,onContentChanged,ca
 
 
             <Field>
-                    <TextArea id="contentToEncrypt" onChange={evt=>{
+                    <TextArea id="contentToEncrypt" onChange={(evt:any)=>{
                       onContentChanged(evt.target.value);
                     }} value={content} placeholder="Place here the content to encrypt."
                     onFocus={()=>setExpand('contentToEncrypt')}/>

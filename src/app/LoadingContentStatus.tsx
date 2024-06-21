@@ -4,8 +4,8 @@ import {NoMobilePage,Spinner} from './components';
 import * as chromeExtension from './chrome-extension';
 
 interface Message {
-    status: string;
-    host: string;
+    status?: string;
+    host?: string;
     content: {
         key?: string;
     }
