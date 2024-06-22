@@ -39,8 +39,8 @@ const Button = styled.button`
     font-family: 'Roboto', sans-serif;
 
     &: hover{
-        transform: translateY(-3px);
         box-shadow: 0 0 50px #ffff;
+        background-color: #64A3DF;
     }
 
 `;
@@ -65,10 +65,6 @@ const Container = styled.div`
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
         display: flex;
-        -moz-box-shadow: 3px 3px 5px #535353;
-        -webkit-box-shadow: 3px 3px 5px #535353;
-        box-shadow: 3px 3px 5px #535353;
-        background-color:rgb(74, 93, 126);
         padding-bottom:10px;
         @media only screen and (min-width:500px){
                 padding-left:10px;
@@ -85,11 +81,9 @@ const TopBar = styled.div`
         align-items:flex-start;
         justify-content: space-between;
         width: 100%;
+        height: 60px;
         align-items: flex-end;
         padding-top:10px;
-
-        background-color:rgb(74, 93, 126);
-
 `;
 const Content = styled.div`
         flex-direction: column;
@@ -99,6 +93,7 @@ const Content = styled.div`
         padding:0;
         display: flex;
         width:100%;
+        height:400px;
         overflow:scroll;
         background-color:white;
 `;
@@ -204,19 +199,18 @@ export const CloseIcon=styled.button`
 const TabContainer=styled.div`
     display:flex;
     flex-direction:row;
-    justify-content:flex-start;
+    justify-content:center;
     align-items:center;
     height:100%;
+    width:100%;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     align-items: flex-end;
 `;
 const TabBase=styled.div`
-        border-top-left-radius: 4px;
-        border-top-right-radius: 4px;
+        border-radius: 100px;
         border-width:0px;
-        margin-right:10px;
-        margin-left:10px;
+        margin: 12px;
         padding:5px;
         display:flex;
         flex-direction:column;
@@ -248,17 +242,19 @@ const TabBase=styled.div`
 
 `;
 const ActiveTab=styled(TabBase)`
-    background-color:white;
+    background-color: #efefef;
+
+    font-family: 'Roboto', sans-serif;
 `;
 const Tab=styled(TabBase).attrs({
     as:`button`
 })`
-margin-bottom:10px;
+
 cursor:pointer;
-background-color:#DDDDDD;
+background-color:#dedede;
+font-family: 'Roboto', sans-serif;
 &: hover{
-    transform: translateY(-3px);
-    box-shadow: 0 0 50px #ffff;
+    background-color:#ededed;
 }
 `;
 
@@ -282,7 +278,7 @@ const SettingsIcon=styled.img.attrs({
     alt:'Settings'
 })`
 display:none;
-@media screen and (min-height:530px){
+@media screen and (min-height:330px){
         display:block;
 }
 `;
@@ -291,7 +287,7 @@ const PairingIcon=styled.img.attrs({
         alt:'Pair'
     })`
     display:none;
-    @media screen and (min-height:530px){
+    @media screen and (min-height:330px){
             display:block;
     }
     `;
@@ -301,7 +297,7 @@ const ConnectIcon=styled.img.attrs({
     alt:'Connect'
 })`
 display:none;
-@media screen and (min-height:530px){
+@media screen and (min-height:330px){
         display:block;
 }
 `;
@@ -403,7 +399,7 @@ export const ConnectWidget:React.FC<ConnectWidgetProps>=({mobile})=>{
                     <Tabs  widgetState={widgetState} setWidgetState={setWidgetState}/>
                 </TopBar>
                 <Content>
-                    {widgetState===WidgetState.CONNECT_QR &&(<ConnectQR mobile={mobile} size={200}/>)}
+                    {widgetState===WidgetState.CONNECT_QR &&(<ConnectQR mobile={mobile} size={320}/>)}
                     {widgetState===WidgetState.PAIRING && (<PairingQR mobile={mobile}/>)}
                     {widgetState===WidgetState.SETTINGS && (<SettingsEditor saveSettings={onSaveSettings} loadSettings={loadSettings}/>)}
                     {message && (<ErrorMessage>{message}</ErrorMessage>)}
