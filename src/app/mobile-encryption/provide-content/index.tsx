@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import * as onComputer from './mobile-ui/onComputer';
 import * as onMobile from './mobile-ui/onMobile';
-import type {MobileData} from '../../mobile';
+import type {MobileData} from 'global-input-mobile';
 import {NoMobilePage,
     DarkButton, Field,TextArea, Label,Help} from '../../components';
 

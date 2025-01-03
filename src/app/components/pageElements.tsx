@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import {Field,TopBar,AppTitle,Title,Footer,Form} from '../common-elements';
-import {ConnectWidget,WhenConnected} from '../mobile';
-import type {MobileData} from '../mobile';
+import {ConnectWidget,WhenConnected} from 'global-input-mobile';
+import type {MobileData} from 'global-input-mobile';
 
 const minWidth=300;
 const maxWidth=500;
-const maxHeight=500;
+const maxHeight=550;
 
 export const PopupWindow =styled.div`
     display:flex;
@@ -17,7 +17,7 @@ export const PopupWindow =styled.div`
     height:100%;
     min-width:${minWidth}px;
     max-width:${maxWidth}px;
-    max-height:${maxHeight}px;
+    max-height:${maxHeight}px;        
 `;
 
 
@@ -113,7 +113,7 @@ interface OnlyConnectedProps{
 
 }
 export const ConnectedPage:React.FC<OnlyConnectedProps>=({mobile,domain, title, children,footer})=>(
-    <PopupWindow>
+    <PopupWindow>        
         <ConnectWidget mobile={mobile} />
         <WhenConnected mobile={mobile}>
             <TopBar>

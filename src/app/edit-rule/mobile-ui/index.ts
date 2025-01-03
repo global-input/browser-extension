@@ -1,4 +1,4 @@
-import { useMobile } from '../../mobile';
+import { useMobile } from 'global-input-mobile';
 
 const FIELDS = {
     domain: {

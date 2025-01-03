@@ -1,3 +1,3 @@
 export * from './pageControl';
 export * from './errorControl';
-export * from '../../mobile';
+export * from 'global-input-mobile';

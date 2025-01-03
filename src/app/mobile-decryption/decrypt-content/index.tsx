@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { useMobile} from '../../mobile';
+import { useMobile} from 'global-input-mobile';
 import {Error,DarkButton,ConnectedInstruction,DecryptIcon,
     ShowIcon,SendIcon,FormPage} from '../../components';
 interface Props {

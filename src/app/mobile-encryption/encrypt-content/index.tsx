@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useMobile} from '../../mobile';
+import { useMobile} from 'global-input-mobile';
 import {Error,FormPage, DarkButton,ConnectedInstruction} from '../../components';
 
 import encryptImage from './images/encrypt-icon.png';

@@ -1,6 +1,6 @@
 import React from 'react';
 import {ConnectedPage, MoreInfo} from './components';
-import {useMobile, DisconnectButton} from './mobile';
+import {useMobile, DisconnectButton} from 'global-input-mobile';
 interface Props {
     domain: string;
     transferFormData: () => void;

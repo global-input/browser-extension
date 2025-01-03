@@ -3,7 +3,7 @@ import React, { useState , useMemo} from 'react';
 import {NoMobilePage,Footer,Label, DarkButton,
     Field, TextArea,Select,Option,MoreInfo, Help} from '../components';
 
-import { useMobile } from '../mobile';
+import { useMobile } from 'global-input-mobile';
 import * as rules from '../page-control/rules';
 
 

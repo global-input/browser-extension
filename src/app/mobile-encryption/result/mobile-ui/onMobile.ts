@@ -1,4 +1,4 @@
-import { useMobile } from '../../../mobile';
+import { useMobile } from 'global-input-mobile';
 export const FIELDS = {
     info: {
         type: "info",

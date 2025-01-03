@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import * as chromeExtension from '../chrome-extension';
 import * as cache from './cache';
 import * as storage from '../storage';
-import type { FormField } from '../mobile';
+import type { FormField } from 'global-input-mobile';
 
 
 import {NoMobilePage,DarkButton,Important} from '../components';

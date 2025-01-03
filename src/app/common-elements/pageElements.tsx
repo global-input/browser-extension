@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import {WhenConnected} from '../mobile';
-import type {MobileData} from '../mobile';
+import {WhenConnected} from 'global-input-mobile';
+import type {MobileData} from 'global-input-mobile';
 
 export const TopBar = styled.div`
         display: flex;

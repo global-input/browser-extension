@@ -1,10 +1,10 @@
 
 
-import { useMobile} from '../../mobile';
-import type {FormField,MobileData} from '../../mobile';
-import type {InitData} from '../../mobile';
+import { useMobile} from 'global-input-mobile';
+import type {FormField,MobileData} from 'global-input-mobile';
+import type {InitData} from 'global-input-mobile';
 import * as storage from '../../storage';
-export * from '../../mobile';
+export * from 'global-input-mobile';
 const userWithDomainAsFormId = (initData: InitData) => {
     if (initData?.form?.domain && initData?.form?.fields?.length) {
         const textFields = initData.form.fields.filter(f => {

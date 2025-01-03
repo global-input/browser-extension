@@ -2,7 +2,7 @@
 import { generateRandomString, encrypt, decrypt } from 'global-input-react';
 
 import * as storage from '../../storage';
-import { FormField } from '../../mobile';
+import { FormField } from 'global-input-mobile';
 
 
 const generateEncryptionKey = () => {

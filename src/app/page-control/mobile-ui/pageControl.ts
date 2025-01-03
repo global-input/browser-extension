@@ -1,5 +1,5 @@
-import { useMobile } from '../../mobile';
-import type {FormField} from '../../mobile';
+import { useMobile } from 'global-input-mobile';
+import type {FormField} from 'global-input-mobile';
 import type {FormRule} from '../rules';
 
 
