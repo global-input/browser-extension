@@ -274,17 +274,23 @@ const QRContainer = styled.div`
   align-items: center;
   text-align: center;
 `;
+const QRCodeContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(255,255,255);
+  border-radius: 1px;
+  max-width: 300px;
+  border-radius: 8px;    
+`;
 
 const QRInstruction = styled.div`
   color:   #4872d3;  
   font-size: 12px;
-  padding-top: 20px;
-  background: rgba(255,255,255);
-  padding-bottom: 10px;
-  padding-left: 10px;
-  max-width: 280px;
-  
-
+  padding-top: 20px;    
+  padding-left: 10px;  
 `;
 
 const ScanInstruction = styled.div`
@@ -488,8 +494,12 @@ export const AppQROverlay: React.FC<QROverlayProps> = ({
   
   return (
     <QRCodeOverlay onClick={onOverlayClick}>
+      <QRCodeContainer>
+
+      
+
       <QRInstruction onClick={onOverlayClick}>
-        Scan the QR code below with your phone's camera to launch the Global Input App.         
+        Scan the QR code below with your phone's camera to launch the Global Input App. Launching the app or clicking <ButtonLike>here</ButtonLike> will reveal the QR code for the app to scan.
       </QRInstruction>
       <QRContainer 
         onClick={onContainerClick} 
@@ -498,8 +508,9 @@ export const AppQROverlay: React.FC<QROverlayProps> = ({
         <QRCodeSVG value={qrValue} size={qrSize} />
       </QRContainer>
       <QRInstruction onClick={onOverlayClick}>        
-        Launching the app or clicking <ButtonLike>here</ButtonLike> will reveal the QR code for the app to scan.
-      </QRInstruction>      
+        
+      </QRInstruction>  
+      </QRCodeContainer>    
     </QRCodeOverlay>
   );
 };
