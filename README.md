@@ -1,19 +1,26 @@
 # Global Input App Browser Extension
-This is a browser extension application ([Chrome](https://chrome.google.com/webstore/detail/global-input-app/hcklienddlealndjnakkagefaelhnjkp?hl=en), [Firefox](https://addons.mozilla.org/en-GB/firefox/addon/global-input-app/)) written with TypeScript, which is a typical React application, demonstrating how you can use the [global-input-react] module to achieve mobile collaboration for applications running on computers and other devices, leading to a series of use cases like one-click sign-in, one-click sign-up, mobile secure storage, mobile encryption to name a few.
 
-This extension allows you to use your mobile to operate on web pages loaded on your computer, transferring data securely between your mobile and computers. You can try this extensions on sign-in pages that you use on a daily basis such as GitHub, GitLab, npm, Dropbox, Digital Ocean, Wordpress, Lucidchart, ProtonMail,
-CamScanner, Evernote, Heroku, join.me, Meetup,  MuleSoft, JS Bin, JSFiddle, Papa John's, Tesco, WisePay, 123-reg, Pexels, Adobe, Atlassian, Amazon+AWS, Apple, Google, Twitter, Facebook, LinkedIn, and Microsoft. You can also specify HTML elements that you would like to control using your mobile.
+A powerful browser extension that transforms your mobile device into a secure controller for web applications. Available for [Chrome](https://chrome.google.com/webstore/detail/global-input-app/hcklienddlealndjnakkagefaelhnjkp?hl=en) and [Firefox](https://addons.mozilla.org/en-GB/firefox/addon/global-input-app/), this TypeScript-based React application leverages the [global-input-react] module to enable seamless mobile-to-desktop interactions.
 
-## How to Build
+## Overview
 
-You can build and run it as standalone React web application:
+The extension creates a secure bridge between your mobile device and web browser, enabling you to interact with web pages directly from your mobile device. It provides secure data transfer capabilities while maintaining end-to-end encryption, making it ideal for tasks such as automated sign-in and authentication, secure form completion, mobile-based data storage and encryption, and custom element interaction and control.
 
-```
+## Compatibility
+
+The extension works seamlessly with popular platforms and services including development and tools platforms like GitHub, GitLab, npm, Digital Ocean, JSFiddle, JS Bin, Heroku, and MuleSoft; productivity tools such as Dropbox, Evernote, Lucidchart, ProtonMail, and CamScanner; social and business platforms including LinkedIn, Twitter, Facebook, Microsoft, Google, and Apple; and e-commerce services like Amazon, AWS, Adobe, Atlassian, Tesco, Papa John's, WisePay, and 123-reg.
+
+## Development Setup
+
+### Prerequisites
+
+- Node.js and npm installed
+- Git for version control
+
+### Build Instructions
+
+1. Clone the repository:
+
+```bash
 git clone https://github.com/global-input/browser-extension.git
-cd browser-extension
-npm install
-npm run build
-npm start
 ```
-
-When you are installing it as a browser extension, you just need to configure your extension to point it to the build folder where all the necessary extensions files are located.
