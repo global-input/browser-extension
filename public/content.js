@@ -478,15 +478,35 @@
 
                   }
                   else {
-                    this.fields[i].formElement.value = newValue;
+                    this.setNativeValue(this.fields[i].formElement, newValue);
                     this.fileInputEvent(this.fields[i].formElement);
                     if (this.fields[i].confirm) {
-                      this.fields[i].confirm.formElement.value = newValue;
+                      this.setNativeValue(this.fields[i].confirm.formElement, newValue);
                       this.fileInputEvent(this.fields[i].confirm.formElement);
                     }
                   }
                 }
               }
+            }
+          },
+          /* React (and similar frameworks) wraps the element's own value setter to track
+             changes, so "element.value = x" is seen as no change and onChange never fires.
+             Calling the prototype's native setter updates the value the way typing does. */
+          setNativeValue: function (formElement, newValue) {
+            var view = (formElement.ownerDocument && formElement.ownerDocument.defaultView) || window;
+            var prototype = view.HTMLInputElement.prototype;
+            if (formElement instanceof view.HTMLTextAreaElement) {
+              prototype = view.HTMLTextAreaElement.prototype;
+            }
+            else if (formElement instanceof view.HTMLSelectElement) {
+              prototype = view.HTMLSelectElement.prototype;
+            }
+            var descriptor = Object.getOwnPropertyDescriptor(prototype, 'value');
+            if (descriptor && descriptor.set) {
+              descriptor.set.call(formElement, newValue);
+            }
+            else {
+              formElement.value = newValue;
             }
           },
           fileInputEvent: function (formElement) {

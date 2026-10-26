@@ -1886,7 +1886,7 @@
                   "data": {
                      "label": "Continue To Payment"
                   },
-                  "nextUI": {
+                  "next": {
                      "type": "refresh"
                   }
                }
@@ -1923,7 +1923,7 @@
                "data": {
                   "label": "Log In"
                },
-               "nextUI": {
+               "next": {
                   "type": "refresh"
                }
             }
@@ -1959,7 +1959,7 @@
                "data": {
                   "label": "Sign in"
                },
-               "nextUI": {
+               "next": {
                   "type": "refresh"
                }
             }
@@ -1998,7 +1998,7 @@
                "data": {
                   "label": "Sign In"
                },
-               "nextUI": {
+               "next": {
                   "type": "refresh"
                }
             }
@@ -2034,7 +2034,7 @@
                "data": {
                   "label": "Sign In"
                },
-               "nextUI": {
+               "next": {
                   "type": "refresh"
                }
             }
@@ -2088,7 +2088,7 @@
                   "data": {
                      "label": "Sign Up"
                   },
-                  "nextUI": {
+                  "next": {
                      "type": "refresh"
                   }
                }
@@ -2122,7 +2122,7 @@
                   "data": {
                      "label": "Login"
                   },
-                  "nextUI": {
+                  "next": {
                      "type": "refresh"
                   }
                }
@@ -2173,7 +2173,7 @@
                   "data": {
                      "label": "CREATE ACCOUNT"
                   },
-                  "nextUI": {
+                  "next": {
                      "type": "refresh"
                   }
                }

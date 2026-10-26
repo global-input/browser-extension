@@ -34,7 +34,7 @@ const initData = (domain:string, errorTitle:string, errorMessage:string) => {
         form: {
             title: errorTitle,
             domain: domain,
-            fields: [{...FIELDS.domain, domain},{...FIELDS.message, value:errorMessage}, FIELDS.back, FIELDS.editRule]
+            fields: [{...FIELDS.domain, value:domain},{...FIELDS.message, value:errorMessage}, FIELDS.back, FIELDS.editRule]
         }
     }
 };
