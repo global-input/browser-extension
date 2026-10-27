@@ -3,75 +3,16 @@
 // value can also go straight into the focused field on the page, so the popup's copy-and-cache
 // workaround is not needed here.
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import type { FormField } from 'global-input-react';
 import * as storage from '../../../app/storage';
 import { FIELDS, buildFormFields, getNextVisibilityValue, sendVisibility, useConnectMobile } from '../../../app/form-data-transfer/mobile-ui';
-import { activeTabId, chromePagePort } from '../../adapters/chromePage';
 import { Button, Card, Notice, SectionLabel, Text } from '../../ui/components';
-import { color, radius } from '../../ui/theme';
+import { Caption, Label, Row, Select, SmallButton, TextArea, TextInput } from '../../ui/controls';
 import type { ToolProps } from '../registry';
+import { copyToClipboard, insertIntoPage } from '../shared/pageInsert';
+import type { ToolMessage } from '../shared/pageInsert';
 import { FIELD_KINDS, addField, isMultiLine, removeField, setFieldValue } from './fields';
 import type { FieldKind } from './fields';
-
-const controlStyle = `
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid ${color.control};
-  border-radius: ${radius.control};
-  padding: 8px 10px;
-  font: inherit;
-  color: ${color.ink};
-  background: ${color.surface};
-  &:focus {
-    outline: 2px solid ${color.primary};
-    outline-offset: 0;
-    border-color: ${color.primary};
-  }
-`;
-const TextInput = styled.input`
-  ${controlStyle}
-  height: 36px;
-`;
-const TextArea = styled.textarea`
-  ${controlStyle}
-  resize: vertical;
-`;
-const Select = styled.select`
-  ${controlStyle}
-  height: 36px;
-`;
-const Label = styled.label`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-weight: 600;
-`;
-const Row = styled.div`
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-const SmallButton = styled(Button)`
-  height: 30px;
-  padding: 0 10px;
-  font-size: 12px;
-`;
-
-type Message = { tone: 'success' | 'warn' | 'info'; text: string } | null;
-
-const insertMessage = (label: string, domain: string, reply: Awaited<ReturnType<typeof chromePagePort.fillFocused>>): Message => {
-  if (!reply) {
-    return { tone: 'warn', text: 'This tab cannot be used. Reload the page and try again.' };
-  }
-  if (reply.status === 'success') {
-    return { tone: 'success', text: `Inserted ${label} into the focused field on ${domain}.` };
-  }
-  return reply.reason === 'host-mismatch'
-    ? { tone: 'warn', text: `The active tab is no longer on ${domain}, so nothing was inserted.` }
-    : { tone: 'warn', text: 'Click into a field on the page first, then Insert again.' };
-};
 
 export const FormTransferTool: React.FC<ToolProps> = ({ domain, exit }) => {
   const [site, setSite] = useState(domain);
@@ -79,7 +20,7 @@ export const FormTransferTool: React.FC<ToolProps> = ({ domain, exit }) => {
   const [fields, setFields] = useState<FormField[]>(() => buildFormFields(domain));
   const [visibility, setVisibility] = useState(FIELDS.visibility.options[0]);
   const [editing, setEditing] = useState(false);
-  const [message, setMessage] = useState<Message>(null);
+  const [message, setMessage] = useState<ToolMessage>(null);
   const [newLabel, setNewLabel] = useState('');
   const [newKind, setNewKind] = useState<FieldKind>('single-line');
   const hidden = visibility.value === 0;
@@ -111,28 +52,9 @@ export const FormTransferTool: React.FC<ToolProps> = ({ domain, exit }) => {
     mobile.sendValue(field.id as string, value, index);
   };
 
-  const insert = async (field: FormField) => {
-    const value = String(field.value ?? '');
-    if (!value) {
-      setMessage({ tone: 'warn', text: `${field.label} is empty.` });
-      return;
-    }
-    const tabId = await activeTabId();
-    if (tabId === null || !domain) {
-      setMessage({ tone: 'warn', text: 'Open a web page in this window first.' });
-      return;
-    }
-    setMessage(insertMessage(String(field.label), domain, await chromePagePort.fillFocused(tabId, value, domain)));
-  };
+  const insert = async (field: FormField) => setMessage(await insertIntoPage(String(field.label), String(field.value ?? ''), domain));
 
-  const copy = async (field: FormField) => {
-    try {
-      await navigator.clipboard.writeText(String(field.value ?? ''));
-      setMessage({ tone: 'success', text: `Copied ${field.label}.` });
-    } catch (error) {
-      setMessage({ tone: 'warn', text: 'Could not copy. Use Insert instead.' });
-    }
-  };
+  const copy = async (field: FormField) => setMessage(await copyToClipboard(String(field.label), String(field.value ?? '')));
 
   const add = () => {
     const result = addField(fields, newLabel, newKind);
@@ -153,9 +75,7 @@ export const FormTransferTool: React.FC<ToolProps> = ({ domain, exit }) => {
       <Label>
         Site
         <TextInput value={site} onChange={event => changeSite(event.target.value)} placeholder="example.com" />
-        <span style={{ fontWeight: 400, fontSize: 12, color: color.muted }}>
-          Your phone offers the values it saved for this site. Each site keeps its own list of fields.
-        </span>
+        <Caption>Your phone offers the values it saved for this site. Each site keeps its own list of fields.</Caption>
       </Label>
 
       <Row style={{ justifyContent: 'space-between' }}>

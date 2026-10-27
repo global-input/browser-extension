@@ -1,14 +1,16 @@
-// The panel's tools: the popup's features, rendered unchanged. They call useMobile themselves;
+// The panel's tools. Restyled tools live under ./<tool>/ and reuse the popup tool's phone screens;
+// the others are the popup's features, rendered unchanged. They call useMobile themselves;
 // with the phone connected, that reuses the panel's connection (global-input-react sends the
 // tool's screen to the phone instead of starting a new session).
 // To add or remove a tool, change this list.
 import React, { useState } from 'react';
-import { MobileEncryption } from '../../app/mobile-encryption';
 import { MobileDecryption } from '../../app/mobile-decryption';
 import { PageControl } from '../../app/page-control';
 import { EditRule } from '../../app/edit-rule';
 import LoadFromPreset from '../../app/load-from-preset';
 import { FormTransferTool } from './formTransfer/FormTransferTool';
+import { PhoneCryptoTool } from './phoneCrypto/PhoneCryptoTool';
+import { ENCRYPT } from './phoneCrypto/kinds';
 
 export interface ToolProps {
   // Host of the active tab when the tool was opened.
@@ -51,7 +53,7 @@ export const TOOLS: ToolDefinition[] = [
     label: 'Encryption',
     title: 'Encrypt',
     description: 'Encrypt content with a key kept on your phone.',
-    Component: ({ domain, exit }) => <MobileEncryption domain={domain} back={exit} />,
+    Component: props => <PhoneCryptoTool {...props} kind={ENCRYPT} />,
   },
   {
     id: 'mobile-decryption',
