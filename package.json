@@ -1,6 +1,6 @@
 {
   "name": "browser-extension",
-  "version": "4.2.0",
+  "version": "5.0.0",
   "private": true,
   "dependencies": {
     "global-input-react": "^4.6.9",
@@ -13,7 +13,9 @@
     "build": "vite build && vite build --config vite.content.config.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "package": "rm -rf build && npm run build && cd build && zip -r ./globalinputapp.zip ."
+    "package": "rm -rf build && npm run build && cd build && zip -r ./globalinputapp.zip .",
+    "build:firefox": "npm run build && node scripts/firefox-manifest.mjs",
+    "package:firefox": "npm run build:firefox && rm -f globalinputapp-firefox.zip && cd build-firefox && zip -qr ../globalinputapp-firefox.zip ."
   },
   "devDependencies": {
     "@types/chrome": "^0.3.6",

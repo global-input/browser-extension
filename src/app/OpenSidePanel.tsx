@@ -1,5 +1,5 @@
-// Opens the always-connected side panel from the popup. Hidden where the browser has no
-// side panel API (Firefox, Chrome before 116).
+// Opens the always-connected panel from the popup: Chrome's side panel, or Firefox's sidebar.
+// Hidden where neither exists.
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -22,6 +22,12 @@ const PanelButton = styled.button`
     }
 `;
 
+interface FirefoxSidebar {
+    sidebarAction?: { open: () => Promise<void> };
+}
+
+const firefoxSidebar = () => (globalThis as unknown as { browser?: FirefoxSidebar }).browser?.sidebarAction;
+
 export const OpenSidePanel: React.FC = () => {
     const [windowId, setWindowId] = useState<number | null>(null);
     useEffect(() => {
@@ -29,12 +35,14 @@ export const OpenSidePanel: React.FC = () => {
             chrome.windows.getCurrent().then(current => setWindowId(current.id ?? null));
         }
     }, []);
-    if (windowId === null) {
+    const sidebar = firefoxSidebar();
+    if (windowId === null && !sidebar) {
         return null;
     }
     // Opening must happen straight from the click, so the window id is looked up beforehand.
     const open = () => {
-        chrome.sidePanel.open({ windowId }).then(() => window.close());
+        const opened = windowId !== null ? chrome.sidePanel.open({ windowId }) : sidebar!.open();
+        opened.then(() => window.close());
     };
     return (
         <PanelButton type="button" onClick={open} title="Stay connected and sign in to any site from your phone">

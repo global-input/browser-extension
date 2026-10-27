@@ -1,5 +1,58 @@
 # Release Notes
 
+## 5.0.0
+
+The extension now lives in Chrome's side panel. It connects to your phone once, stays connected, and signs you in to sites without copy-paste.
+
+### New
+
+- **Always-connected side panel.** The toolbar icon opens the panel. One QR scan per browser session: the panel stays connected while it is open. If the phone drops (app in the background, network change), it rejoins from the app's history without a new scan. It disconnects after an idle time (30 minutes by default) or when the screen locks; both are in Settings.
+- **Sign in from your phone.**
+  - When a page shows a sign-in form, the phone gets "Sign in to <site>" with the account saved for that site.
+  - Choose it and the page is filled directly, with no clipboard, then tap the page's sign-in button on the phone.
+  - The panel shows each step, notices a wrong password (the phone asks again, no new scan), and confirms when you are signed in.
+  - Forms are found by the built-in or your own page rules, or automatically.
+- **Two-step sign-ins.** Sites that ask for the username on one page and the password on the next (Microsoft, Google, AWS or Okta style) are handled on the same connection, as "Step 1 of 2" and "Step 2 of 2" on the phone.
+- **Per-site settings** on the panel's site card:
+  - sign in automatically after filling;
+  - turn sign-in detection off for a site;
+  - save an automatically found form as a page rule.
+
+  Settings, then Sites, lists and resets them.
+- **Send text from the phone** into the field that has focus, for one-time codes and other values. A code split over one-character boxes is spread across them.
+- **Tools in the panel.** Transfer form data, Encrypt, Decrypt and Page control (with the rule editor) are in the panel's Tools tab, and can also be started from the phone's home screen. They share the panel's connection, so no extra scan is needed.
+
+### Security
+
+- Values from the phone are written straight into the page. They are never stored, logged or put on the clipboard.
+- A value is filled only if the page is still on the site it was requested for: the host is checked in the panel and again in the page.
+- Only site names and per-site choices are stored (extension local storage).
+
+### Permissions
+
+- Added `sidePanel` (the panel) and `idle` (disconnect when idle or locked). Neither shows a new warning when installing or updating.
+- A background service worker makes the toolbar icon open the panel. It needs no permission.
+
+### Development
+
+- Moved from Create React App to Vite 6 and TypeScript 5.9.
+  - `npm run build` builds the popup, the panel and the content script.
+  - `npm test` runs 53 unit tests (Vitest).
+  - `npm run typecheck`.
+  - `npm run build:firefox` and `npm run package:firefox` make the Firefox package.
+- The content script is now TypeScript (`src/content/`). It replaces `public/content.js`, and the popup's messages get the same replies as before.
+- Fixed: a top-level `const URL` in `src/global-input-mobile/storage.ts` shadowed the browser's `URL` once bundled, and the pages rendered blank. It is renamed to `URL_KEY`; the stored key name is unchanged.
+- The 4.2.0 known issue "TypeScript type check fails in `node_modules`" is resolved by the TypeScript upgrade.
+
+### Firefox
+
+- The Firefox package keeps the popup on the toolbar icon. It offers the same panel as Firefox's sidebar, and the popup's "Open side panel" button opens that sidebar. Not tested in Firefox yet.
+
+### Known issues
+
+- Automated end-to-end tests cannot reach the relay in Chrome for Testing 150: there, requests from extension pages hang when the extension has site access. Manual testing in Chrome works.
+- The tools still use the popup's styling inside the panel.
+
 ## 4.2.0
 
 ### Fixes

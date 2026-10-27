@@ -25,3 +25,7 @@ yarn-error.log*
 
 #we only use package-lock.json
 yarn.lock
+
+# browser packages
+/build-firefox
+/globalinputapp-firefox.zip

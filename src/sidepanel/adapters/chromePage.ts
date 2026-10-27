@@ -52,7 +52,9 @@ export const watchPageStates = (onState: (tabId: number, state: PageState) => vo
       return;
     }
     const state = message.content as PageState;
-    if (!sender.origin || !state || new URL(sender.origin).host !== state.host) {
+    // Firefox gives no sender.origin; sender.url also comes from the browser, not the page.
+    const senderUrl = sender.origin || sender.url;
+    if (!senderUrl || !state || new URL(senderUrl).host !== state.host) {
       return;
     }
     onState(sender.tab.id, state);

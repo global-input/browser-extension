@@ -14,40 +14,33 @@ The extension works seamlessly with popular platforms and services including dev
 
 ### Prerequisites
 
-- Node.js and npm installed
+- Node.js 20 or newer and npm
 - Git for version control
 
 ### Build Instructions
 
-1. Clone the repository:
-
 ```bash
 git clone https://github.com/global-input/browser-extension.git
-```
-
-2. Navigate to project directory:
-
-```bash
 cd browser-extension
-```
-
-3. Install dependencies:
-
-```bash
 npm install
+npm run build          # build/: popup, side panel, content script (Vite)
+npm test               # unit tests (Vitest)
+npm run typecheck      # TypeScript
+npm run dev            # rebuild on change (development mode)
+npm run package        # build/globalinputapp.zip for the Chrome Web Store
+FIREFOX_ADDON_ID=<id> npm run package:firefox   # globalinputapp-firefox.zip for addons.mozilla.org
 ```
 
-4. Build the project:
+### Project Layout
 
-```bash
-npm run build
-```
-
-5. Start development server:
-
-```bash
-npm start
-```
+| Path | What it is |
+|---|---|
+| `src/sidepanel/` | The side panel: `core/` (sign-in flow, no Chrome or React code), `adapters/` (Chrome, phone connection, storage), `ui/`, `tools/` |
+| `src/content/` | The content script: page rules, sign-in form detection, filling |
+| `src/shared/` | Page rule types and the panel and page message contract |
+| `src/app/` | The tools (form transfer, encryption, decryption, page control), also the popup |
+| `public/` | `manifest.json`, `background.js` (icon opens the panel), images |
+| `scripts/firefox-manifest.mjs` | Makes the Firefox package from the Chrome build |
 
 ### Browser Extension Installation
 
