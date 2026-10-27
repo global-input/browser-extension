@@ -3,12 +3,12 @@
 // tool's screen to the phone instead of starting a new session).
 // To add or remove a tool, change this list.
 import React, { useState } from 'react';
-import { FormDataTransfer } from '../../app/form-data-transfer';
 import { MobileEncryption } from '../../app/mobile-encryption';
 import { MobileDecryption } from '../../app/mobile-decryption';
 import { PageControl } from '../../app/page-control';
 import { EditRule } from '../../app/edit-rule';
 import LoadFromPreset from '../../app/load-from-preset';
+import { FormTransferTool } from './formTransfer/FormTransferTool';
 
 export interface ToolProps {
   // Host of the active tab when the tool was opened.
@@ -44,7 +44,7 @@ export const TOOLS: ToolDefinition[] = [
     label: 'Transfer Form Data',
     title: 'Transfer form data',
     description: 'Send text or form values between your phone and this computer.',
-    Component: ({ domain, exit }) => <FormDataTransfer domain={domain} back={exit} />,
+    Component: FormTransferTool,
   },
   {
     id: 'mobile-encryption',

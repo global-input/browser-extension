@@ -62,3 +62,9 @@ export const watchPageStates = (onState: (tabId: number, state: PageState) => vo
   chrome.runtime.onMessage.addListener(listener);
   return () => chrome.runtime.onMessage.removeListener(listener);
 };
+
+// The active tab of the panel's window, for tools that act on the page.
+export const activeTabId = async (): Promise<number | null> => {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  return tab && tab.id !== undefined ? tab.id : null;
+};
