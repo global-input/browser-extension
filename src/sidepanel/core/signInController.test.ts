@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { REJECTED_NOTICE, SPA_FAILURE_MS, SignInController } from './signInController';
+import { PASSWORD_STEP_NOTICE, REJECTED_NOTICE, SPA_FAILURE_MS, SignInController, USERNAME_STEP_NOTICE } from './signInController';
 import type { Ports, SignInView } from './signInController';
 import { PHONE_FIELD } from './phoneForms';
 import type { PageState } from '../../shared/signInMessages';
@@ -24,7 +24,9 @@ const setup = () => {
       queryState: vi.fn(async (tabId: number) => page[tabId] ?? null),
       detect: vi.fn(async (tabId: number) => {
         const state = page[tabId];
-        return state ? { status: 'success' as const, pageId: state.pageId, host: state.host, form: FORM, ruleSource: 'auto' as const } : null;
+        return state
+          ? { status: 'success' as const, pageId: state.pageId, host: state.host, form: FORM, ruleSource: 'auto' as const, step: state.step ?? ('password' as const) }
+          : null;
       }),
       fill: vi.fn(async (_tabId: number, fieldId: string) => ({ status: 'success' as const, pressed: fieldId === 'login' })),
     },
@@ -55,8 +57,9 @@ const setup = () => {
   };
 };
 
-const signInPage = (pageId = 'p1'): PageState => ({ pageId, host: 'tools.example.com', hasSignInForm: true });
-const dashboard = (pageId = 'p2'): PageState => ({ pageId, host: 'tools.example.com', hasSignInForm: false });
+const signInPage = (pageId = 'p1'): PageState => ({ pageId, host: 'tools.example.com', hasSignInForm: true, step: 'password' });
+const usernamePage = (pageId = 'u1'): PageState => ({ pageId, host: 'tools.example.com', hasSignInForm: true, step: 'username' });
+const dashboard = (pageId = 'p2'): PageState => ({ pageId, host: 'tools.example.com', hasSignInForm: false, step: null });
 
 describe('SignInController', () => {
   it('shows the QR state until a phone connects, then asks the phone for the form on the active tab', async () => {
@@ -261,5 +264,82 @@ describe('SignInController', () => {
     expect(t.view().phase).toBe('ready');
     await t.controller.phoneInput('login', null);
     expect(t.ports.page.fill).not.toHaveBeenCalled();
+  });
+
+  describe('two-step sign-in', () => {
+    const notices = (t: ReturnType<typeof setup>) => t.lastScreen().form.fields.filter((f: { type: string }) => f.type === 'info').map((f: { value: string }) => f.value);
+
+    it('asks for the username, then for the password on the next page, then reports signed in', async () => {
+      const t = setup();
+      t.page[1] = usernamePage('u1');
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      expect(t.view()).toMatchObject({ phase: 'requesting', step: 'username', twoStep: true });
+      expect(notices(t)).toEqual([USERNAME_STEP_NOTICE]);
+
+      await t.controller.phoneInput('username', 'you@company.com');
+      await t.controller.phoneInput('login', null);
+      expect(t.view().phase).toBe('submitted');
+
+      t.advance(2000);
+      t.page[1] = signInPage('p1');
+      await t.controller.pageStateReceived(1, signInPage('p1'));
+      expect(t.view()).toMatchObject({ phase: 'requesting', step: 'password', twoStep: true, notice: undefined });
+      expect(notices(t)).toEqual([PASSWORD_STEP_NOTICE]);
+
+      await t.controller.phoneInput('password', 'secret');
+      await t.controller.phoneInput('login', null);
+      t.advance(1500);
+      await t.controller.pageStateReceived(1, dashboard('d1'));
+      expect(t.view().phase).toBe('signed-in');
+      expect(t.view().signedInMs).toBe(3500);
+    });
+
+    it('treats the password field appearing in the same page as progress, not a rejection', async () => {
+      const t = setup();
+      t.page[1] = usernamePage('s1');
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      await t.controller.phoneInput('login', null);
+
+      const passwordStep: PageState = { pageId: 's1', host: 'tools.example.com', hasSignInForm: true, step: 'password' };
+      t.page[1] = passwordStep;
+      await t.controller.pageStateReceived(1, passwordStep);
+      expect(t.view()).toMatchObject({ phase: 'requesting', step: 'password', notice: undefined });
+      expect(t.timers[0].cancelled).toBe(true);
+    });
+
+    it('reports a rejected username when the username page comes back', async () => {
+      const t = setup();
+      t.page[1] = usernamePage('u1');
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      await t.controller.phoneInput('login', null);
+
+      t.page[1] = usernamePage('u2');
+      await t.controller.pageStateReceived(1, usernamePage('u2'));
+      expect(t.view()).toMatchObject({ phase: 'requesting', step: 'username', notice: REJECTED_NOTICE });
+    });
+
+    it('follows the page when the user moves to the password step without the phone', async () => {
+      const t = setup();
+      t.page[1] = usernamePage('s1');
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      const passwordStep: PageState = { pageId: 's1', host: 'tools.example.com', hasSignInForm: true, step: 'password' };
+      t.page[1] = passwordStep;
+      await t.controller.pageStateReceived(1, passwordStep);
+      expect(t.view()).toMatchObject({ phase: 'requesting', step: 'password' });
+      expect(t.ports.page.detect).toHaveBeenCalledTimes(2);
+    });
+
+    it('a one-step sign-in shows no step notice', async () => {
+      const t = setup();
+      t.page[1] = signInPage();
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      expect(t.view().twoStep).toBe(false);
+      expect(notices(t)).toEqual([]);
+    });
   });
 });

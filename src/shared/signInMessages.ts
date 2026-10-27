@@ -16,12 +16,17 @@ export const SIGN_IN_MESSAGE = {
 
 export const isSignInMessage = (messageType: unknown) => typeof messageType === 'string' && messageType.startsWith('signin/');
 
+// "username": the first page of a two-step sign-in. "password": a page asking for the
+// password (with or without the username).
+export type SignInStep = 'username' | 'password';
+
 export interface PageState {
   // New for every document, so the panel can tell "the form came back after a reload"
   // from "the form is still there".
   pageId: string;
   host: string;
   hasSignInForm: boolean;
+  step: SignInStep | null;
 }
 
 export interface DetectRequest {
@@ -36,6 +41,7 @@ export interface DetectReply {
   host: string;
   form?: MobileForm;
   ruleSource?: RuleSource;
+  step?: SignInStep;
 }
 
 export interface FillRequest {

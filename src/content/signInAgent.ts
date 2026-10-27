@@ -1,6 +1,6 @@
 // The page side of phone sign-in: reports whether the page shows a sign-in form, finds the
 // form's fields, and fills them. Values are written straight into the page and never kept.
-import { detectSignInRule, hasVisiblePasswordField } from './autoDetect';
+import { detectSignInRule, detectUsernameStepRule, hasVisiblePasswordField, signInStepOf } from './autoDetect';
 import { buildPageForm, setFieldValue, toMobileForm } from './formBuilder';
 import type { PageForm } from './formBuilder';
 import { SIGN_IN_MESSAGE } from '../shared/signInMessages';
@@ -18,17 +18,22 @@ export interface SignInAgentOptions {
 export const createSignInAgent = ({ doc = document, send = sendToExtension }: SignInAgentOptions = {}) => {
   const pageId = randomId();
   let pageForm: PageForm | null = null;
-  let lastReported: boolean | null = null;
+  let lastReported: string | null = null;
   let timer: ReturnType<typeof setTimeout> | null = null;
 
-  const state = (): PageState => ({ pageId, host: doc.location.host, hasSignInForm: hasVisiblePasswordField(doc) });
+  const state = (): PageState => {
+    const step = signInStepOf(doc);
+    return { pageId, host: doc.location.host, hasSignInForm: step !== null, step };
+  };
 
+  // Reported when the step changes, including username -> password within one page.
   const report = (force = false) => {
     const current = state();
-    if (!force && current.hasSignInForm === lastReported) {
+    const key = String(current.step);
+    if (!force && key === lastReported) {
       return;
     }
-    lastReported = current.hasSignInForm;
+    lastReported = key;
     if (!current.hasSignInForm) {
       pageForm = null;
     }
@@ -45,15 +50,21 @@ export const createSignInAgent = ({ doc = document, send = sendToExtension }: Si
   const detect = ({ rule }: DetectRequest): DetectReply => {
     const host = doc.location.host;
     let ruleSource: DetectReply['ruleSource'] = 'rule';
+    let step: DetectReply['step'] = hasVisiblePasswordField(doc) ? 'password' : 'username';
     pageForm = buildPageForm(rule, doc);
     if (!pageForm) {
       ruleSource = 'auto';
       pageForm = buildPageForm(detectSignInRule(doc), doc);
+      step = 'password';
+    }
+    if (!pageForm) {
+      pageForm = buildPageForm(detectUsernameStepRule(doc), doc);
+      step = 'username';
     }
     if (!pageForm) {
       return { status: 'failed', pageId, host };
     }
-    return { status: 'success', pageId, host, form: toMobileForm(pageForm), ruleSource };
+    return { status: 'success', pageId, host, form: toMobileForm(pageForm), ruleSource, step };
   };
 
   const fill = ({ fieldId, value, expectedHost }: FillRequest): FillReply => {

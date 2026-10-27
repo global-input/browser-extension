@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createSignInAgent } from './signInAgent';
-import { detectSignInRule } from './autoDetect';
+import { detectSignInRule, detectUsernameStepRule, signInStepOf } from './autoDetect';
 import { handleLegacyMessage } from './legacyProtocol';
 import { SIGN_IN_MESSAGE } from '../shared/signInMessages';
 
@@ -127,5 +127,61 @@ describe('popup page-control messages (unchanged behaviour)', () => {
     handleLegacyMessage({ messageType: 'set-key', content: { key: 'k1' } }, reply);
     handleLegacyMessage({ messageType: 'check-page-status' }, reply);
     expect(reply).toHaveBeenLastCalledWith(expect.objectContaining({ content: { key: 'k1' } }));
+  });
+});
+
+describe('two-step sign-in detection', () => {
+  const withTitle = (title: string, html: string) => {
+    document.title = title;
+    document.body.innerHTML = html;
+  };
+
+  it('finds a username step with a hidden password field in the form (Google-style)', () => {
+    withTitle('Example', `<form><input id="identifier" type="email" aria-label="Email or phone">
+      <input type="password" name="hiddenPassword" hidden><button type="button">Next</button></form>`);
+    const rule = detectUsernameStepRule(document)!;
+    expect(rule.forms[0].fields.map(f => f.id)).toEqual(['username', 'login']);
+    expect(rule.forms[0].fields[1].data).toEqual({ label: 'Next' });
+    expect(signInStepOf(document)).toBe('username');
+  });
+
+  it('finds a username step from autocomplete="username", or sign-in wording', () => {
+    withTitle('Portal', '<form><input name="loginfmt" autocomplete="username"><input type="submit" value="Next"></form>');
+    expect(detectUsernameStepRule(document)).not.toBeNull();
+    withTitle('Sign in to Example', '<form><input name="user"><button>Continue</button></form>');
+    expect(detectUsernameStepRule(document)).not.toBeNull();
+  });
+
+  it('ignores a newsletter box, a search box, and forms with several text fields', () => {
+    withTitle('Our shop', '<h1>Spring sale</h1><form><input type="email" name="email" placeholder="Your email"><button>Subscribe</button></form>');
+    expect(detectUsernameStepRule(document)).toBeNull();
+    withTitle('About the author', '<h2>Author notes</h2><form><input type="email" name="email"><button>Join</button></form>');
+    expect(detectUsernameStepRule(document)).toBeNull();
+    withTitle('Sign in', '<form role="search"><input type="text" name="user-search"><button>Search</button></form>');
+    expect(detectUsernameStepRule(document)).toBeNull();
+    withTitle('Sign in', '<form><input name="email"><input name="name"><button>Sign in</button></form>');
+    expect(detectUsernameStepRule(document)).toBeNull();
+  });
+
+  it('reads a password-only page (the second step) without a username field', () => {
+    withTitle('Sign in', '<form><p>you@company.com</p><input type="password" id="pw"><button>Sign in</button></form>');
+    expect(detectSignInRule(document)!.forms[0].fields.map(f => f.id)).toEqual(['password', 'login']);
+    expect(signInStepOf(document)).toBe('password');
+  });
+
+  it('reports the change from the username step to the password step in the same page', async () => {
+    vi.useFakeTimers();
+    withTitle('Sign in', '<form><input id="u" type="email"><input id="p" type="password" hidden><button>Next</button></form>');
+    const send = vi.fn();
+    const agent = createSignInAgent({ send });
+    agent.start();
+    expect(send).toHaveBeenLastCalledWith({ messageType: SIGN_IN_MESSAGE.PAGE_STATE, content: expect.objectContaining({ step: 'username' }) });
+    (document.getElementById('u') as HTMLElement).hidden = true;
+    (document.getElementById('p') as HTMLElement).hidden = false;
+    await vi.advanceTimersByTimeAsync(500);
+    expect(send).toHaveBeenLastCalledWith({ messageType: SIGN_IN_MESSAGE.PAGE_STATE, content: expect.objectContaining({ step: 'password' }) });
+    const reply = agent.detect({ rule: null });
+    expect(reply).toMatchObject({ status: 'success', step: 'password' });
+    vi.useRealTimers();
   });
 });

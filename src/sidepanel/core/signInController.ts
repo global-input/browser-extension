@@ -3,7 +3,7 @@
 // It has no Chrome or React code: everything outside comes in through the ports, so the flow
 // can be tested with fakes and the UI or transport can change without touching it.
 import type { MobileForm, PageRule } from '../../shared/pageRule';
-import type { DetectReply, FillReply, PageState, RuleSource } from '../../shared/signInMessages';
+import type { DetectReply, FillReply, PageState, RuleSource, SignInStep } from '../../shared/signInMessages';
 import { PHONE_FIELD, homeScreen, signInScreen, signedInScreen, toolIdFromField } from './phoneForms';
 import type { PhoneScreen, ToolEntry } from './phoneForms';
 
@@ -30,6 +30,9 @@ export interface SignInView {
   notice?: string;
   signedInMs?: number;
   recent: { host: string; at: number }[];
+  // The step the phone is asked for, and whether this sign-in has a username step first.
+  step?: SignInStep;
+  twoStep?: boolean;
 }
 
 export interface Ports {
@@ -59,10 +62,13 @@ interface Target {
   pageId: string;
   host: string;
   form: MobileForm;
+  step: SignInStep;
   startedAt: number;
 }
 
 export const REJECTED_NOTICE = 'The site did not accept the sign-in. Choose the account again.';
+export const USERNAME_STEP_NOTICE = 'Step 1 of 2: the username.';
+export const PASSWORD_STEP_NOTICE = 'Step 2 of 2: the password.';
 
 export class SignInController {
   private view: SignInView = { phase: 'not-connected', filledFieldIds: [], recent: [] };
@@ -228,8 +234,11 @@ export class SignInController {
     if (target && this.view.phase === 'submitted') {
       if (!state.hasSignInForm) {
         this.signedIn(target, state.host);
+      } else if (target.step === 'username' && state.step === 'password') {
+        // The username was accepted: the same page, or the next one, now asks for the password.
+        await this.request(tabId, state, undefined, target);
       } else if (state.pageId !== target.pageId) {
-        // A new page with the form again: the site rejected the sign-in.
+        // A new page with the same step again: the site rejected it.
         await this.request(tabId, state, REJECTED_NOTICE);
       }
       return;
@@ -247,13 +256,14 @@ export class SignInController {
     if (state.pageId === this.skippedPageId) {
       return;
     }
-    if (target && target.pageId === state.pageId) {
+    if (target && target.pageId === state.pageId && target.step === state.step) {
       return;
     }
     await this.request(tabId, state);
   }
 
-  private async request(tabId: number, state: PageState, notice?: string) {
+  // continuedFrom: the username step this password step follows, in a two-step sign-in.
+  private async request(tabId: number, state: PageState, notice?: string, continuedFrom?: Target) {
     this.clearTarget();
     const reply = await this.ports.page.detect(tabId, this.ports.rules.find(state.host));
     if (tabId !== this.activeTabId || !this.connected || this.suspended || (this.lastState && this.lastState.pageId !== state.pageId)) {
@@ -263,9 +273,13 @@ export class SignInController {
       this.update({ phase: 'no-form', host: state.host, notice: undefined, filledFieldIds: [] });
       return;
     }
-    this.target = { tabId, pageId: reply.pageId, host: reply.host, form: reply.form, startedAt: this.ports.now() };
-    this.ports.phone.show(signInScreen(reply.form, reply.host, notice));
-    this.update({ phase: 'requesting', host: reply.host, ruleSource: reply.ruleSource, notice, filledFieldIds: [] });
+    const step: SignInStep = reply.step || 'password';
+    const twoStep = step === 'username' || (!!continuedFrom && this.view.twoStep === true);
+    const stepNotice = twoStep ? (step === 'username' ? USERNAME_STEP_NOTICE : PASSWORD_STEP_NOTICE) : undefined;
+    const startedAt = continuedFrom ? continuedFrom.startedAt : this.ports.now();
+    this.target = { tabId, pageId: reply.pageId, host: reply.host, form: reply.form, step, startedAt };
+    this.ports.phone.show(signInScreen(reply.form, reply.host, notice || stepNotice));
+    this.update({ phase: 'requesting', host: reply.host, ruleSource: reply.ruleSource, notice, step, twoStep, filledFieldIds: [] });
   }
 
   private submitted(target: Target) {
@@ -273,7 +287,7 @@ export class SignInController {
     this.cancelTimer = this.ports.setTimer(() => {
       // Still the same document, still showing the form: a single-page app that said no.
       if (this.target === target && this.view.phase === 'submitted') {
-        this.request(target.tabId, { pageId: target.pageId, host: target.host, hasSignInForm: true }, REJECTED_NOTICE);
+        this.request(target.tabId, { pageId: target.pageId, host: target.host, hasSignInForm: true, step: target.step }, REJECTED_NOTICE);
       }
     }, SPA_FAILURE_MS);
   }

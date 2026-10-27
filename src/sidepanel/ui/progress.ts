@@ -7,7 +7,28 @@ export interface Step {
   state: StepState;
 }
 
+const twoStepProgress = (view: SignInView): Step[] => {
+  const found: Step = { label: 'Sign-in form found', state: 'done' };
+  const usernameDone: Step = { label: 'Username from your phone', state: 'done' };
+  const passwordDone: Step = { label: 'Password from your phone', state: 'done' };
+  const signedIn: Step = { label: 'Signed in', state: 'todo' };
+  if (view.phase === 'signed-in') {
+    return [found, usernameDone, passwordDone, { ...signedIn, state: 'done' }];
+  }
+  if (view.step === 'username') {
+    return view.phase === 'submitted'
+      ? [found, usernameDone, { label: 'Waiting for the password page', state: 'current' }, signedIn]
+      : [found, { label: 'Choose the account on your phone (username)', state: 'current' }, { label: 'Password from your phone', state: 'todo' }, signedIn];
+  }
+  return view.phase === 'submitted'
+    ? [found, usernameDone, passwordDone, { label: 'Checking the sign-in', state: 'current' }]
+    : [found, usernameDone, { label: 'Choose the account on your phone (password)', state: 'current' }, signedIn];
+};
+
 export const progressSteps = (view: SignInView): Step[] => {
+  if (view.twoStep && (view.phase === 'requesting' || view.phase === 'submitted' || view.phase === 'signed-in')) {
+    return twoStepProgress(view);
+  }
   const detected: Step = { label: 'Sign-in form found', state: 'done' };
   const sent: Step = { label: 'Request sent to your phone', state: 'done' };
   switch (view.phase) {
