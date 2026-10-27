@@ -29,3 +29,4 @@ yarn.lock
 # browser packages
 /build-firefox
 /globalinputapp-firefox.zip
+/globalinputapp-source.zip

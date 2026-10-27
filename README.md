@@ -28,8 +28,19 @@ npm test               # unit tests (Vitest)
 npm run typecheck      # TypeScript
 npm run dev            # rebuild on change (development mode)
 npm run package        # build/globalinputapp.zip for the Chrome Web Store
-FIREFOX_ADDON_ID=<id> npm run package:firefox   # globalinputapp-firefox.zip for addons.mozilla.org
+npm run package:firefox   # globalinputapp-firefox.zip for addons.mozilla.org
+npm run package:source    # globalinputapp-source.zip: the committed source, for AMO review
 ```
+
+### Building the Firefox package from source (for addons.mozilla.org reviewers)
+
+The package is bundled with Vite, so its source is supplied separately. To rebuild it:
+
+1. Use Node.js 20 or newer (built with Node.js 24.13 and npm 11.8) on macOS, Linux or Windows.
+2. Unzip the source and run `npm ci` (exact versions from `package-lock.json`, all from the npm registry).
+3. Run `npm run build:firefox`. The package is in `build-firefox/`, the same files as the submitted zip.
+
+`scripts/firefox-manifest.mjs` makes the Firefox manifest from the Chrome one: Firefox's sidebar instead of Chrome's side panel, the add-on ID, and the data disclosure.
 
 ### Project Layout
 

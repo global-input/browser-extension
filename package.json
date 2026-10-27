@@ -1,6 +1,6 @@
 {
   "name": "browser-extension",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "private": true,
   "dependencies": {
     "global-input-react": "^4.6.9",
@@ -15,7 +15,8 @@
     "test": "vitest run",
     "package": "rm -rf build && npm run build && cd build && zip -r ./globalinputapp.zip .",
     "build:firefox": "npm run build && node scripts/firefox-manifest.mjs",
-    "package:firefox": "npm run build:firefox && rm -f globalinputapp-firefox.zip && cd build-firefox && zip -qr ../globalinputapp-firefox.zip ."
+    "package:firefox": "npm run build:firefox && rm -f globalinputapp-firefox.zip && cd build-firefox && zip -qr ../globalinputapp-firefox.zip .",
+    "package:source": "git archive --format=zip --output=globalinputapp-source.zip HEAD"
   },
   "devDependencies": {
     "@types/chrome": "^0.3.6",

@@ -1,5 +1,30 @@
 # Release Notes
 
+## 5.1.0
+
+All the tools are redesigned for the panel, and new features help keep your content away from people and cameras around you. This is also the first release of the new extension for Firefox, where the panel is Firefox's sidebar.
+
+### New
+
+- **Redesigned tools.** Transfer form data, Encrypt, Decrypt and Page control now use the panel's design. Your phone shows the same screens as before.
+  - **Transfer form data:** each field has **Insert into page** (into the field that has focus) and **Copy**. **Edit fields** adds and removes fields, and each site keeps its own list.
+  - **Encrypt and Decrypt:** three clear steps. Results can be inserted into the page, copied, or shown on your phone.
+  - **Page control:** shows the controls it found on the page, with **Find again**, a rule editor that checks the JSON before saving, and presets.
+- **Encrypt and decrypt in place.** Click into a field on the page, then press **Use the focused field**, and **Put back into the page** when your phone sends the result. The plain text never needs to appear on your screen.
+- **Hidden by default.** Decrypted text, and text taken from the page for encryption, are hidden until you press **Show**. Insert and Copy work while hidden.
+- **Hides again by itself.** Anything you reveal hides again after 30 seconds, or when the panel is hidden.
+- **Site access check.** If the extension's access to websites is turned off, the panel says so and offers **Allow on all sites**.
+- **Firefox.** The panel opens as Firefox's sidebar: from the popup's **Open side panel**, or View → Sidebar.
+
+### Fixed
+
+- Changing the site in Transfer form data no longer overwrites the previous site's saved field list.
+- The tools find the active page's site themselves. For a tab that was open before the extension was updated, they ask you to reload it.
+
+### Permissions
+
+- No new permissions. The Firefox package declares its data use: sign-in details and page content go between the page and your phone, end-to-end encrypted, to fill pages for you. Nothing is stored or sold.
+
 ## 5.0.0
 
 The extension now lives in Chrome's side panel. It connects to your phone once, stays connected, and signs you in to sites without copy-paste.

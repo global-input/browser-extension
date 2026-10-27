@@ -7,7 +7,7 @@
     "24": "images/globalInput24.png",
     "16": "images/globalInput16.png"
   },
-  "version": "5.0.0",
+  "version": "5.1.0",
   "manifest_version": 3,
   "minimum_chrome_version": "116",
   "description": "Use your mobile to operate on web pages in your computer browser to login, subscribe, encrypt, or control any element in the page.",

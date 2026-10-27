@@ -6,6 +6,7 @@ import type { IdleReason } from '../adapters/idle';
 import { IDLE_CHOICES, loadSettings, saveSettings } from '../adapters/settings';
 import type { PanelSettings } from '../adapters/settings';
 import { useSignIn } from '../useSignIn';
+import { useSiteAccess } from '../adapters/siteAccess';
 import { homeScreen } from '../core/phoneForms';
 import { TOOLS, findTool } from '../tools/registry';
 import { Tabs, ToolFrame, ToolList } from './tools';
@@ -89,6 +90,8 @@ export const App: React.FC = () => {
     connection.disconnect();
   };
 
+  const siteAccess = useSiteAccess();
+
   const updateSettings = (next: PanelSettings) => {
     setSettings(next);
     saveSettings(next);
@@ -99,6 +102,7 @@ export const App: React.FC = () => {
       <Header connected={connected} />
       {!showSettings && !tool && <Tabs selected={tab} onSelect={setTab} />}
       <Body>
+        {siteAccess.granted === false && !showSettings && <SiteAccessNotice onAllow={siteAccess.request} />}
         {showSettings ? (
           <SettingsView settings={settings} onChange={updateSettings} onClose={() => setShowSettings(false)} onSitesChanged={detectionChanged} />
         ) : tool && openTool ? (
@@ -230,6 +234,20 @@ const PhaseCard: React.FC<{ view: SignInView; actions: SiteActions }> = ({ view,
       );
   }
 };
+
+const SiteAccessNotice: React.FC<{ onAllow: () => void }> = ({ onAllow }) => (
+  <Notice $tone="warn" role="alert">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
+      <span>
+        <strong>Global Input cannot reach web pages.</strong> Its access to websites is turned off, so it cannot find sign-in forms or
+        fill them. Allow it, then reload the pages you have open.
+      </span>
+      <Button type="button" onClick={onAllow}>
+        Allow on all sites
+      </Button>
+    </div>
+  </Notice>
+);
 
 const SettingsView: React.FC<{
   settings: PanelSettings;
