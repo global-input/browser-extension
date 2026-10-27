@@ -9,6 +9,7 @@ import { useSignIn } from '../useSignIn';
 import { homeScreen } from '../core/phoneForms';
 import { TOOLS, findTool } from '../tools/registry';
 import { Tabs, ToolFrame, ToolList } from './tools';
+import { SiteControls, SitesSection, TurnDetectionOn } from './siteSettings';
 import type { PanelTab } from './tools';
 import type { SignInView } from '../core/signInController';
 import { formatSeconds, formatTime, progressSteps, ruleSourceLabel } from './progress';
@@ -31,7 +32,7 @@ export const App: React.FC = () => {
   const [tab, setTab] = useState<PanelTab>('sign-in');
   const [openTool, setOpenTool] = useState<{ id: string; domain: string } | null>(null);
   const openToolRef = useRef<(toolId: string) => void>(() => undefined);
-  const { view, skip, suspend, resume } = useSignIn(connection, {
+  const { view, skip, suspend, resume, saveAutoRule, detectionChanged } = useSignIn(connection, {
     list: () => TOOL_ENTRIES,
     open: toolId => openToolRef.current(toolId),
   });
@@ -99,13 +100,13 @@ export const App: React.FC = () => {
       {!showSettings && !tool && <Tabs selected={tab} onSelect={setTab} />}
       <Body>
         {showSettings ? (
-          <SettingsView settings={settings} onChange={updateSettings} onClose={() => setShowSettings(false)} />
+          <SettingsView settings={settings} onChange={updateSettings} onClose={() => setShowSettings(false)} onSitesChanged={detectionChanged} />
         ) : tool && openTool ? (
           <ToolFrame tool={tool} domain={openTool.domain} onExit={exitTool} />
         ) : tab === 'tools' ? (
           <ToolList tools={TOOLS} onOpen={toolId => openToolRef.current(toolId)} />
         ) : connected ? (
-          <ConnectedView view={view} onSkip={skip} />
+          <ConnectedView view={view} actions={{ onSkip: skip, onSaveRule: saveAutoRule, onDetectionChanged: detectionChanged }} />
         ) : (
           <ConnectView connection={connection} notice={disconnectReason} />
         )}
@@ -141,18 +142,32 @@ const ConnectView: React.FC<{ connection: ReturnType<typeof usePhoneConnection>;
   </>
 );
 
-const ConnectedView: React.FC<{ view: SignInView; onSkip: () => void }> = ({ view, onSkip }) => {
+interface SiteActions {
+  onSkip: () => void;
+  onSaveRule: () => void;
+  onDetectionChanged: () => void;
+}
+
+const ConnectedView: React.FC<{ view: SignInView; actions: SiteActions }> = ({ view, actions }) => {
   const recent = view.recent.map(item => ({ host: item.host, time: formatTime(item.at) }));
   return (
     <>
       {view.notice && view.phase === 'ready' && <Notice $tone="warn">{view.notice}</Notice>}
-      <PhaseCard view={view} onSkip={onSkip} />
+      <PhaseCard view={view} actions={actions} />
       <Recent items={recent} />
     </>
   );
 };
 
-const PhaseCard: React.FC<{ view: SignInView; onSkip: () => void }> = ({ view, onSkip }) => {
+const PhaseCard: React.FC<{ view: SignInView; actions: SiteActions }> = ({ view, actions }) => {
+  const siteControls = view.host ? (
+    <SiteControls
+      host={view.host}
+      canSaveRule={!!view.autoRule && view.phase === 'requesting'}
+      onSaveRule={actions.onSaveRule}
+      onDetectionChanged={actions.onDetectionChanged}
+    />
+  ) : null;
   switch (view.phase) {
     case 'requesting':
     case 'submitted':
@@ -163,7 +178,8 @@ const PhaseCard: React.FC<{ view: SignInView; onSkip: () => void }> = ({ view, o
           <Progress steps={progressSteps(view)} />
           {view.notice && <Notice $tone="warn">{view.notice}</Notice>}
           {view.phase === 'signed-in' && <Notice $tone="success">Signed in in {formatSeconds(view.signedInMs)}</Notice>}
-          {view.phase !== 'signed-in' && <Button onClick={onSkip}>Skip this page</Button>}
+          {view.phase !== 'signed-in' && <Button onClick={actions.onSkip}>Skip this page</Button>}
+          {siteControls}
         </Card>
       );
     case 'unavailable':
@@ -177,7 +193,16 @@ const PhaseCard: React.FC<{ view: SignInView; onSkip: () => void }> = ({ view, o
       return (
         <Card>
           {view.host && <Site host={view.host} detail="Asks for a password" />}
-          <Text>The sign-in form on this page could not be read. A page rule can describe it: open the extension popup and use Page Control.</Text>
+          <Text>The sign-in form on this page could not be read. A page rule can describe it: Tools, then Page control.</Text>
+          {siteControls}
+        </Card>
+      );
+    case 'detection-off':
+      return (
+        <Card>
+          {view.host && <Site host={view.host} detail="Asks for a sign-in" />}
+          <Text>Sign-in detection is off for this site, so nothing is sent to your phone.</Text>
+          {view.host && <TurnDetectionOn host={view.host} onDetectionChanged={actions.onDetectionChanged} />}
         </Card>
       );
     case 'skipped':
@@ -197,11 +222,12 @@ const PhaseCard: React.FC<{ view: SignInView; onSkip: () => void }> = ({ view, o
   }
 };
 
-const SettingsView: React.FC<{ settings: PanelSettings; onChange: (settings: PanelSettings) => void; onClose: () => void }> = ({
-  settings,
-  onChange,
-  onClose,
-}) => (
+const SettingsView: React.FC<{
+  settings: PanelSettings;
+  onChange: (settings: PanelSettings) => void;
+  onClose: () => void;
+  onSitesChanged: () => void;
+}> = ({ settings, onChange, onClose, onSitesChanged }) => (
   <>
     <Title>Settings</Title>
     <Field>
@@ -222,8 +248,9 @@ const SettingsView: React.FC<{ settings: PanelSettings; onChange: (settings: Pan
         onChange={event => onChange({ ...settings, disconnectOnLock: event.target.checked })}
       />
     </Field>
+    <SitesSection onChanged={onSitesChanged} />
     <SectionLabel>Page rules</SectionLabel>
-    <Text>Built-in rules and your own rules from Page Control are used first; other sign-in forms are found automatically.</Text>
+    <Text>Your own rules (Tools, then Page control) and the built-in ones are used first; other sign-in forms are found automatically.</Text>
     <Button onClick={onClose}>Done</Button>
   </>
 );

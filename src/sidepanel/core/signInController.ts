@@ -19,7 +19,18 @@ export type Phase =
   | 'requesting' // the phone shows the sign-in form
   | 'submitted' // the phone pressed the page's button; waiting for the outcome
   | 'signed-in'
-  | 'skipped';
+  | 'skipped'
+  | 'detection-off'; // the page asks for a sign-in, but the user turned detection off for the site
+
+export interface SiteSettings {
+  // Press the page's button as soon as every field is filled from the phone.
+  autoSubmit: boolean;
+  // Look for sign-in forms on this site at all.
+  detect: boolean;
+}
+
+// Pause between the last value and the automatic press, so the page can react to the input.
+export const AUTO_SUBMIT_DELAY_MS = 300;
 
 export interface SignInView {
   phase: Phase;
@@ -33,6 +44,8 @@ export interface SignInView {
   // The step the phone is asked for, and whether this sign-in has a username step first.
   step?: SignInStep;
   twoStep?: boolean;
+  // The auto-detected rule of the current request, which the user can save as a page rule.
+  autoRule?: PageRule;
 }
 
 export interface Ports {
@@ -47,6 +60,10 @@ export interface Ports {
   };
   rules: {
     find: (host: string) => PageRule | null;
+    save: (host: string, rule: PageRule) => void;
+  };
+  sites: {
+    get: (host: string) => SiteSettings;
   };
   // Other things the phone can start from its home screen (the panel's tools).
   tools: {
@@ -189,9 +206,39 @@ export class SignInController {
     }
     if (reply.pressed) {
       this.submitted(target);
-    } else if (!this.view.filledFieldIds.includes(fieldId)) {
+      return;
+    }
+    if (!this.view.filledFieldIds.includes(fieldId)) {
       this.update({ filledFieldIds: [...this.view.filledFieldIds, fieldId] });
     }
+    this.autoSubmitWhenComplete(target);
+  }
+
+  // Saves the auto-detected form of the current request as a page rule for the site.
+  saveAutoRule() {
+    const { autoRule, host } = this.view;
+    if (!autoRule || !host) {
+      return;
+    }
+    this.ports.rules.save(host, autoRule);
+    this.update({ ruleSource: 'rule', autoRule: undefined });
+  }
+
+  // The user turned detection on or off for a site: look at the active tab again.
+  async detectionChanged() {
+    if (!this.connected || this.suspended || this.activeTabId === null || !this.lastState) {
+      return;
+    }
+    const tabId = this.activeTabId;
+    const state = this.lastState;
+    const hadRequest = !!this.target;
+    this.clearTarget();
+    this.skippedPageId = null;
+    if (hadRequest) {
+      this.ports.phone.show(this.home());
+    }
+    this.update({ phase: 'ready', notice: undefined, filledFieldIds: [] });
+    await this.handleState(tabId, state);
   }
 
   skip() {
@@ -203,6 +250,22 @@ export class SignInController {
       this.ports.phone.show(this.home());
     }
     this.update({ phase: 'skipped', notice: undefined, filledFieldIds: [] });
+  }
+
+  private autoSubmitWhenComplete(target: Target) {
+    if (!this.ports.sites.get(target.host).autoSubmit) {
+      return;
+    }
+    const inputs = target.form.fields.filter(field => field.type !== 'button' && field.type !== 'info');
+    const button = target.form.fields.find(field => field.type === 'button');
+    if (!button || !inputs.every(field => this.view.filledFieldIds.includes(field.id))) {
+      return;
+    }
+    this.ports.setTimer(() => {
+      if (this.target === target && this.view.phase === 'requesting') {
+        this.phoneInput(button.id, null);
+      }
+    }, AUTO_SUBMIT_DELAY_MS);
   }
 
   private home() {
@@ -253,6 +316,10 @@ export class SignInController {
       }
       return;
     }
+    if (!this.ports.sites.get(state.host).detect) {
+      this.update({ phase: 'detection-off', host: state.host, notice: undefined, filledFieldIds: [] });
+      return;
+    }
     if (state.pageId === this.skippedPageId) {
       return;
     }
@@ -279,7 +346,8 @@ export class SignInController {
     const startedAt = continuedFrom ? continuedFrom.startedAt : this.ports.now();
     this.target = { tabId, pageId: reply.pageId, host: reply.host, form: reply.form, step, startedAt };
     this.ports.phone.show(signInScreen(reply.form, reply.host, notice || stepNotice));
-    this.update({ phase: 'requesting', host: reply.host, ruleSource: reply.ruleSource, notice, step, twoStep, filledFieldIds: [] });
+    const autoRule = reply.ruleSource === 'auto' ? reply.rule : undefined;
+    this.update({ phase: 'requesting', host: reply.host, ruleSource: reply.ruleSource, notice, step, twoStep, autoRule, filledFieldIds: [] });
   }
 
   private submitted(target: Target) {

@@ -42,6 +42,8 @@ export interface DetectReply {
   form?: MobileForm;
   ruleSource?: RuleSource;
   step?: SignInStep;
+  // The auto-detected rule (selectors and labels only), when ruleSource is "auto".
+  rule?: PageRule;
 }
 
 export interface FillRequest {

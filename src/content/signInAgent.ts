@@ -5,10 +5,24 @@ import { buildPageForm, setFieldValue, toMobileForm } from './formBuilder';
 import type { PageForm } from './formBuilder';
 import { SIGN_IN_MESSAGE } from '../shared/signInMessages';
 import type { DetectReply, DetectRequest, FillReply, FillRequest, PageState } from '../shared/signInMessages';
+import type { PageRule } from '../shared/pageRule';
 
 const CHANGE_DEBOUNCE_MS = 400;
 
 const randomId = () => Math.random().toString(36).slice(2, 12);
+
+// A rule can have one form per sign-in step. Hidden fields of the other step often stay in
+// the page, so try the forms for the step the page shows first: with a visible password
+// field, forms that have a secret field.
+const preferStep = (rule: PageRule | null, passwordVisible: boolean): PageRule | null => {
+  if (!rule || !Array.isArray(rule.forms)) {
+    return rule;
+  }
+  const hasSecret = (form: PageRule['forms'][number]) => form.fields.some(field => field.type === 'secret');
+  const first = rule.forms.filter(form => hasSecret(form) === passwordVisible);
+  const rest = rule.forms.filter(form => hasSecret(form) !== passwordVisible);
+  return { ...rule, forms: [...first, ...rest] };
+};
 
 export interface SignInAgentOptions {
   doc?: Document;
@@ -50,21 +64,26 @@ export const createSignInAgent = ({ doc = document, send = sendToExtension }: Si
   const detect = ({ rule }: DetectRequest): DetectReply => {
     const host = doc.location.host;
     let ruleSource: DetectReply['ruleSource'] = 'rule';
-    let step: DetectReply['step'] = hasVisiblePasswordField(doc) ? 'password' : 'username';
-    pageForm = buildPageForm(rule, doc);
+    let autoRule: PageRule | null = null;
+    const passwordVisible = hasVisiblePasswordField(doc);
+    let step: DetectReply['step'] = passwordVisible ? 'password' : 'username';
+    pageForm = buildPageForm(preferStep(rule, passwordVisible), doc);
     if (!pageForm) {
       ruleSource = 'auto';
-      pageForm = buildPageForm(detectSignInRule(doc), doc);
+      autoRule = detectSignInRule(doc);
+      pageForm = buildPageForm(autoRule, doc);
       step = 'password';
     }
     if (!pageForm) {
-      pageForm = buildPageForm(detectUsernameStepRule(doc), doc);
+      autoRule = detectUsernameStepRule(doc);
+      pageForm = buildPageForm(autoRule, doc);
       step = 'username';
     }
     if (!pageForm) {
       return { status: 'failed', pageId, host };
     }
-    return { status: 'success', pageId, host, form: toMobileForm(pageForm), ruleSource, step };
+    // An auto-detected rule goes back too, so the panel can offer to save it as a page rule.
+    return { status: 'success', pageId, host, form: toMobileForm(pageForm), ruleSource, step, ...(ruleSource === 'auto' && autoRule ? { rule: autoRule } : {}) };
   };
 
   const fill = ({ fieldId, value, expectedHost }: FillRequest): FillReply => {

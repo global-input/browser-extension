@@ -185,3 +185,28 @@ describe('two-step sign-in detection', () => {
     vi.useRealTimers();
   });
 });
+
+describe('saved rules with one form per step', () => {
+  it('uses the password form on the password page even though the username field is still in the page', () => {
+    document.body.innerHTML = '<form><input id="u" type="email" hidden><input id="p" type="password"><button>Sign in</button></form>';
+    const agent = createSignInAgent({ send: vi.fn() });
+    const reply = agent.detect({
+      rule: {
+        forms: [
+          { title: 'step 1', fields: [{ id: 'username', type: 'text', selector: '#u' }] },
+          { title: 'step 2', fields: [{ id: 'password', type: 'secret', selector: '#p' }] },
+        ],
+      },
+    });
+    expect(reply).toMatchObject({ status: 'success', ruleSource: 'rule', step: 'password' });
+    expect(reply.form!.title).toBe('step 2');
+    expect(reply.rule).toBeUndefined();
+  });
+
+  it('returns the auto-detected rule so the panel can save it', () => {
+    const agent = createSignInAgent({ send: vi.fn() });
+    const reply = agent.detect({ rule: null });
+    expect(reply.ruleSource).toBe('auto');
+    expect(reply.rule!.forms[0].fields.map(field => field.id)).toEqual(['username', 'password', 'login']);
+  });
+});

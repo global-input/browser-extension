@@ -4,6 +4,7 @@ import { SignInController } from './core/signInController';
 import type { Ports, SignInView } from './core/signInController';
 import { chromePagePort, watchActiveTab, watchPageStates } from './adapters/chromePage';
 import { pageRulesPort } from './adapters/rules';
+import { siteSettingsStore } from './adapters/siteSettings';
 import type { usePhoneConnection } from './adapters/usePhoneConnection';
 
 type Connection = ReturnType<typeof usePhoneConnection>;
@@ -23,6 +24,7 @@ export const useSignIn = (connection: Connection, tools: Ports['tools']) => {
       },
       page: chromePagePort,
       rules: pageRulesPort,
+      sites: { get: host => siteSettingsStore.get(host) },
       tools: {
         list: () => toolsRef.current.list(),
         open: toolId => toolsRef.current.open(toolId),
@@ -62,5 +64,7 @@ export const useSignIn = (connection: Connection, tools: Ports['tools']) => {
     skip: () => controller.skip(),
     suspend: () => controller.suspend(),
     resume: () => controller.resume(),
+    saveAutoRule: () => controller.saveAutoRule(),
+    detectionChanged: () => controller.detectionChanged(),
   };
 };

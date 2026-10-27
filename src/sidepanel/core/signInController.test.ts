@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { PASSWORD_STEP_NOTICE, REJECTED_NOTICE, SPA_FAILURE_MS, SignInController, USERNAME_STEP_NOTICE } from './signInController';
+import { AUTO_SUBMIT_DELAY_MS, PASSWORD_STEP_NOTICE, REJECTED_NOTICE, SPA_FAILURE_MS, SignInController, USERNAME_STEP_NOTICE } from './signInController';
 import type { Ports, SignInView } from './signInController';
 import { PHONE_FIELD } from './phoneForms';
 import type { PageState } from '../../shared/signInMessages';
@@ -14,6 +14,8 @@ const FORM = {
   ],
 };
 
+const AUTO_RULE = { forms: [{ title: 'auto', fields: [{ id: 'password', type: 'secret', selector: '#pw' }] }] };
+
 const setup = () => {
   let now = 1000;
   const timers: { callback: () => void; ms: number; cancelled: boolean }[] = [];
@@ -25,12 +27,13 @@ const setup = () => {
       detect: vi.fn(async (tabId: number) => {
         const state = page[tabId];
         return state
-          ? { status: 'success' as const, pageId: state.pageId, host: state.host, form: FORM, ruleSource: 'auto' as const, step: state.step ?? ('password' as const) }
+          ? { status: 'success' as const, pageId: state.pageId, host: state.host, form: FORM, ruleSource: 'auto' as const, step: state.step ?? ('password' as const), rule: AUTO_RULE }
           : null;
       }),
       fill: vi.fn(async (_tabId: number, fieldId: string) => ({ status: 'success' as const, pressed: fieldId === 'login' })),
     },
-    rules: { find: vi.fn(() => null) },
+    rules: { find: vi.fn(() => null), save: vi.fn() },
+    sites: { get: vi.fn((_host: string) => ({ autoSubmit: false, detect: true })) },
     tools: { list: () => [{ id: 'encryption', label: 'Encrypt' }], open: vi.fn() },
     now: () => now,
     setTimer: (callback: () => void, ms: number) => {
@@ -340,6 +343,72 @@ describe('SignInController', () => {
       await t.controller.activeTabChanged(1);
       expect(t.view().twoStep).toBe(false);
       expect(notices(t)).toEqual([]);
+    });
+  });
+
+  describe('per-site settings', () => {
+    it('does not ask the phone on a site with detection turned off, and asks once it is turned on', async () => {
+      const t = setup();
+      t.ports.sites.get.mockReturnValue({ autoSubmit: false, detect: false });
+      t.page[1] = signInPage();
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      expect(t.view()).toMatchObject({ phase: 'detection-off', host: 'tools.example.com' });
+      expect(t.ports.page.detect).not.toHaveBeenCalled();
+
+      t.ports.sites.get.mockReturnValue({ autoSubmit: false, detect: true });
+      await t.controller.detectionChanged();
+      expect(t.view().phase).toBe('requesting');
+    });
+
+    it('turning detection off during a request gives the phone its home screen back', async () => {
+      const t = setup();
+      t.page[1] = signInPage();
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      t.ports.sites.get.mockReturnValue({ autoSubmit: false, detect: false });
+      await t.controller.detectionChanged();
+      expect(t.view().phase).toBe('detection-off');
+      expect(t.lastScreen().id).toBe('gi-panel-home');
+      await t.controller.phoneInput('password', 'secret');
+      expect(t.ports.page.fill).not.toHaveBeenCalled();
+    });
+
+    it('presses the page button by itself once every field is filled, when auto-submit is on', async () => {
+      const t = setup();
+      t.ports.sites.get.mockReturnValue({ autoSubmit: true, detect: true });
+      t.page[1] = signInPage();
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      await t.controller.phoneInput('username', 'you@company.com');
+      expect(t.timers.filter(timer => timer.ms === AUTO_SUBMIT_DELAY_MS)).toHaveLength(0);
+      await t.controller.phoneInput('password', 'secret');
+      const autoTimer = t.timers.find(timer => timer.ms === AUTO_SUBMIT_DELAY_MS)!;
+      autoTimer.callback();
+      await vi.waitFor(() => expect(t.view().phase).toBe('submitted'));
+      expect(t.ports.page.fill).toHaveBeenLastCalledWith(1, 'login', null, 'tools.example.com');
+    });
+
+    it('waits for the phone button when auto-submit is off', async () => {
+      const t = setup();
+      t.page[1] = signInPage();
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      await t.controller.phoneInput('username', 'you@company.com');
+      await t.controller.phoneInput('password', 'secret');
+      expect(t.timers).toHaveLength(0);
+      expect(t.view().phase).toBe('requesting');
+    });
+
+    it('saves the auto-detected form as a page rule for the site', async () => {
+      const t = setup();
+      t.page[1] = signInPage();
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      expect(t.view().autoRule).toEqual(AUTO_RULE);
+      t.controller.saveAutoRule();
+      expect(t.ports.rules.save).toHaveBeenCalledWith('tools.example.com', AUTO_RULE);
+      expect(t.view()).toMatchObject({ ruleSource: 'rule', autoRule: undefined });
     });
   });
 });
