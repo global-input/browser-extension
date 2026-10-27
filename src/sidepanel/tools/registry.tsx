@@ -1,15 +1,13 @@
-// The panel's tools. Restyled tools live under ./<tool>/ and reuse the popup tool's phone screens;
-// the others are the popup's features, rendered unchanged. They call useMobile themselves;
+// The panel's tools. Each lives under ./<tool>/ and reuses the popup tool's phone screens, so the
+// phone sees no change. They call useMobile themselves;
 // with the phone connected, that reuses the panel's connection (global-input-react sends the
 // tool's screen to the phone instead of starting a new session).
 // To add or remove a tool, change this list.
-import React, { useState } from 'react';
-import { PageControl } from '../../app/page-control';
-import { EditRule } from '../../app/edit-rule';
-import LoadFromPreset from '../../app/load-from-preset';
+import React from 'react';
 import { FormTransferTool } from './formTransfer/FormTransferTool';
 import { PhoneCryptoTool } from './phoneCrypto/PhoneCryptoTool';
 import { DECRYPT, ENCRYPT } from './phoneCrypto/kinds';
+import { PageControlTool } from './pageControl/PageControlTool';
 
 export interface ToolProps {
   // Host of the active tab when the tool was opened.
@@ -25,19 +23,6 @@ export interface ToolDefinition {
   description: string;
   Component: React.FC<ToolProps>;
 }
-
-const PageControlTool: React.FC<ToolProps> = ({ domain, exit }) => {
-  const [page, setPage] = useState<{ name: 'control' | 'edit' | 'preset'; content?: string | null }>({ name: 'control' });
-  const editRule = (content?: string) => setPage({ name: 'edit', content });
-  switch (page.name) {
-    case 'edit':
-      return <EditRule back={exit} domain={domain} loadFromPreset={() => setPage({ name: 'preset' })} contentToEdit={page.content} />;
-    case 'preset':
-      return <LoadFromPreset editRule={editRule} domain={domain} />;
-    default:
-      return <PageControl back={exit} domain={domain} editRule={editRule} />;
-  }
-};
 
 export const TOOLS: ToolDefinition[] = [
   {

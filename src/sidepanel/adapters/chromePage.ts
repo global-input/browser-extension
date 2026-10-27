@@ -68,3 +68,11 @@ export const activeTabId = async (): Promise<number | null> => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   return tab && tab.id !== undefined ? tab.id : null;
 };
+
+// The host of the active tab, as its content script reports it; null when the tab has no
+// content script that answers (see sendToTab).
+export const activeTabHost = async (): Promise<string | null> => {
+  const tabId = await activeTabId();
+  const state = tabId === null ? null : await chromePagePort.queryState(tabId);
+  return state ? state.host : null;
+};

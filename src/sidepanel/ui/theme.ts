@@ -23,6 +23,7 @@ export const color = {
 export const font = {
   ui: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
   brand: "Georgia, 'Times New Roman', serif",
+  mono: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
 };
 
 export const radius = { card: '12px', control: '8px', pill: '13px' };
