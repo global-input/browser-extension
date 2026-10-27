@@ -9,6 +9,7 @@ import {MainPage} from './MainPage';
 import {PageControl} from './page-control';
 import {EditRule} from './edit-rule';
 import LoadFromPreset from './load-from-preset';
+import {OpenSidePanel} from './OpenSidePanel';
 
 
 enum PAGE_NAME {
@@ -76,8 +77,11 @@ const App = () => {
         case PAGE_NAME.DECRYPTION:
             return (<MobileDecryption back={mainPage} domain={domain} />);
         case PAGE_NAME.MAIN_PAGE:
-            return (<MainPage domain={domain} transferFormData={transferFormData} encryption={encryption}
-                decryption={decryption} pageControl={pageControl}/>);
+            return (<>
+                <OpenSidePanel/>
+                <MainPage domain={domain} transferFormData={transferFormData} encryption={encryption}
+                decryption={decryption} pageControl={pageControl}/>
+            </>);
         case PAGE_NAME.PAGE_CONTROL:
             return (<PageControl back={mainPage} domain={domain} editRule={editRule}/>);
         case PAGE_NAME.EDIT_RULE:

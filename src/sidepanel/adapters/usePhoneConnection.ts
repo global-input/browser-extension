@@ -1,0 +1,28 @@
+// The one Global Input connection of the panel. The session stays the same while the panel
+// is open: when the phone drops (app in the background, network change), global-input-react
+// reconnects with the same session, so the phone can rejoin from the app's history without
+// a new scan. disconnect() starts a new session, so the old one can no longer be joined.
+import { useMemo } from 'react';
+import { useMobile } from 'global-input-mobile';
+import type { InitData } from 'global-input-react';
+import { homeScreen } from '../core/phoneForms';
+import type { PhoneScreen } from '../core/phoneForms';
+
+export type ConnectionStatus = 'connecting' | 'waiting' | 'connected' | 'error';
+
+export const usePhoneConnection = () => {
+  const initData = useMemo(() => homeScreen() as unknown as InitData, []);
+  const mobile = useMobile(initData, true);
+  const status: ConnectionStatus = mobile.isConnected ? 'connected' : mobile.isError ? 'error' : mobile.isReady ? 'waiting' : 'connecting';
+  return {
+    mobile,
+    status,
+    // The phone was connected and dropped; it can rejoin from the app's history.
+    canRejoin: !!mobile.isDisconnected && status === 'waiting',
+    errorMessage: mobile.errorMessage,
+    show: (screen: PhoneScreen) => mobile.sendInitData(screen as unknown as InitData),
+    onInput: (listener: (fieldId: string, value: unknown) => void) =>
+      mobile.setOnchange(({ field }) => listener(field.id as string, field.value)),
+    disconnect: () => mobile.restart(),
+  };
+};

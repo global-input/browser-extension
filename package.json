@@ -3,38 +3,27 @@
   "version": "4.2.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "bootstrap": "^4.5.3",
     "global-input-react": "^4.6.9",
-    "install": "^0.13.0",
-    "npm": "^6.14.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-scripts": "^5.0.1",
-    "styled-components": "^6.1.11",
-    "typescript": "^3.9.10"
+    "styled-components": "^6.1.11"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "env INLINE_RUNTIME_CHUNK=false react-scripts build",
-    "package": "rm -rf build && npm run build && cd build && zip -r ./globalinputapp.zip .",
-    "eject": "react-scripts eject"
+    "dev": "vite build --watch --mode development",
+    "build": "vite build && vite build --config vite.content.config.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "package": "rm -rf build && npm run build && cd build && zip -r ./globalinputapp.zip ."
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "devDependencies": {
+    "@types/chrome": "^0.3.6",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.5",
+    "vitest": "^3.2.7"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "type": "module"
 }

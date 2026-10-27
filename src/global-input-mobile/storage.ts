@@ -1,11 +1,11 @@
-const URL = "iterative.globalInputApp.url";
-const getURL = () => localStorage.getItem(URL);
+const URL_KEY = "iterative.globalInputApp.url";
+const getURL = () => localStorage.getItem(URL_KEY);
 const setURL = (url: string | null | undefined) => {
   url = url?.trim();
   if (url) {
-    localStorage.setItem(URL, url);
+    localStorage.setItem(URL_KEY, url);
   } else {
-    localStorage.removeItem(URL);
+    localStorage.removeItem(URL_KEY);
   }
 };
 

@@ -9,10 +9,13 @@
   },
   "version": "4.2.0",
   "manifest_version": 3,
+  "minimum_chrome_version": "116",
   "description": "Use your mobile to operate on web pages in your computer browser to login, subscribe, encrypt, or control any element in the page.",
   "homepage_url": "https://globalinput.co.uk/",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "sidePanel",
+    "idle"
   ],
   "content_scripts": [
     {
@@ -33,6 +36,9 @@
       "16": "images/globalInput16.png"
     },
     "default_popup": "index.html"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
   },
   "content_security_policy": {}
 }
