@@ -210,3 +210,15 @@ describe('saved rules with one form per step', () => {
     expect(reply.rule!.forms[0].fields.map(field => field.id)).toEqual(['username', 'password', 'login']);
   });
 });
+
+describe('send text from the phone', () => {
+  it('fills the focused field only when the page is on the expected host', () => {
+    const agent = createSignInAgent({ send: vi.fn() });
+    const email = document.getElementById('email') as HTMLInputElement;
+    email.focus();
+    expect(agent.fillFocused({ value: 'abc', expectedHost: 'evil.example' })).toEqual({ status: 'error', reason: 'host-mismatch' });
+    expect(email.value).toBe('');
+    expect(agent.fillFocused({ value: 'abc', expectedHost: window.location.host })).toEqual({ status: 'success', filled: 1 });
+    expect(email.value).toBe('abc');
+  });
+});

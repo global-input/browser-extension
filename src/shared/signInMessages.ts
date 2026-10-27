@@ -8,6 +8,8 @@ export const SIGN_IN_MESSAGE = {
   DETECT: 'signin/detect',
   // panel -> page: write one value, or press a button, in the detected form.
   FILL: 'signin/fill',
+  // panel -> page: write text from the phone into the element that has focus.
+  FILL_FOCUSED: 'signin/fill-focused',
   // panel -> page: report the page state now.
   QUERY_STATE: 'signin/query-state',
   // page -> panel: the page loaded, or its sign-in form appeared or went away.
@@ -57,4 +59,16 @@ export interface FillReply {
   reason?: 'host-mismatch' | 'no-form' | 'no-field';
   // True when the field was a button (the form was submitted).
   pressed?: boolean;
+}
+
+export interface FillFocusedRequest {
+  value: string;
+  expectedHost: string;
+}
+
+export interface FillFocusedReply {
+  status: 'success' | 'error';
+  reason?: 'host-mismatch' | 'no-focus';
+  // How many elements were written to (more than one for a code split over boxes).
+  filled?: number;
 }

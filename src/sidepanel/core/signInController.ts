@@ -3,8 +3,8 @@
 // It has no Chrome or React code: everything outside comes in through the ports, so the flow
 // can be tested with fakes and the UI or transport can change without touching it.
 import type { MobileForm, PageRule } from '../../shared/pageRule';
-import type { DetectReply, FillReply, PageState, RuleSource, SignInStep } from '../../shared/signInMessages';
-import { PHONE_FIELD, homeScreen, signInScreen, signedInScreen, toolIdFromField } from './phoneForms';
+import type { DetectReply, FillFocusedReply, FillReply, PageState, RuleSource, SignInStep } from '../../shared/signInMessages';
+import { PHONE_FIELD, homeScreen, signInScreen, signedInScreen, textScreen, toolIdFromField } from './phoneForms';
 import type { PhoneScreen, ToolEntry } from './phoneForms';
 
 // A submitted single-page app that still shows its form after this long did not accept it.
@@ -46,6 +46,9 @@ export interface SignInView {
   twoStep?: boolean;
   // The auto-detected rule of the current request, which the user can save as a page rule.
   autoRule?: PageRule;
+  // The phone shows the Send text screen; and the outcome of the last text sent (never the text).
+  textMode?: boolean;
+  textResult?: { host: string; ok: boolean; message: string };
 }
 
 export interface Ports {
@@ -57,6 +60,7 @@ export interface Ports {
     queryState: (tabId: number) => Promise<PageState | null>;
     detect: (tabId: number, rule: PageRule | null) => Promise<DetectReply | null>;
     fill: (tabId: number, fieldId: string, value: unknown, expectedHost: string) => Promise<FillReply | null>;
+    fillFocused: (tabId: number, value: string, expectedHost: string) => Promise<FillFocusedReply | null>;
   };
   rules: {
     find: (host: string) => PageRule | null;
@@ -97,6 +101,8 @@ export class SignInController {
   private cancelTimer: (() => void) | null = null;
   // While suspended (a tool owns the phone) page reports are only recorded.
   private suspended = false;
+  // The text typed on the phone's Send text screen, kept only until it is sent.
+  private pendingText = '';
 
   constructor(private ports: Ports, private onChange: (view: SignInView) => void) {}
 
@@ -118,6 +124,7 @@ export class SignInController {
 
   phoneDisconnected() {
     this.connected = false;
+    this.leaveTextMode();
     this.clearTarget();
     this.update({ phase: 'not-connected', host: undefined, notice: undefined, filledFieldIds: [] });
   }
@@ -125,6 +132,7 @@ export class SignInController {
   // A tool takes over the phone: stop asking for sign-ins until resume().
   suspend() {
     this.suspended = true;
+    this.leaveTextMode();
     this.clearTarget();
     this.update({ phase: this.connected ? 'ready' : 'not-connected', notice: undefined, filledFieldIds: [] });
   }
@@ -183,6 +191,23 @@ export class SignInController {
         return;
       case PHONE_FIELD.DISCONNECT:
         this.ports.phone.disconnect();
+        return;
+      case PHONE_FIELD.SEND_TEXT:
+        this.enterTextMode();
+        return;
+      case PHONE_FIELD.TEXT:
+        this.pendingText = typeof value === 'string' ? value : String(value ?? '');
+        return;
+      case PHONE_FIELD.TEXT_SEND:
+        await this.sendText();
+        return;
+      case PHONE_FIELD.TEXT_BACK:
+        this.leaveTextMode();
+        this.ports.phone.show(this.home());
+        this.update({ phase: 'ready', notice: undefined });
+        if (this.activeTabId !== null) {
+          await this.refresh(this.activeTabId);
+        }
         return;
       default:
     }
@@ -252,6 +277,45 @@ export class SignInController {
     this.update({ phase: 'skipped', notice: undefined, filledFieldIds: [] });
   }
 
+  private enterTextMode() {
+    this.clearTarget();
+    this.pendingText = '';
+    const host = this.lastState ? this.lastState.host : undefined;
+    this.ports.phone.show(textScreen(host));
+    this.update({ textMode: true, textResult: undefined, phase: 'ready', notice: undefined, filledFieldIds: [] });
+  }
+
+  private leaveTextMode() {
+    this.pendingText = '';
+    if (this.view.textMode) {
+      this.update({ textMode: false });
+    }
+  }
+
+  private async sendText() {
+    const text = this.pendingText;
+    const state = this.lastState;
+    const tabId = this.activeTabId;
+    if (!text) {
+      this.ports.phone.show(textScreen(state ? state.host : undefined, 'Type the text first.'));
+      return;
+    }
+    if (!state || tabId === null) {
+      this.ports.phone.show(textScreen(undefined, 'This tab cannot be used. Open a web page and click into a field.'));
+      return;
+    }
+    const reply = await this.ports.page.fillFocused(tabId, text, state.host);
+    this.pendingText = '';
+    const ok = !!reply && reply.status === 'success';
+    const message = ok
+      ? `Sent to ${state.host}.`
+      : reply && reply.reason === 'host-mismatch'
+        ? 'The page changed to another site, so nothing was sent.'
+        : 'Click into a field on the page first, then send again.';
+    this.ports.phone.show(textScreen(state.host, message));
+    this.update({ textResult: { host: state.host, ok, message } });
+  }
+
   private autoSubmitWhenComplete(target: Target) {
     if (!this.ports.sites.get(target.host).autoSubmit) {
       return;
@@ -288,8 +352,17 @@ export class SignInController {
   }
 
   private async handleState(tabId: number, state: PageState) {
+    const previousHost = this.lastState ? this.lastState.host : undefined;
     this.lastState = state;
     if (!this.connected) {
+      this.update({ host: state.host });
+      return;
+    }
+    if (this.view.textMode) {
+      // The Send text screen stays on the phone; it names the site the text will go to.
+      if (state.host !== previousHost) {
+        this.ports.phone.show(textScreen(state.host));
+      }
       this.update({ host: state.host });
       return;
     }

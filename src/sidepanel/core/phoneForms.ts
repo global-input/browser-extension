@@ -8,6 +8,10 @@ export const PHONE_FIELD = {
   SKIP: 'gi-skip',
   DONE: 'gi-done',
   DISCONNECT: 'gi-disconnect',
+  SEND_TEXT: 'gi-send-text',
+  TEXT: 'gi-text',
+  TEXT_SEND: 'gi-text-send',
+  TEXT_BACK: 'gi-text-back',
 } as const;
 
 // Tool buttons on the home screen are "gi-tool-<tool id>".
@@ -39,6 +43,7 @@ export const homeScreen = (tools: ToolEntry[] = []): PhoneScreen => ({
     title: 'Connected to your browser',
     fields: [
       info('Waiting for a sign-in page. Open a site on your computer.'),
+      button(PHONE_FIELD.SEND_TEXT, 'Send text'),
       ...tools.map(tool => button(toolFieldId(tool.id), tool.label)),
       button(PHONE_FIELD.DISCONNECT, 'Disconnect'),
     ],
@@ -65,6 +70,20 @@ export const signedInScreen = (host: string): PhoneScreen => ({
   id: 'gi-panel-signed-in',
   form: {
     title: 'Signed in',
-    fields: [info(`Signed in to ${host}`), button(PHONE_FIELD.DONE, 'Done')],
+    fields: [info(`Signed in to ${host}`), button(PHONE_FIELD.SEND_TEXT, 'Send text'), button(PHONE_FIELD.DONE, 'Done')],
+  },
+});
+
+// Text (a one-time code, for example) for the field that has focus on the computer.
+export const textScreen = (host: string | undefined, notice?: string): PhoneScreen => ({
+  id: 'gi-panel-text',
+  form: {
+    title: 'Send to the focused field',
+    fields: [
+      info(notice || (host ? `Goes into the field that has focus on ${host}.` : 'Goes into the field that has focus in the browser.')),
+      { id: PHONE_FIELD.TEXT, type: 'text', label: 'Text or code', value: '' },
+      button(PHONE_FIELD.TEXT_SEND, 'Send'),
+      button(PHONE_FIELD.TEXT_BACK, 'Back'),
+    ],
   },
 });

@@ -4,7 +4,7 @@
 // and origin.
 import type { PageRule } from '../../shared/pageRule';
 import { SIGN_IN_MESSAGE } from '../../shared/signInMessages';
-import type { DetectReply, FillReply, PageState } from '../../shared/signInMessages';
+import type { DetectReply, FillFocusedReply, FillReply, PageState } from '../../shared/signInMessages';
 import type { Ports } from '../core/signInController';
 
 const sendToTab = async <T>(tabId: number, messageType: string, content?: unknown): Promise<T | null> => {
@@ -22,6 +22,7 @@ export const chromePagePort: Ports['page'] = {
   queryState: tabId => sendToTab<PageState>(tabId, SIGN_IN_MESSAGE.QUERY_STATE),
   detect: (tabId, rule: PageRule | null) => sendToTab<DetectReply>(tabId, SIGN_IN_MESSAGE.DETECT, { rule }),
   fill: (tabId, fieldId, value, expectedHost) => sendToTab<FillReply>(tabId, SIGN_IN_MESSAGE.FILL, { fieldId, value, expectedHost }),
+  fillFocused: (tabId, value, expectedHost) => sendToTab<FillFocusedReply>(tabId, SIGN_IN_MESSAGE.FILL_FOCUSED, { value, expectedHost }),
 };
 
 // Calls back with the active tab of this window now and whenever it changes.

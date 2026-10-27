@@ -2,9 +2,10 @@
 // form's fields, and fills them. Values are written straight into the page and never kept.
 import { detectSignInRule, detectUsernameStepRule, hasVisiblePasswordField, signInStepOf } from './autoDetect';
 import { buildPageForm, setFieldValue, toMobileForm } from './formBuilder';
+import { fillFocusedElement } from './focusedField';
 import type { PageForm } from './formBuilder';
 import { SIGN_IN_MESSAGE } from '../shared/signInMessages';
-import type { DetectReply, DetectRequest, FillReply, FillRequest, PageState } from '../shared/signInMessages';
+import type { DetectReply, DetectRequest, FillFocusedReply, FillFocusedRequest, FillReply, FillRequest, PageState } from '../shared/signInMessages';
 import type { PageRule } from '../shared/pageRule';
 
 const CHANGE_DEBOUNCE_MS = 400;
@@ -100,6 +101,13 @@ export const createSignInAgent = ({ doc = document, send = sendToExtension }: Si
     return { status: 'success', pressed: field.type === 'button' };
   };
 
+  const fillFocused = ({ value, expectedHost }: FillFocusedRequest): FillFocusedReply => {
+    if (doc.location.host !== expectedHost) {
+      return { status: 'error', reason: 'host-mismatch' };
+    }
+    return fillFocusedElement(doc, String(value));
+  };
+
   const handle = (message: { messageType: string; content?: any }, reply: (response: object) => void) => {
     switch (message.messageType) {
       case SIGN_IN_MESSAGE.DETECT:
@@ -107,6 +115,9 @@ export const createSignInAgent = ({ doc = document, send = sendToExtension }: Si
         break;
       case SIGN_IN_MESSAGE.FILL:
         reply(fill(message.content));
+        break;
+      case SIGN_IN_MESSAGE.FILL_FOCUSED:
+        reply(fillFocused(message.content));
         break;
       case SIGN_IN_MESSAGE.QUERY_STATE:
         reply(state());
@@ -132,7 +143,7 @@ export const createSignInAgent = ({ doc = document, send = sendToExtension }: Si
     });
   };
 
-  return { start, handle, detect, fill, state };
+  return { start, handle, detect, fill, fillFocused, state };
 };
 
 // No side panel open means nobody is listening; that is normal.

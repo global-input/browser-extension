@@ -168,6 +168,15 @@ const PhaseCard: React.FC<{ view: SignInView; actions: SiteActions }> = ({ view,
       onDetectionChanged={actions.onDetectionChanged}
     />
   ) : null;
+  if (view.textMode) {
+    return (
+      <Card aria-live="polite">
+        <Title as="h2">Send text from your phone</Title>
+        <Text>Click into the field on the page{view.host ? ` (${view.host})` : ''}, type the text or code on your phone, then tap Send.</Text>
+        {view.textResult && <Notice $tone={view.textResult.ok ? 'success' : 'warn'}>{view.textResult.message}</Notice>}
+      </Card>
+    );
+  }
   switch (view.phase) {
     case 'requesting':
     case 'submitted':

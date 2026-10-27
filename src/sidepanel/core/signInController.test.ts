@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { AUTO_SUBMIT_DELAY_MS, PASSWORD_STEP_NOTICE, REJECTED_NOTICE, SPA_FAILURE_MS, SignInController, USERNAME_STEP_NOTICE } from './signInController';
 import type { Ports, SignInView } from './signInController';
 import { PHONE_FIELD } from './phoneForms';
-import type { PageState } from '../../shared/signInMessages';
+import type { FillFocusedReply, PageState } from '../../shared/signInMessages';
 
 const FORM = {
   id: '###username###@tools.example.com',
@@ -31,6 +31,7 @@ const setup = () => {
           : null;
       }),
       fill: vi.fn(async (_tabId: number, fieldId: string) => ({ status: 'success' as const, pressed: fieldId === 'login' })),
+      fillFocused: vi.fn(async (_tabId: number, _value: string, _host: string) => ({ status: 'success' as const, filled: 1 }) as FillFocusedReply),
     },
     rules: { find: vi.fn(() => null), save: vi.fn() },
     sites: { get: vi.fn((_host: string) => ({ autoSubmit: false, detect: true })) },
@@ -232,7 +233,7 @@ describe('SignInController', () => {
     const t = setup();
     t.controller.phoneConnected();
     const ids = t.lastScreen().form.fields.map((f: { id: string }) => f.id);
-    expect(ids).toEqual([PHONE_FIELD.STATUS, 'gi-tool-encryption', PHONE_FIELD.DISCONNECT]);
+    expect(ids).toEqual([PHONE_FIELD.STATUS, PHONE_FIELD.SEND_TEXT, 'gi-tool-encryption', PHONE_FIELD.DISCONNECT]);
     await t.controller.phoneInput('gi-tool-encryption', null);
     expect(t.ports.tools.open).toHaveBeenCalledWith('encryption');
   });
@@ -409,6 +410,71 @@ describe('SignInController', () => {
       t.controller.saveAutoRule();
       expect(t.ports.rules.save).toHaveBeenCalledWith('tools.example.com', AUTO_RULE);
       expect(t.view()).toMatchObject({ ruleSource: 'rule', autoRule: undefined });
+    });
+  });
+
+  describe('send text to the focused field', () => {
+    const info = (t: ReturnType<typeof setup>) => t.lastScreen().form.fields.find((f: { type: string }) => f.type === 'info').value;
+
+    it('sends the typed text to the active tab with its host, then forgets it', async () => {
+      const t = setup();
+      t.page[1] = dashboard();
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      await t.controller.phoneInput(PHONE_FIELD.SEND_TEXT, null);
+      expect(t.lastScreen().id).toBe('gi-panel-text');
+      expect(t.view().textMode).toBe(true);
+
+      await t.controller.phoneInput(PHONE_FIELD.TEXT, '482913');
+      await t.controller.phoneInput(PHONE_FIELD.TEXT_SEND, null);
+      expect(t.ports.page.fillFocused).toHaveBeenCalledWith(1, '482913', 'tools.example.com');
+      expect(info(t)).toBe('Sent to tools.example.com.');
+      expect(t.view().textResult).toEqual({ host: 'tools.example.com', ok: true, message: 'Sent to tools.example.com.' });
+      expect(JSON.stringify(t.view())).not.toContain('482913');
+
+      await t.controller.phoneInput(PHONE_FIELD.TEXT_SEND, null);
+      expect(t.ports.page.fillFocused).toHaveBeenCalledTimes(1);
+      expect(info(t)).toBe('Type the text first.');
+    });
+
+    it('tells the phone when nothing on the page has focus', async () => {
+      const t = setup();
+      t.page[1] = dashboard();
+      t.ports.page.fillFocused.mockResolvedValueOnce({ status: 'error', reason: 'no-focus' });
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      await t.controller.phoneInput(PHONE_FIELD.SEND_TEXT, null);
+      await t.controller.phoneInput(PHONE_FIELD.TEXT, 'abc');
+      await t.controller.phoneInput(PHONE_FIELD.TEXT_SEND, null);
+      expect(info(t)).toMatch(/Click into a field/);
+      expect(t.view().textResult!.ok).toBe(false);
+    });
+
+    it('does not push sign-in requests while the Send text screen is open, and resumes after Back', async () => {
+      const t = setup();
+      t.page[1] = dashboard();
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      await t.controller.phoneInput(PHONE_FIELD.SEND_TEXT, null);
+
+      t.page[1] = signInPage('p5');
+      await t.controller.pageStateReceived(1, signInPage('p5'));
+      expect(t.ports.page.detect).not.toHaveBeenCalled();
+      expect(t.lastScreen().id).toBe('gi-panel-text');
+
+      await t.controller.phoneInput(PHONE_FIELD.TEXT_BACK, null);
+      expect(t.view().textMode).toBe(false);
+      expect(t.view().phase).toBe('requesting');
+    });
+
+    it('offers Send text after signing in (for a code page that follows)', async () => {
+      const t = setup();
+      t.page[1] = signInPage();
+      t.controller.phoneConnected();
+      await t.controller.activeTabChanged(1);
+      await t.controller.phoneInput('login', null);
+      await t.controller.pageStateReceived(1, dashboard());
+      expect(t.lastScreen().form.fields.map((f: { id: string }) => f.id)).toContain(PHONE_FIELD.SEND_TEXT);
     });
   });
 });
