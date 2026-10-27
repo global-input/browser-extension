@@ -5,7 +5,8 @@ import React, { useReducer, useState } from 'react';
 import type { MobileData } from 'global-input-mobile';
 import { Button, Card, Notice, SectionLabel, Text } from '../../ui/components';
 import { Caption, Label, PrimaryButton, Row, SmallButton, TextArea } from '../../ui/controls';
-import { color } from '../../ui/theme';
+import styled from 'styled-components';
+import { color, radius } from '../../ui/theme';
 import type { ToolProps } from '../registry';
 import { copyToClipboard, insertIntoPage } from '../shared/pageInsert';
 import type { ToolMessage } from '../shared/pageInsert';
@@ -142,6 +143,21 @@ const Processing: React.FC<{ kind: CryptoKind; state: Extract<CryptoState, { sta
 
 // --- result ---
 
+const Concealed = styled.div`
+  min-height: 96px;
+  box-sizing: border-box;
+  border: 1px dashed ${color.control};
+  border-radius: ${radius.control};
+  background: ${color.canvas};
+  color: ${color.muted};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-weight: 400;
+`;
+
 interface ResultProps {
   kind: CryptoKind;
   state: Extract<CryptoState, { stage: 'result' }>;
@@ -152,6 +168,7 @@ interface ResultProps {
 
 const ResultView: React.FC<ResultProps & { mobile: MobileData }> = ({ kind, state, dispatch, domain, exit, mobile }) => {
   const [message, setMessage] = useState<ToolMessage>(null);
+  const [revealed, setRevealed] = useState(!kind.concealResult);
   const label = kind.text.resultLabel.toLowerCase();
   return (
     <>
@@ -159,10 +176,24 @@ const ResultView: React.FC<ResultProps & { mobile: MobileData }> = ({ kind, stat
       <Notice $tone="success">Received from your phone.</Notice>
       <Label>
         {kind.text.resultLabel}
-        <TextArea rows={6} readOnly value={state.result} />
+        {revealed ? (
+          <TextArea rows={6} readOnly value={state.result} />
+        ) : (
+          <Concealed role="img" aria-label={`${kind.text.resultLabel} is hidden`}>
+            <span aria-hidden="true" style={{ letterSpacing: 4, fontSize: 18 }}>
+              ••••••••
+            </span>
+            <span>Hidden. Press Show to see it.</span>
+          </Concealed>
+        )}
         <Caption>{kind.text.resultCaption}</Caption>
       </Label>
       <Row>
+        {kind.concealResult && (
+          <SmallButton type="button" aria-pressed={revealed} onClick={() => setRevealed(!revealed)}>
+            {revealed ? 'Hide' : 'Show'}
+          </SmallButton>
+        )}
         <SmallButton type="button" onClick={async () => setMessage(await insertIntoPage(label, state.result, domain))}>
           Insert into page
         </SmallButton>

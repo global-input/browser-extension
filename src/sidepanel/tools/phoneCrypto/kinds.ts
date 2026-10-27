@@ -33,6 +33,8 @@ export interface CryptoKind {
   phoneTitle: string;
   // The icon of the phone's encrypt or decrypt button, shown in the panel's steps.
   actionIcon: string;
+  // Hide the result on screen until the user presses Show (Insert and Copy work while hidden).
+  concealResult: boolean;
   // The id of the info line on the input screens, for messages to the phone.
   phoneInfoId: string;
   // The phone's text field on the 'mobile' input screen.
@@ -60,6 +62,7 @@ export const ENCRYPT: CryptoKind = {
   processField: { id: 'encryptContent', label: 'Content', type: 'encrypt', value: '' },
   phoneTitle: 'Mobile Encryption',
   actionIcon: encryptIcon,
+  concealResult: false,
   phoneInfoId: inputOnComputer.FIELDS.info.id,
   phoneContentId: inputOnMobile.FIELDS.content.id,
   useInputOnComputer: ({ cancel, onTypeOnPhone, onStart }) =>
@@ -89,6 +92,7 @@ export const DECRYPT: CryptoKind = {
   processField: { id: 'decryptContent', label: 'Content', type: 'decrypt', value: '' },
   phoneTitle: 'Mobile Decryption',
   actionIcon: decryptIcon,
+  concealResult: true,
   phoneInfoId: decryptInputOnComputer.FIELDS.info.id,
   phoneContentId: decryptInputOnMobile.FIELDS.content.id,
   useInputOnComputer: ({ cancel, onTypeOnPhone, onStart }) =>
@@ -106,7 +110,8 @@ export const DECRYPT: CryptoKind = {
     processingTitle: 'Decrypting on your phone',
     processingAction: 'Decrypt',
     resultLabel: 'Decrypted content',
-    resultCaption: 'As your phone sent it. It is not stored: it is gone when you press Done or close the panel.',
+    resultCaption:
+      'Hidden from people and cameras around you: Insert and Copy work without showing it. It is not stored: it is gone when you press Done or close the panel.',
     restart: 'Decrypt something else',
     empty: 'Please provide the content to decrypt using the application connected to your mobile app.',
     failed: 'Failed to decrypt!',
