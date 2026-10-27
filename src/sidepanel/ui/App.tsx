@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ConnectQR } from 'global-input-react';
 import { usePhoneConnection } from '../adapters/usePhoneConnection';
 import { watchIdle } from '../adapters/idle';
@@ -6,6 +6,10 @@ import type { IdleReason } from '../adapters/idle';
 import { IDLE_CHOICES, loadSettings, saveSettings } from '../adapters/settings';
 import type { PanelSettings } from '../adapters/settings';
 import { useSignIn } from '../useSignIn';
+import { homeScreen } from '../core/phoneForms';
+import { TOOLS, findTool } from '../tools/registry';
+import { Tabs, ToolFrame, ToolList } from './tools';
+import type { PanelTab } from './tools';
 import type { SignInView } from '../core/signInController';
 import { formatSeconds, formatTime, progressSteps, ruleSourceLabel } from './progress';
 import {
@@ -19,9 +23,39 @@ const DISCONNECT_REASON: Record<IdleReason | 'manual', string> = {
   manual: 'Disconnected. Scan again to reconnect.',
 };
 
+const TOOL_ENTRIES = TOOLS.map(({ id, label }) => ({ id, label }));
+
 export const App: React.FC = () => {
-  const connection = usePhoneConnection();
-  const { view, skip } = useSignIn(connection);
+  const initialScreen = useMemo(() => homeScreen(TOOL_ENTRIES), []);
+  const connection = usePhoneConnection(initialScreen);
+  const [tab, setTab] = useState<PanelTab>('sign-in');
+  const [openTool, setOpenTool] = useState<{ id: string; domain: string } | null>(null);
+  const openToolRef = useRef<(toolId: string) => void>(() => undefined);
+  const { view, skip, suspend, resume } = useSignIn(connection, {
+    list: () => TOOL_ENTRIES,
+    open: toolId => openToolRef.current(toolId),
+  });
+  openToolRef.current = toolId => {
+    if (!findTool(toolId)) {
+      return;
+    }
+    suspend();
+    setTab('tools');
+    setOpenTool({ id: toolId, domain: view.host || '' });
+  };
+  const exitTool = () => {
+    setOpenTool(null);
+    connection.reclaim();
+    resume();
+  };
+  const tool = openTool && findTool(openTool.id);
+
+  // A sign-in request is what the user is waiting for: show it even from the Tools tab.
+  useEffect(() => {
+    if (view.phase === 'requesting') {
+      setTab('sign-in');
+    }
+  }, [view.phase]);
   const [settings, setSettings] = useState<PanelSettings>(loadSettings);
   const [showSettings, setShowSettings] = useState(false);
   const [disconnectReason, setDisconnectReason] = useState<string | null>(null);
@@ -62,9 +96,14 @@ export const App: React.FC = () => {
   return (
     <Shell>
       <Header connected={connected} />
+      {!showSettings && !tool && <Tabs selected={tab} onSelect={setTab} />}
       <Body>
         {showSettings ? (
           <SettingsView settings={settings} onChange={updateSettings} onClose={() => setShowSettings(false)} />
+        ) : tool && openTool ? (
+          <ToolFrame tool={tool} domain={openTool.domain} onExit={exitTool} />
+        ) : tab === 'tools' ? (
+          <ToolList tools={TOOLS} onOpen={toolId => openToolRef.current(toolId)} />
         ) : connected ? (
           <ConnectedView view={view} onSkip={skip} />
         ) : (

@@ -16,6 +16,7 @@ export const color = {
   warnInk: '#8A4200',
   warnBg: '#FFF4E5',
   neutralBg: '#EEF1F6',
+  infoBg: '#EEF3FF',
   neutralDot: '#8A94A6',
 };
 

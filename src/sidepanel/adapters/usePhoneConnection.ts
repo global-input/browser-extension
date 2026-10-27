@@ -2,17 +2,20 @@
 // is open: when the phone drops (app in the background, network change), global-input-react
 // reconnects with the same session, so the phone can rejoin from the app's history without
 // a new scan. disconnect() starts a new session, so the old one can no longer be joined.
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useMobile } from 'global-input-mobile';
 import type { InitData } from 'global-input-react';
-import { homeScreen } from '../core/phoneForms';
 import type { PhoneScreen } from '../core/phoneForms';
 
 export type ConnectionStatus = 'connecting' | 'waiting' | 'connected' | 'error';
 
-export const usePhoneConnection = () => {
-  const initData = useMemo(() => homeScreen() as unknown as InitData, []);
-  const mobile = useMobile(initData, true);
+export const usePhoneConnection = (initialScreen: PhoneScreen) => {
+  const initData = useMemo(() => initialScreen as unknown as InitData, [initialScreen]);
+  // A tool opened in the panel uses the same connection with its own screen and handlers.
+  // Changing claimId makes this hook connect again: with the phone still connected that only
+  // sends the panel's screen and makes the panel the receiver of the phone's input again.
+  const [claimId, setClaimId] = useState(0);
+  const mobile = useMobile(initData, true, claimId);
   const status: ConnectionStatus = mobile.isConnected ? 'connected' : mobile.isError ? 'error' : mobile.isReady ? 'waiting' : 'connecting';
   return {
     mobile,
@@ -24,5 +27,6 @@ export const usePhoneConnection = () => {
     onInput: (listener: (fieldId: string, value: unknown) => void) =>
       mobile.setOnchange(({ field }) => listener(field.id as string, field.value)),
     disconnect: () => mobile.restart(),
+    reclaim: () => setClaimId(id => id + 1),
   };
 };

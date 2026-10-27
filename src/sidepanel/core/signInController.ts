@@ -4,8 +4,8 @@
 // can be tested with fakes and the UI or transport can change without touching it.
 import type { MobileForm, PageRule } from '../../shared/pageRule';
 import type { DetectReply, FillReply, PageState, RuleSource } from '../../shared/signInMessages';
-import { PHONE_FIELD, homeScreen, signInScreen, signedInScreen } from './phoneForms';
-import type { PhoneScreen } from './phoneForms';
+import { PHONE_FIELD, homeScreen, signInScreen, signedInScreen, toolIdFromField } from './phoneForms';
+import type { PhoneScreen, ToolEntry } from './phoneForms';
 
 // A submitted single-page app that still shows its form after this long did not accept it.
 export const SPA_FAILURE_MS = 15000;
@@ -45,6 +45,11 @@ export interface Ports {
   rules: {
     find: (host: string) => PageRule | null;
   };
+  // Other things the phone can start from its home screen (the panel's tools).
+  tools: {
+    list: () => ToolEntry[];
+    open: (toolId: string) => void;
+  };
   now: () => number;
   setTimer: (callback: () => void, ms: number) => () => void;
 }
@@ -67,6 +72,8 @@ export class SignInController {
   private target: Target | null = null;
   private skippedPageId: string | null = null;
   private cancelTimer: (() => void) | null = null;
+  // While suspended (a tool owns the phone) page reports are only recorded.
+  private suspended = false;
 
   constructor(private ports: Ports, private onChange: (view: SignInView) => void) {}
 
@@ -76,7 +83,10 @@ export class SignInController {
 
   phoneConnected() {
     this.connected = true;
-    this.ports.phone.show(homeScreen());
+    if (this.suspended) {
+      return;
+    }
+    this.ports.phone.show(this.home());
     this.update({ phase: 'ready', notice: undefined });
     if (this.activeTabId !== null) {
       this.refresh(this.activeTabId);
@@ -87,6 +97,26 @@ export class SignInController {
     this.connected = false;
     this.clearTarget();
     this.update({ phase: 'not-connected', host: undefined, notice: undefined, filledFieldIds: [] });
+  }
+
+  // A tool takes over the phone: stop asking for sign-ins until resume().
+  suspend() {
+    this.suspended = true;
+    this.clearTarget();
+    this.update({ phase: this.connected ? 'ready' : 'not-connected', notice: undefined, filledFieldIds: [] });
+  }
+
+  // The panel has the phone again: show the home screen and look at the active tab afresh.
+  async resume() {
+    this.suspended = false;
+    this.skippedPageId = null;
+    if (!this.connected) {
+      return;
+    }
+    this.ports.phone.show(this.home());
+    if (this.activeTabId !== null) {
+      await this.refresh(this.activeTabId);
+    }
   }
 
   async activeTabChanged(tabId: number) {
@@ -104,16 +134,28 @@ export class SignInController {
     if (tabId !== this.activeTabId) {
       return;
     }
+    if (this.suspended) {
+      this.lastState = state;
+      return;
+    }
     await this.handleState(tabId, state);
   }
 
   async phoneInput(fieldId: string, value: unknown) {
+    if (this.suspended) {
+      return;
+    }
+    const toolId = toolIdFromField(fieldId);
+    if (toolId) {
+      this.ports.tools.open(toolId);
+      return;
+    }
     switch (fieldId) {
       case PHONE_FIELD.SKIP:
         this.skip();
         return;
       case PHONE_FIELD.DONE:
-        this.ports.phone.show(homeScreen());
+        this.ports.phone.show(this.home());
         this.update({ phase: 'ready', notice: undefined });
         return;
       case PHONE_FIELD.DISCONNECT:
@@ -135,7 +177,7 @@ export class SignInController {
           ? 'The page changed to another site, so nothing was filled.'
           : 'Could not fill the page. Reload it and try again.';
       this.clearTarget();
-      this.ports.phone.show(homeScreen());
+      this.ports.phone.show(this.home());
       this.update({ phase: 'ready', notice });
       return;
     }
@@ -152,14 +194,18 @@ export class SignInController {
     }
     this.clearTarget();
     if (this.connected) {
-      this.ports.phone.show(homeScreen());
+      this.ports.phone.show(this.home());
     }
     this.update({ phase: 'skipped', notice: undefined, filledFieldIds: [] });
   }
 
+  private home() {
+    return homeScreen(this.ports.tools.list());
+  }
+
   private async refresh(tabId: number) {
     const state = await this.ports.page.queryState(tabId);
-    if (tabId !== this.activeTabId) {
+    if (tabId !== this.activeTabId || this.suspended) {
       return;
     }
     if (!state) {
@@ -192,7 +238,7 @@ export class SignInController {
       if (this.view.phase !== 'signed-in') {
         this.clearTarget();
         if (this.view.phase === 'requesting') {
-          this.ports.phone.show(homeScreen());
+          this.ports.phone.show(this.home());
         }
         this.update({ phase: 'ready', host: state.host, notice: undefined, filledFieldIds: [] });
       }
@@ -210,7 +256,7 @@ export class SignInController {
   private async request(tabId: number, state: PageState, notice?: string) {
     this.clearTarget();
     const reply = await this.ports.page.detect(tabId, this.ports.rules.find(state.host));
-    if (tabId !== this.activeTabId || !this.connected || (this.lastState && this.lastState.pageId !== state.pageId)) {
+    if (tabId !== this.activeTabId || !this.connected || this.suspended || (this.lastState && this.lastState.pageId !== state.pageId)) {
       return;
     }
     if (!reply || reply.status !== 'success' || !reply.form || reply.host !== state.host) {

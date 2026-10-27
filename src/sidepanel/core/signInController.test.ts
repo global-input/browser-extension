@@ -29,6 +29,7 @@ const setup = () => {
       fill: vi.fn(async (_tabId: number, fieldId: string) => ({ status: 'success' as const, pressed: fieldId === 'login' })),
     },
     rules: { find: vi.fn(() => null) },
+    tools: { list: () => [{ id: 'encryption', label: 'Encrypt' }], open: vi.fn() },
     now: () => now,
     setTimer: (callback: () => void, ms: number) => {
       const timer = { callback, ms, cancelled: false };
@@ -219,5 +220,46 @@ describe('SignInController', () => {
     expect(t.ports.phone.disconnect).toHaveBeenCalled();
     t.controller.phoneDisconnected();
     expect(t.view().phase).toBe('not-connected');
+  });
+
+  it('offers the tools on the phone home screen and opens one when pressed', async () => {
+    const t = setup();
+    t.controller.phoneConnected();
+    const ids = t.lastScreen().form.fields.map((f: { id: string }) => f.id);
+    expect(ids).toEqual([PHONE_FIELD.STATUS, 'gi-tool-encryption', PHONE_FIELD.DISCONNECT]);
+    await t.controller.phoneInput('gi-tool-encryption', null);
+    expect(t.ports.tools.open).toHaveBeenCalledWith('encryption');
+  });
+
+  it('while suspended for a tool, ignores pages and phone input; resume asks again for the active tab', async () => {
+    const t = setup();
+    t.page[1] = dashboard();
+    t.controller.phoneConnected();
+    await t.controller.activeTabChanged(1);
+    t.controller.suspend();
+    const shown = t.ports.phone.show.mock.calls.length;
+
+    t.page[1] = signInPage('p9');
+    await t.controller.pageStateReceived(1, signInPage('p9'));
+    await t.controller.phoneInput('password', 'secret');
+    expect(t.ports.page.detect).not.toHaveBeenCalled();
+    expect(t.ports.page.fill).not.toHaveBeenCalled();
+    expect(t.ports.phone.show.mock.calls.length).toBe(shown);
+
+    await t.controller.resume();
+    expect(t.view().phase).toBe('requesting');
+    expect(t.lastScreen().form.id).toBe(FORM.id);
+  });
+
+  it('suspending drops a sign-in in progress', async () => {
+    const t = setup();
+    t.page[1] = signInPage();
+    t.controller.phoneConnected();
+    await t.controller.activeTabChanged(1);
+    expect(t.view().phase).toBe('requesting');
+    t.controller.suspend();
+    expect(t.view().phase).toBe('ready');
+    await t.controller.phoneInput('login', null);
+    expect(t.ports.page.fill).not.toHaveBeenCalled();
   });
 });

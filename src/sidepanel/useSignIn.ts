@@ -8,9 +8,11 @@ import type { usePhoneConnection } from './adapters/usePhoneConnection';
 
 type Connection = ReturnType<typeof usePhoneConnection>;
 
-export const useSignIn = (connection: Connection) => {
+export const useSignIn = (connection: Connection, tools: Ports['tools']) => {
   const connectionRef = useRef(connection);
   connectionRef.current = connection;
+  const toolsRef = useRef(tools);
+  toolsRef.current = tools;
   const [view, setView] = useState<SignInView | null>(null);
   const controllerRef = useRef<SignInController | null>(null);
   if (!controllerRef.current) {
@@ -21,6 +23,10 @@ export const useSignIn = (connection: Connection) => {
       },
       page: chromePagePort,
       rules: pageRulesPort,
+      tools: {
+        list: () => toolsRef.current.list(),
+        open: toolId => toolsRef.current.open(toolId),
+      },
       now: () => Date.now(),
       setTimer: (callback, ms) => {
         const timer = setTimeout(callback, ms);
@@ -51,5 +57,10 @@ export const useSignIn = (connection: Connection) => {
 
   connection.onInput((fieldId, value) => controller.phoneInput(fieldId, value));
 
-  return { view: view || controller.getView(), skip: () => controller.skip() };
+  return {
+    view: view || controller.getView(),
+    skip: () => controller.skip(),
+    suspend: () => controller.suspend(),
+    resume: () => controller.resume(),
+  };
 };

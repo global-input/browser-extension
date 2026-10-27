@@ -10,6 +10,16 @@ export const PHONE_FIELD = {
   DISCONNECT: 'gi-disconnect',
 } as const;
 
+// Tool buttons on the home screen are "gi-tool-<tool id>".
+const TOOL_PREFIX = 'gi-tool-';
+export const toolFieldId = (toolId: string) => `${TOOL_PREFIX}${toolId}`;
+export const toolIdFromField = (fieldId: string) => (fieldId.startsWith(TOOL_PREFIX) ? fieldId.slice(TOOL_PREFIX.length) : null);
+
+export interface ToolEntry {
+  id: string;
+  label: string;
+}
+
 export interface PhoneScreen {
   id?: string;
   form: {
@@ -23,11 +33,15 @@ export interface PhoneScreen {
 const info = (value: string) => ({ id: PHONE_FIELD.STATUS, type: 'info', value });
 const button = (id: string, label: string) => ({ id, type: 'button', label });
 
-export const homeScreen = (): PhoneScreen => ({
+export const homeScreen = (tools: ToolEntry[] = []): PhoneScreen => ({
   id: 'gi-panel-home',
   form: {
     title: 'Connected to your browser',
-    fields: [info('Waiting for a sign-in page. Open a site on your computer.'), button(PHONE_FIELD.DISCONNECT, 'Disconnect')],
+    fields: [
+      info('Waiting for a sign-in page. Open a site on your computer.'),
+      ...tools.map(tool => button(toolFieldId(tool.id), tool.label)),
+      button(PHONE_FIELD.DISCONNECT, 'Disconnect'),
+    ],
   },
 });
 

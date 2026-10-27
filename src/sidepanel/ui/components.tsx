@@ -104,11 +104,17 @@ export const Text = styled.p`
   line-height: 1.5;
 `;
 
-export const Notice = styled.div<{ $tone: 'warn' | 'success' }>`
+const NOTICE_TONES = {
+  warn: { background: color.warnBg, ink: color.warnInk },
+  success: { background: color.successBg, ink: color.successInk },
+  info: { background: color.infoBg, ink: color.brand },
+};
+
+export const Notice = styled.div<{ $tone: keyof typeof NOTICE_TONES }>`
   padding: 10px 12px;
   border-radius: ${radius.control};
-  background: ${p => (p.$tone === 'warn' ? color.warnBg : color.successBg)};
-  color: ${p => (p.$tone === 'warn' ? color.warnInk : color.successInk)};
+  background: ${p => NOTICE_TONES[p.$tone].background};
+  color: ${p => NOTICE_TONES[p.$tone].ink};
   line-height: 1.45;
   font-weight: ${p => (p.$tone === 'success' ? 500 : 400)};
 `;

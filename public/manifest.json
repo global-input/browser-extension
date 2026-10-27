@@ -40,5 +40,8 @@
   "side_panel": {
     "default_path": "sidepanel.html"
   },
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_security_policy": {}
 }
