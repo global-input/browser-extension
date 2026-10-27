@@ -10,6 +10,9 @@ export const SIGN_IN_MESSAGE = {
   FILL: 'signin/fill',
   // panel -> page: write text from the phone into the element that has focus.
   FILL_FOCUSED: 'signin/fill-focused',
+  // panel -> page: read the text of the element that has focus (only on the user's request,
+  // for encrypting or decrypting it in place).
+  READ_FOCUSED: 'signin/read-focused',
   // panel -> page: report the page state now.
   QUERY_STATE: 'signin/query-state',
   // page -> panel: the page loaded, or its sign-in form appeared or went away.
@@ -71,4 +74,14 @@ export interface FillFocusedReply {
   reason?: 'host-mismatch' | 'no-focus';
   // How many elements were written to (more than one for a code split over boxes).
   filled?: number;
+}
+
+export interface ReadFocusedRequest {
+  expectedHost: string;
+}
+
+export interface ReadFocusedReply {
+  status: 'success' | 'error';
+  reason?: 'host-mismatch' | 'no-focus' | 'empty';
+  value?: string;
 }

@@ -1,6 +1,6 @@
 // "Insert into page" for the panel's tools: writes a value into the field that has focus in the
-// active tab, with the same host check as sign-in.
-import { activeTabId, chromePagePort } from '../../adapters/chromePage';
+// active tab, with the same host check as sign-in. Also reads that field, for in-place tools.
+import { activeTabId, chromePagePort, readFocused } from '../../adapters/chromePage';
 
 export type ToolMessage = { tone: 'success' | 'warn' | 'info'; text: string } | null;
 
@@ -35,5 +35,28 @@ export const copyToClipboard = async (label: string, value: string): Promise<Too
     return { tone: 'success', text: `Copied ${label}.` };
   } catch (error) {
     return { tone: 'warn', text: 'Could not copy. Use Insert instead.' };
+  }
+};
+
+// The text of the focused field on the page, or a message saying why there is none.
+export const readFromPage = async (domain: string): Promise<{ value: string } | { message: ToolMessage }> => {
+  const tabId = await activeTabId();
+  if (tabId === null || !domain) {
+    return { message: { tone: 'warn', text: 'Open a web page in this window first.' } };
+  }
+  const reply = await readFocused(tabId, domain);
+  if (!reply) {
+    return { message: { tone: 'warn', text: 'This tab cannot be used. Reload the page and try again.' } };
+  }
+  if (reply.status === 'success' && reply.value !== undefined) {
+    return { value: reply.value };
+  }
+  switch (reply.reason) {
+    case 'host-mismatch':
+      return { message: { tone: 'warn', text: `The active tab is no longer on ${domain}.` } };
+    case 'empty':
+      return { message: { tone: 'warn', text: 'The focused field on the page is empty.' } };
+    default:
+      return { message: { tone: 'warn', text: 'Click into a text field on the page first, then press the button again.' } };
   }
 };

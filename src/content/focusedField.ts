@@ -1,11 +1,13 @@
 // Writes text from the phone into the element that has focus on the page: an input, a
 // textarea or an editable element. A one-time code split over one-character boxes is spread
-// over the boxes, starting at the focused one.
+// over the boxes, starting at the focused one. Also reads that element's text, for tools that
+// encrypt or decrypt it in place (only when the user asks, from the panel).
 import { isVisible } from './autoDetect';
 
 const TEXT_INPUT_TYPES = /^(text|email|tel|number|password|search|url|)$/;
 
 export type FocusedFillResult = { status: 'success'; filled: number } | { status: 'error'; reason: 'no-focus' };
+export type FocusedReadResult = { status: 'success'; value: string } | { status: 'error'; reason: 'no-focus' | 'empty' };
 
 const isTextInput = (element: Element): element is HTMLInputElement =>
   element instanceof HTMLInputElement && TEXT_INPUT_TYPES.test((element.getAttribute('type') || '').toLowerCase()) && !element.readOnly && !element.disabled;
@@ -70,4 +72,19 @@ export const fillFocusedElement = (doc: Document, text: string): FocusedFillResu
     return { status: 'success', filled: 1 };
   }
   return { status: 'error', reason: 'no-focus' };
+};
+
+// The text of the focused element, when the element could also take the result back.
+export const readFocusedElement = (doc: Document): FocusedReadResult => {
+  const focused = doc.activeElement;
+  let value: string | null = null;
+  if (focused && (isTextInput(focused) || (focused instanceof HTMLTextAreaElement && !focused.readOnly && !focused.disabled))) {
+    value = focused.value;
+  } else if (focused instanceof HTMLElement && focused !== doc.body && focused.isContentEditable) {
+    value = focused.innerText ?? focused.textContent ?? '';
+  }
+  if (value === null) {
+    return { status: 'error', reason: 'no-focus' };
+  }
+  return value.trim() ? { status: 'success', value } : { status: 'error', reason: 'empty' };
 };

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fillFocusedElement } from './focusedField';
+import { fillFocusedElement, readFocusedElement } from './focusedField';
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -42,5 +42,27 @@ describe('fillFocusedElement', () => {
     expect(fillFocusedElement(document, 'abc')).toEqual({ status: 'error', reason: 'no-focus' });
     (document.querySelector('input[readonly]') as HTMLElement).focus();
     expect(fillFocusedElement(document, 'abc')).toEqual({ status: 'error', reason: 'no-focus' });
+  });
+});
+
+describe('readFocusedElement', () => {
+  it('reads the focused input or textarea', () => {
+    document.body.innerHTML = '<input id="a" value="secret text"><textarea id="b">line 1\nline 2</textarea>';
+    (document.getElementById('a') as HTMLInputElement).focus();
+    expect(readFocusedElement(document)).toEqual({ status: 'success', value: 'secret text' });
+    (document.getElementById('b') as HTMLTextAreaElement).focus();
+    expect(readFocusedElement(document)).toEqual({ status: 'success', value: 'line 1\nline 2' });
+  });
+
+  it('refuses when nothing editable has focus or the field is empty', () => {
+    document.body.innerHTML = '<input id="a" value="  "><input id="c" type="checkbox"><input id="r" value="x" readonly>';
+    (document.getElementById('a') as HTMLInputElement).focus();
+    expect(readFocusedElement(document)).toEqual({ status: 'error', reason: 'empty' });
+    (document.getElementById('c') as HTMLInputElement).focus();
+    expect(readFocusedElement(document)).toEqual({ status: 'error', reason: 'no-focus' });
+    (document.getElementById('r') as HTMLInputElement).focus();
+    expect(readFocusedElement(document)).toEqual({ status: 'error', reason: 'no-focus' });
+    (document.activeElement as HTMLElement).blur();
+    expect(readFocusedElement(document)).toEqual({ status: 'error', reason: 'no-focus' });
   });
 });

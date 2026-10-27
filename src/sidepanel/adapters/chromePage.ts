@@ -4,7 +4,7 @@
 // and origin.
 import type { PageRule } from '../../shared/pageRule';
 import { SIGN_IN_MESSAGE } from '../../shared/signInMessages';
-import type { DetectReply, FillFocusedReply, FillReply, PageState } from '../../shared/signInMessages';
+import type { DetectReply, FillFocusedReply, FillReply, PageState, ReadFocusedReply } from '../../shared/signInMessages';
 import type { Ports } from '../core/signInController';
 
 const sendToTab = async <T>(tabId: number, messageType: string, content?: unknown): Promise<T | null> => {
@@ -76,3 +76,7 @@ export const activeTabHost = async (): Promise<string | null> => {
   const state = tabId === null ? null : await chromePagePort.queryState(tabId);
   return state ? state.host : null;
 };
+
+// The text of the focused element in a tab, for the tools that encrypt or decrypt in place.
+export const readFocused = (tabId: number, expectedHost: string) =>
+  sendToTab<ReadFocusedReply>(tabId, SIGN_IN_MESSAGE.READ_FOCUSED, { expectedHost });

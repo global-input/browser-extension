@@ -2,13 +2,15 @@
 // (src/app/form-data-transfer): the same form id, fields, Show/Hide and Back. In the panel a
 // value can also go straight into the focused field on the page, so the popup's copy-and-cache
 // workaround is not needed here.
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { FormField } from 'global-input-react';
 import * as storage from '../../../app/storage';
 import { FIELDS, buildFormFields, getNextVisibilityValue, sendVisibility, useConnectMobile } from '../../../app/form-data-transfer/mobile-ui';
 import { Button, Card, Notice, SectionLabel, Text } from '../../ui/components';
 import { Caption, Label, Row, Select, SmallButton, TextArea, TextInput } from '../../ui/controls';
 import type { ToolProps } from '../registry';
+import { AUTO_HIDE_MS, useAutoHide } from '../shared/autoHide';
+import { useActiveHost } from '../shared/useActiveHost';
 import { copyToClipboard, insertIntoPage } from '../shared/pageInsert';
 import type { ToolMessage } from '../shared/pageInsert';
 import { FIELD_KINDS, addField, isMultiLine, removeField, setFieldValue } from './fields';
@@ -36,23 +38,41 @@ export const FormTransferTool: React.FC<ToolProps> = ({ domain, exit }) => {
 
   const mobile = useConnectMobile({ domain: site, formFields: fields, configId, visibility, setVisibility, onFormModified, back: exit });
 
+  // Loads the site's own fields and sends them to the phone. Nothing is saved: saving here
+  // would store them under the previous site.
   const changeSite = (value: string) => {
     setSite(value);
-    onFormModified(buildFormFields(value), true);
+    setFields(buildFormFields(value));
+    setConfigId(id => id + 1);
   };
+
+  // Opened without a site (the Sign in tab did not know it): ask the active tab.
+  const { host: activeHost } = useActiveHost(domain);
+  useEffect(() => {
+    if (!domain && activeHost && !site) {
+      changeSite(activeHost);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeHost]);
+  const pageHost = domain || activeHost;
 
   const toggleVisibility = () => {
     const next = getNextVisibilityValue(visibility);
     setVisibility(next);
     sendVisibility(mobile, next);
   };
+  useAutoHide(!hidden, () => {
+    if (visibility.value !== 0) {
+      toggleVisibility();
+    }
+  });
 
   const typeValue = (field: FormField, index: number, value: string) => {
     onFormModified(setFieldValue(fields, field.id as string, value), false);
     mobile.sendValue(field.id as string, value, index);
   };
 
-  const insert = async (field: FormField) => setMessage(await insertIntoPage(String(field.label), String(field.value ?? ''), domain));
+  const insert = async (field: FormField) => setMessage(await insertIntoPage(String(field.label), String(field.value ?? ''), pageHost));
 
   const copy = async (field: FormField) => setMessage(await copyToClipboard(String(field.label), String(field.value ?? '')));
 
@@ -89,6 +109,7 @@ export const FormTransferTool: React.FC<ToolProps> = ({ domain, exit }) => {
           </SmallButton>
         </Row>
       </Row>
+      {!hidden && <Caption>Values hide again after {AUTO_HIDE_MS / 1000} seconds, or when the panel is hidden.</Caption>}
 
       {fields.map((field, index) => {
         const id = `transfer-${field.id}`;

@@ -1,4 +1,5 @@
 // Form controls shared by the panel's tools. Presentational only.
+import React from 'react';
 import styled from 'styled-components';
 import { Button } from './components';
 import { color, radius } from './theme';
@@ -81,3 +82,30 @@ export const PrimaryButton = styled(Button)`
     cursor: default;
   }
 `;
+
+const ConcealedBox = styled.div`
+  min-height: 96px;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px dashed ${color.control};
+  border-radius: ${radius.control};
+  background: ${color.canvas};
+  color: ${color.muted};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-weight: 400;
+  text-align: center;
+`;
+
+// Stands in for a value that is hidden from people and cameras around the user.
+export const Concealed: React.FC<{ label: string; hint: string }> = ({ label, hint }) => (
+  <ConcealedBox role="img" aria-label={`${label} is hidden`}>
+    <span aria-hidden="true" style={{ letterSpacing: 4, fontSize: 18 }}>
+      ••••••••
+    </span>
+    <span>{hint}</span>
+  </ConcealedBox>
+);

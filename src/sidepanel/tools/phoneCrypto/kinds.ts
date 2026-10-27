@@ -35,6 +35,8 @@ export interface CryptoKind {
   actionIcon: string;
   // Hide the result on screen until the user presses Show (Insert and Copy work while hidden).
   concealResult: boolean;
+  // Hide text taken from the page until the user presses Show (it is plain text for Encrypt).
+  concealPageInput: boolean;
   // The id of the info line on the input screens, for messages to the phone.
   phoneInfoId: string;
   // The phone's text field on the 'mobile' input screen.
@@ -63,6 +65,7 @@ export const ENCRYPT: CryptoKind = {
   phoneTitle: 'Mobile Encryption',
   actionIcon: encryptIcon,
   concealResult: false,
+  concealPageInput: true,
   phoneInfoId: inputOnComputer.FIELDS.info.id,
   phoneContentId: inputOnMobile.FIELDS.content.id,
   useInputOnComputer: ({ cancel, onTypeOnPhone, onStart }) =>
@@ -93,6 +96,7 @@ export const DECRYPT: CryptoKind = {
   phoneTitle: 'Mobile Decryption',
   actionIcon: decryptIcon,
   concealResult: true,
+  concealPageInput: false,
   phoneInfoId: decryptInputOnComputer.FIELDS.info.id,
   phoneContentId: decryptInputOnMobile.FIELDS.content.id,
   useInputOnComputer: ({ cancel, onTypeOnPhone, onStart }) =>

@@ -39,9 +39,13 @@ export const FormDataTransfer: React.FC<Props> = ({ domain, back }) => {
         setFormFields(formFields);
     }
 
+    // Loads the new site's fields without saving them: saving here would store them under the
+    // previous site (userDomain is not updated yet).
     const changeDomain = (domain:string) => {
         setUserDomain(domain);
-        onFormModified(buildFormFields(domain),true);
+        setSelectedFields([]);
+        setFormFields(buildFormFields(domain));
+        setConfigId(configId=>configId+1);
     };
 
 

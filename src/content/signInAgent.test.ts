@@ -222,3 +222,14 @@ describe('send text from the phone', () => {
     expect(email.value).toBe('abc');
   });
 });
+
+describe('read the focused field for in-place encryption', () => {
+  it('reads only when the page is on the expected host', () => {
+    const agent = createSignInAgent({ send: vi.fn() });
+    const email = document.getElementById('email') as HTMLInputElement;
+    email.value = 'plain text';
+    email.focus();
+    expect(agent.readFocused({ expectedHost: 'evil.example' })).toEqual({ status: 'error', reason: 'host-mismatch' });
+    expect(agent.readFocused({ expectedHost: window.location.host })).toEqual({ status: 'success', value: 'plain text' });
+  });
+});

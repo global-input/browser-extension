@@ -5,7 +5,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useMobile } from 'global-input-mobile';
 import * as chromeExtension from '../../../app/chrome-extension';
-import { activeTabHost } from '../../adapters/chromePage';
 import * as storage from '../../../app/storage';
 import * as rules from '../../../app/page-control/rules';
 import type { PageRule, ProcessData } from '../../../app/page-control/rules';
@@ -15,6 +14,7 @@ import { Button, Card, Notice, SectionLabel, Site } from '../../ui/components';
 import { Caption, Label, PrimaryButton, Row, Select, TextArea } from '../../ui/controls';
 import { color, font } from '../../ui/theme';
 import type { ToolProps } from '../registry';
+import { useActiveHost } from '../shared/useActiveHost';
 import { RULE_SOURCE_TEXT, describeControl, ruleSourceOf, validateRuleContent } from './model';
 import type { PageControlScreen } from './model';
 
@@ -149,27 +149,6 @@ const ControlScreen: React.FC<{ domain: string; exit: () => void; edit: () => vo
       {data.step === rules.ProcessStep.SUCCESS && <ControllingView data={data} exit={exit} edit={edit} retry={retry} />}
     </>
   );
-};
-
-// The site comes from the active tab itself, so the tool does not depend on what the Sign in
-// tab knew when it was opened. null: still asking.
-const useActiveHost = (initial: string) => {
-  const [host, setHost] = useState<string | null>(initial || null);
-  const [asked, setAsked] = useState(!!initial);
-  const ask = () => {
-    setAsked(false);
-    activeTabHost().then(found => {
-      setHost(found);
-      setAsked(true);
-    });
-  };
-  useEffect(() => {
-    if (!initial) {
-      ask();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  return { host: host || '', asked, ask };
 };
 
 // --- edit rule ---
