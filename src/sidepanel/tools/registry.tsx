@@ -4,13 +4,12 @@
 // tool's screen to the phone instead of starting a new session).
 // To add or remove a tool, change this list.
 import React, { useState } from 'react';
-import { MobileDecryption } from '../../app/mobile-decryption';
 import { PageControl } from '../../app/page-control';
 import { EditRule } from '../../app/edit-rule';
 import LoadFromPreset from '../../app/load-from-preset';
 import { FormTransferTool } from './formTransfer/FormTransferTool';
 import { PhoneCryptoTool } from './phoneCrypto/PhoneCryptoTool';
-import { ENCRYPT } from './phoneCrypto/kinds';
+import { DECRYPT, ENCRYPT } from './phoneCrypto/kinds';
 
 export interface ToolProps {
   // Host of the active tab when the tool was opened.
@@ -60,7 +59,7 @@ export const TOOLS: ToolDefinition[] = [
     label: 'Decryption',
     title: 'Decrypt',
     description: 'Decrypt content with a key kept on your phone.',
-    Component: ({ domain, exit }) => <MobileDecryption domain={domain} back={exit} />,
+    Component: props => <PhoneCryptoTool {...props} kind={DECRYPT} />,
   },
   {
     id: 'page-control',

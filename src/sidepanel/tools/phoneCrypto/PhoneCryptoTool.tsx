@@ -1,4 +1,4 @@
-// Encrypt (and later Decrypt) in the panel's design. The panel shows one view per stage of
+// Encrypt and Decrypt in the panel's design. The panel shows one view per stage of
 // flow.ts; each stage view mounts the phone screen of the popup tool for that stage, so the
 // phone sees no change.
 import React, { useReducer, useState } from 'react';
@@ -122,7 +122,9 @@ const Processing: React.FC<{ kind: CryptoKind; state: Extract<CryptoState, { sta
           <li>
             On your phone, press <PhoneIcon src={showIcon} alt="Show" /> to check the content it received.
           </li>
-          <li>Press {kind.text.processingAction}.</li>
+          <li>
+            Press <PhoneIcon src={kind.actionIcon} alt={kind.text.processingAction} /> to {kind.text.processingAction.toLowerCase()} it.
+          </li>
           <li>
             Check the result, then press <PhoneIcon src={sendIcon} alt="Send" /> to send it here.
           </li>
