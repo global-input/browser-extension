@@ -239,7 +239,7 @@ export const toMobileForm = (form: PageForm): MobileForm => ({
 /* React (and similar frameworks) wraps the element's own value setter to track
    changes, so "element.value = x" is seen as no change and onChange never fires.
    Calling the prototype's native setter updates the value the way typing does. */
-const setNativeValue = (element: Element, value: unknown) => {
+export const setNativeValue = (element: Element, value: unknown) => {
   const view = (element.ownerDocument && element.ownerDocument.defaultView) || window;
   let prototype: object = view.HTMLInputElement.prototype;
   if (element instanceof view.HTMLTextAreaElement) {
@@ -255,7 +255,7 @@ const setNativeValue = (element: Element, value: unknown) => {
   }
 };
 
-const fireInputEvents = (element: Element) => {
+export const fireInputEvents = (element: Element) => {
   element.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
   element.dispatchEvent(new Event('change', { bubbles: false, cancelable: true }));
 };

@@ -7,7 +7,7 @@ import React from 'react';
 import { FormTransferTool } from './formTransfer/FormTransferTool';
 import { PhoneCryptoTool } from './phoneCrypto/PhoneCryptoTool';
 import { DECRYPT, ENCRYPT } from './phoneCrypto/kinds';
-import { PageControlTool } from './pageControl/PageControlTool';
+import { PageAnalyseTool } from './pageControl/AnalyseTool';
 
 export interface ToolProps {
   // Host of the active tab when the tool was opened.
@@ -50,8 +50,8 @@ export const TOOLS: ToolDefinition[] = [
     id: 'page-control',
     label: 'Page Control',
     title: 'Page control',
-    description: 'Operate this page from your phone with a page rule.',
-    Component: PageControlTool,
+    description: 'Operate this page from your phone. The page is analysed for what can be operated.',
+    Component: PageAnalyseTool,
   },
 ];
 
