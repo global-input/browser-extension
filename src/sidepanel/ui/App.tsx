@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ConnectQR } from 'global-input-react';
 import { usePhoneConnection } from '../adapters/usePhoneConnection';
 import { watchIdle } from '../adapters/idle';
 import type { IdleReason } from '../adapters/idle';
@@ -10,6 +9,7 @@ import { useSiteAccess } from '../adapters/siteAccess';
 import { homeScreen } from '../core/phoneForms';
 import { TOOLS, findTool } from '../tools/registry';
 import { Tabs, ToolFrame, ToolList } from './tools';
+import { ConnectCode } from './connectCode';
 import { SiteControls, SitesSection, TurnDetectionOn } from './siteSettings';
 import type { PanelTab } from './tools';
 import type { SignInView } from '../core/signInController';
@@ -134,9 +134,7 @@ const ConnectView: React.FC<{ connection: ReturnType<typeof usePhoneConnection>;
     {connection.canRejoin && <Notice $tone="warn">Your phone dropped the connection. Rejoin from the app's history, or scan again.</Notice>}
     <Title>Connect your phone</Title>
     <Text>Scan once with the Global Input App. You stay connected while this panel is open.</Text>
-    <div style={{ alignSelf: 'center', padding: 12, border: `1px solid ${color.line}`, borderRadius: 12, minHeight: 200, minWidth: 200 }}>
-      <ConnectQR mobile={connection.mobile} size={200} label={null} />
-    </div>
+    <ConnectCode mobile={connection.mobile} />
     {connection.status === 'error' && <Notice $tone="warn">Could not reach the Global Input service. {connection.errorMessage}</Notice>}
     <ol style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6, color: color.inkSoft }}>
       <li>Open the Global Input App on your phone</li>
