@@ -1,12 +1,21 @@
 // Page control without presets or rules: the page is analysed when the tool opens (and again
 // on request). The panel lists what can be operated, grouped as the page groups it, with Locate
-// to outline a control on the page; the phone gets the same controls and operates them.
-// Values are never shown in the panel.
+// to outline a control on the page; the phone gets the same controls and operates them, and
+// keeps up as the page changes. Values are never shown in the panel.
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useMobile } from 'global-input-mobile';
 import type { InitData } from 'global-input-react';
-import { actOnActivePage, analyseActivePage, highlightOnActivePage, pageActionOnActivePage } from '../../adapters/chromePage';
+import {
+  actOnActivePage,
+  analyseActivePage,
+  highlightOnActivePage,
+  pageActionOnActivePage,
+  stopPageControl,
+  watchActiveTab,
+  watchPageControlChanges,
+  watchPageStates,
+} from '../../adapters/chromePage';
 import { Card, Notice, SectionLabel, Site, Text } from '../../ui/components';
 import { Caption, PrimaryButton, Row, SmallButton } from '../../ui/controls';
 import { color } from '../../ui/theme';
@@ -14,7 +23,17 @@ import type { ToolProps } from '../registry';
 import { useActiveHost } from '../shared/useActiveHost';
 import { KIND_TEXT, analysisStateOf, controlCount, describeMore } from './analysis';
 import type { AnalysisState } from './analysis';
-import { PHONE_IDS, describeInput, mayChangePage, phoneFormOf, phoneInputOf, phoneMessageForm, phoneSignatureOf } from './phoneForm';
+import {
+  PHONE_IDS,
+  describeInput,
+  phoneFormOf,
+  phoneInputOf,
+  phoneMessageForm,
+  phoneSignatureOf,
+  phoneValueChangesOf,
+  phoneValuesOf,
+  valueKeyOf,
+} from './phoneForm';
 import type { PhoneInput } from './phoneForm';
 import type { PageModel } from '../../../shared/pageControlMessages';
 
@@ -82,16 +101,17 @@ const Groups: React.FC<{ model: PageModel; host: string }> = ({ model, host }) =
   );
 };
 
-// After input that may change the page (a press, a choice, going back), the page is analysed
-// again a few times, so a new step, a dialog or a new page reaches the phone. Step 3 replaces
-// this with watching the page.
-const REANALYSE_AFTER_MS = [800, 2000, 4000];
-
 const ACT_PROBLEMS: Record<string, (label: string) => string> = {
   disabled: label => `“${label}” can't be used at the moment.`,
   unsupported: label => `“${label}” can't be operated from the phone yet.`,
   gone: () => 'The page has changed, so it was analysed again.',
 };
+
+// A tab that showed nothing answering after an input is analysed again after this long: the
+// page is usually loading, and reports itself when it has loaded.
+const NO_ANSWER_RETRY_MS = 3000;
+
+const otherSiteText = (other?: string) => `This tab now shows ${other || 'another site'}.`;
 
 const phoneScreenOf = (state: AnalysisState, host: string, status: string) => {
   switch (state.status) {
@@ -100,67 +120,102 @@ const phoneScreenOf = (state: AnalysisState, host: string, status: string) => {
     case 'unreachable':
       return { key: 'unreachable', screen: phoneMessageForm('Page control', 'This tab cannot be operated. Reload the page, then press Analyse again.') };
     case 'other-site':
-      return { key: 'other-site', screen: phoneMessageForm('Page control', 'This tab now shows another site. Press Analyse again to operate it.') };
+      return { key: `other-site:${state.host || ''}`, screen: phoneMessageForm('Page control', `${otherSiteText(state.host)} Press Analyse again to operate it.`) };
     default:
       return { key: 'analysing', screen: phoneMessageForm('Page control', `Analysing ${host || 'the page'}…`) };
   }
 };
 
+// Another site keeps the name it was reported with, when analysing again can only say "another site".
+const keepOtherSite = (next: AnalysisState) => (previous: AnalysisState) =>
+  next.status === 'other-site' && !next.host && previous.status === 'other-site' ? previous : next;
+
 export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit }) => {
   const { host, asked, ask } = useActiveHost(openedOn);
   const [state, setState] = useState<AnalysisState>({ status: 'analysing' });
   const [lastInput, setLastInput] = useState('');
-  const timers = useRef<number[]>([]);
+  const retry = useRef<number | null>(null);
   const status = useRef('');
   const sent = useRef('');
+  // What the phone shows for each control, so only values the page changed are sent.
+  const shown = useRef(new Map<string, string>());
   const screen = useRef(phoneScreenOf(state, host, '').screen);
   const mobile = useMobile(() => screen.current as unknown as InitData, true);
 
-  const stopReanalysing = () => {
-    timers.current.forEach(timer => window.clearTimeout(timer));
-    timers.current = [];
-  };
-  useEffect(() => stopReanalysing, []);
-
-  const analyse = useCallback(async () => {
-    stopReanalysing();
-    if (!host) {
-      setState({ status: 'unreachable' });
-      return;
-    }
-    setState({ status: 'analysing' });
-    setState(analysisStateOf(await analyseActivePage(host), Date.now()));
-  }, [host]);
+  // Quietly (without "Analysing…") when keeping up with the page.
+  const analyse = useCallback(
+    async (quiet = false) => {
+      if (retry.current) window.clearTimeout(retry.current);
+      retry.current = null;
+      if (!host) {
+        setState({ status: 'unreachable' });
+        return;
+      }
+      if (!quiet) setState({ status: 'analysing' });
+      setState(keepOtherSite(analysisStateOf(await analyseActivePage(host), Date.now())));
+    },
+    [host]
+  );
 
   useEffect(() => {
     if (asked) analyse();
   }, [asked, analyse]);
 
-  // Quietly, without "Analysing…": while a new page loads nothing answers, which only counts
-  // on the last try.
-  const reanalyseSoon = () => {
-    stopReanalysing();
-    timers.current = REANALYSE_AFTER_MS.map((delay, index) =>
-      window.setTimeout(async () => {
-        const reply = await analyseActivePage(host);
-        if (reply || index === REANALYSE_AFTER_MS.length - 1) setState(analysisStateOf(reply, Date.now()));
-      }, delay)
-    );
-  };
+  // Keeping up with the page: changes the page reports, a new page loaded in the tab (it
+  // reports itself), and switching tabs. Pages stop reporting when Page control closes.
+  useEffect(() => {
+    if (!host) return undefined;
+    let activeTab: number | null = null;
+    const stopChanges = watchPageControlChanges((tabId, model) => {
+      if ((activeTab !== null && tabId !== activeTab) || model.host !== host) return false;
+      setState({ status: 'done', model, at: Date.now() });
+      return true;
+    });
+    const stopPages = watchPageStates((tabId, page) => {
+      if (tabId !== activeTab) return;
+      if (page.host === host) analyse(true);
+      else setState({ status: 'other-site', host: page.host });
+    });
+    const stopTabs = watchActiveTab(tabId => {
+      const switched = activeTab !== null && activeTab !== tabId;
+      activeTab = tabId;
+      if (switched) analyse(true);
+    });
+    return () => {
+      stopChanges();
+      stopPages();
+      stopTabs();
+    };
+  }, [host, analyse]);
+
+  useEffect(
+    () => () => {
+      if (retry.current) window.clearTimeout(retry.current);
+      stopPageControl();
+    },
+    []
+  );
 
   const tellPhone = (text: string) => {
     status.current = text;
     mobile.sendValue(PHONE_IDS.status, text);
   };
 
-  // The phone gets a new form only when the controls change, not when values do.
+  // The phone gets a new form when the controls change; otherwise only the values the page
+  // changed by itself.
   useEffect(() => {
     const dialogNote = state.status === 'done' && state.model.scope === 'dialog' ? 'A dialog is open on the page, so only its controls are shown.' : '';
     const next = phoneScreenOf(state, host, status.current || dialogNote);
     screen.current = next.screen;
     if (next.key !== sent.current) {
       sent.current = next.key;
+      shown.current = state.status === 'done' ? phoneValuesOf(state.model) : new Map();
       mobile.sendInitData(next.screen as unknown as InitData);
+    } else if (state.status === 'done') {
+      for (const change of phoneValueChangesOf(state.model, shown.current)) {
+        shown.current.set(change.id, change.key);
+        mobile.sendValue(change.id, change.value);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, host]);
@@ -177,31 +232,26 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
       return;
     }
     setLastInput(describeInput(input));
-    if (input.type === 'page') {
-      const reply = await pageActionOnActivePage(host, input.action);
-      if (reply && reply.status === 'error') setState({ status: 'other-site' });
-      else if (!reply) setState({ status: 'unreachable' });
-      else if (mayChangePage(input)) reanalyseSoon();
-      return;
-    }
-    const reply = await actOnActivePage(host, input.control.id, input.value);
+    const reply =
+      input.type === 'page' ? await pageActionOnActivePage(host, input.action) : await actOnActivePage(host, input.control.id, input.value);
     if (!reply) {
-      // The page is reloading or moved on after a press; analysing again finds out.
-      reanalyseSoon();
+      // The page is loading after a press; it reports itself once loaded.
+      if (!retry.current) retry.current = window.setTimeout(() => analyse(true), NO_ANSWER_RETRY_MS);
     } else if (reply.status === 'error' && reply.reason === 'host-mismatch') {
-      setState({ status: 'other-site' });
-    } else if (reply.status === 'error') {
+      setState(keepOtherSite({ status: 'other-site' }));
+    } else if (reply.status === 'error' && input.type === 'control') {
       tellPhone(ACT_PROBLEMS[reply.reason](input.control.label));
-      if (reply.reason === 'gone') analyse();
-    } else {
-      if (status.current) tellPhone('');
-      if (mayChangePage(input)) reanalyseSoon();
+      if (reply.reason === 'gone') analyse(true);
+    } else if (status.current) {
+      tellPhone('');
     }
   };
 
   mobile.setOnchange(({ field }) => {
     const input = phoneInputOf(state.status === 'done' ? state.model : null, field.id as string, field.value);
-    if (input) run(input);
+    if (!input) return;
+    if (input.type === 'control') shown.current.set(input.control.id, valueKeyOf(field.value));
+    run(input);
   });
 
   const count = state.status === 'done' ? controlCount(state.model) : 0;
@@ -210,7 +260,7 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
       {host && <Site host={host} detail={state.status === 'done' ? `Analysed at ${formatTime(state.at)}` : 'Analysing this page'} />}
       <Row>
-        <PrimaryButton type="button" onClick={host ? analyse : ask} disabled={state.status === 'analysing'}>
+        <PrimaryButton type="button" onClick={host ? () => analyse() : ask} disabled={state.status === 'analysing'}>
           {state.status === 'done' ? 'Analyse again' : 'Analyse page'}
         </PrimaryButton>
       </Row>
@@ -223,7 +273,7 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
       )}
       {state.status === 'other-site' && (
         <>
-          <Notice $tone="warn">This tab now shows another site.</Notice>
+          <Notice $tone="warn">{otherSiteText(state.host)}</Notice>
           <Row>
             <SmallButton type="button" onClick={ask}>
               Analyse this tab

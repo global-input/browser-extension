@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PHONE_IDS, describeInput, mayChangePage, phoneFormOf, phoneInputOf, phoneSignatureOf } from './phoneForm';
+import { PHONE_IDS, describeInput, phoneFormOf, phoneValueChangesOf, phoneValuesOf, valueKeyOf, phoneInputOf, phoneSignatureOf } from './phoneForm';
 import type { PageModel } from '../../../shared/pageControlMessages';
 
 const model: PageModel = {
@@ -71,13 +71,9 @@ describe('the phone form', () => {
     expect(phoneInputOf(null, 'c1', 'x')).toBeNull();
   });
 
-  it('expects the page to change after a press or a choice, not after typing', () => {
+  it('says what the phone did, without values', () => {
     const typing = phoneInputOf(model, 'c1', 'G')!;
     const press = phoneInputOf(model, 'c6', undefined)!;
-    expect(mayChangePage(typing)).toBe(false);
-    expect(mayChangePage(press)).toBe(true);
-    expect(mayChangePage({ type: 'page', action: 'back' })).toBe(true);
-    expect(mayChangePage({ type: 'page', action: 'up' })).toBe(false);
     expect(describeInput(press)).toBe('Pressed “Place order”');
     expect(describeInput(typing)).toBe('Typing into “Full name”');
   });
@@ -86,5 +82,24 @@ describe('the phone form', () => {
     const typed = { ...model, groups: [{ ...model.groups[0], controls: [{ ...model.groups[0].controls[0], value: 'Grace' }, ...model.groups[0].controls.slice(1)] }, ...model.groups.slice(1)] };
     expect(phoneSignatureOf(typed)).toBe(phoneSignatureOf(model));
     expect(phoneSignatureOf({ ...model, groups: model.groups.slice(1) })).not.toBe(phoneSignatureOf(model));
+  });
+
+  it('sends only the values the page changed by itself, not what the phone typed', () => {
+    const shown = phoneValuesOf(model);
+    expect(shown.has('c2')).toBe(false);
+    // The phone typed "Grace  " (the page reports it trimmed) and chose UK.
+    shown.set('c1', valueKeyOf('Grace  '));
+    shown.set('c3', valueKeyOf(['uk']));
+    const page = (changes: Record<string, unknown>): typeof model => ({
+      ...model,
+      groups: model.groups.map(group => ({ ...group, controls: group.controls.map(control => (control.id in changes ? { ...control, value: changes[control.id] as any } : control)) })),
+    });
+    expect(phoneValueChangesOf(page({ c1: 'Grace', c3: 'uk' }), shown)).toEqual([]);
+    expect(phoneValueChangesOf(page({ c1: 'Grace', c3: 'uk', c4: false, c5: '2026-11-01' }), shown)).toEqual([
+      { id: 'c4', value: [], key: '' },
+      { id: 'c5', value: '2026-11-01', key: '2026-11-01' },
+    ]);
+    shown.set('c1', valueKeyOf('x'.repeat(600)));
+    expect(phoneValueChangesOf(page({ c1: `${'x'.repeat(499)}…`, c3: 'uk' }), shown)).toEqual([]);
   });
 });

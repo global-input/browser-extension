@@ -7,7 +7,7 @@ import { SIGN_IN_MESSAGE } from '../../shared/signInMessages';
 import type { DetectReply, FillFocusedReply, FillReply, PageState, ReadFocusedReply } from '../../shared/signInMessages';
 import type { Ports } from '../core/signInController';
 import { PAGE_CONTROL_MESSAGE } from '../../shared/pageControlMessages';
-import type { ActReply, AnalyseReply, ControlValue, HighlightReply, PageAction, PageActionReply } from '../../shared/pageControlMessages';
+import type { ActReply, AnalyseReply, ChangedReport, ControlValue, HighlightReply, PageAction, PageActionReply, PageModel } from '../../shared/pageControlMessages';
 
 const sendToTab = async <T>(tabId: number, messageType: string, content?: unknown): Promise<T | null> => {
   try {
@@ -108,4 +108,29 @@ export const actOnActivePage = async (expectedHost: string, id: string, value?: 
 export const pageActionOnActivePage = async (expectedHost: string, action: PageAction) => {
   const tabId = await activeTabId();
   return tabId === null ? null : sendToTab<PageActionReply>(tabId, PAGE_CONTROL_MESSAGE.PAGE_ACTION, { expectedHost, action });
+};
+
+// Page control is closed: the page stops reporting changes.
+export const stopPageControl = async () => {
+  const tabId = await activeTabId();
+  if (tabId !== null) await sendToTab(tabId, PAGE_CONTROL_MESSAGE.STOP);
+};
+
+// Changes reported by pages while Page control is open. Answering { status: 'ok' } keeps the
+// page reporting (onChange returns false for a page Page control no longer operates); the
+// model's host must match the origin Chrome gives for the sender.
+export const watchPageControlChanges = (onChange: (tabId: number, model: PageModel) => boolean) => {
+  const listener = (message: any, sender: chrome.runtime.MessageSender, reply: (response: object) => void) => {
+    if (!message || message.messageType !== PAGE_CONTROL_MESSAGE.CHANGED || !sender.tab || sender.tab.id === undefined) {
+      return;
+    }
+    const report = message.content as ChangedReport;
+    const senderUrl = sender.origin || sender.url;
+    if (!senderUrl || !report || !report.model || new URL(senderUrl).host !== report.model.host) {
+      return;
+    }
+    reply({ status: onChange(sender.tab.id, report.model) ? 'ok' : 'stop' });
+  };
+  chrome.runtime.onMessage.addListener(listener);
+  return () => chrome.runtime.onMessage.removeListener(listener);
 };

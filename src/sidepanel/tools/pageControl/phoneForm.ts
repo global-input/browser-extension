@@ -24,12 +24,32 @@ const PAGE_ACTIONS: FormField[] = [
   { id: PHONE_IDS.close, type: 'button', label: 'Close', viewId: 'pc-row2' },
 ];
 
+// A control's value as the phone shows it; undefined for secrets and for what has no value.
+export const phoneValueOf = (control: PageControl): FormField['value'] | undefined => {
+  switch (control.kind) {
+    case 'text':
+    case 'number':
+    case 'date':
+    case 'multiline':
+      return typeof control.value === 'string' || typeof control.value === 'number' ? String(control.value) : '';
+    case 'choice':
+    case 'multi-choice':
+      return Array.isArray(control.value) ? control.value : control.value === undefined ? [] : [String(control.value)];
+    case 'toggle':
+      return control.value === true ? [TOGGLE_ON] : [];
+    case 'range':
+      return typeof control.value === 'number' ? control.value : 0;
+    default:
+      return undefined;
+  }
+};
+
 const textField = (control: PageControl, nLines: number): FormField => ({
   id: control.id,
   type: 'text',
   label: control.format ? `${control.label} (${control.format})` : control.label,
   nLines,
-  value: typeof control.value === 'string' || typeof control.value === 'number' ? String(control.value) : '',
+  value: phoneValueOf(control),
 });
 
 // One phone field for a control, or null for what the phone can't operate yet (video and audio).
@@ -47,14 +67,13 @@ export const phoneFieldOf = (control: PageControl): FormField | null => {
     case 'choice':
     case 'multi-choice': {
       if (!control.options || !control.options.length) return null;
-      const chosen = Array.isArray(control.value) ? control.value : control.value === undefined ? [] : [String(control.value)];
       return {
         id: control.id,
         type: 'list',
         selectType: control.kind === 'choice' ? 'single' : 'multiple',
         label: control.label,
         items: control.options.map(option => ({ value: option.value, label: option.label })),
-        value: chosen,
+        value: phoneValueOf(control),
       };
     }
     case 'toggle':
@@ -63,14 +82,14 @@ export const phoneFieldOf = (control: PageControl): FormField | null => {
         type: 'list',
         selectType: 'multiple',
         items: [{ value: TOGGLE_ON, label: control.label }],
-        value: control.value === true ? [TOGGLE_ON] : [],
+        value: phoneValueOf(control),
       };
     case 'range':
       return {
         id: control.id,
         type: 'range',
         label: control.label,
-        value: typeof control.value === 'number' ? control.value : 0,
+        value: phoneValueOf(control),
         ...(control.min !== undefined && { minimumValue: control.min }),
         ...(control.max !== undefined && { maximumValue: control.max }),
         ...(control.step !== undefined && { step: control.step }),
@@ -113,6 +132,41 @@ export const phoneSignatureOf = (model: PageModel) =>
       group.controls.map(control => [control.id, control.kind, control.label, (control.options || []).map(option => option.value)]),
     ])
   );
+
+// Values compared the way the page reports them: spaces collapsed, choices in any order.
+export const valueKeyOf = (value: unknown) => {
+  if (value === undefined || value === null) return '';
+  if (Array.isArray(value)) return value.map(String).sort().join('\u0000');
+  return String(value).replace(/\s+/g, ' ').trim();
+};
+
+const controlsOf = (model: PageModel) => model.groups.flatMap(group => group.controls);
+
+// What the phone shows for each control, by id, right after it got the form.
+export const phoneValuesOf = (model: PageModel) => {
+  const values = new Map<string, string>();
+  for (const control of controlsOf(model)) {
+    const value = phoneValueOf(control);
+    if (value !== undefined) values.set(control.id, valueKeyOf(value));
+  }
+  return values;
+};
+
+// Values the page changed by itself, to send to the phone. What the phone typed comes back
+// from the page the same, so it isn't sent back while the user types. A long text the page
+// reports shortened (ending in "…") is not sent back either.
+export const phoneValueChangesOf = (model: PageModel, shown: Map<string, string>) => {
+  const changes: { id: string; value: FormField['value']; key: string }[] = [];
+  for (const control of controlsOf(model)) {
+    const value = phoneValueOf(control);
+    if (value === undefined) continue;
+    const key = valueKeyOf(value);
+    const before = shown.get(control.id) ?? '';
+    if (key === before || (key.endsWith('…') && before.startsWith(key.slice(0, -1)))) continue;
+    changes.push({ id: control.id, value, key });
+  }
+  return changes;
+};
 
 export type PhoneInput =
   | { type: 'control'; control: PageControl; value?: ControlValue }
@@ -167,10 +221,6 @@ export const phoneInputOf = (model: PageModel | null, fieldId: string, value: un
     }
   }
 };
-
-// Whether the page may look different after the input: everything but typing.
-export const mayChangePage = (input: PhoneInput) =>
-  input.type === 'page' ? input.action === 'back' : input.type === 'control' && !['text', 'multiline', 'secret', 'number', 'date'].includes(input.control.kind);
 
 // What the panel says the phone did, without any value.
 export const describeInput = (input: PhoneInput) => {

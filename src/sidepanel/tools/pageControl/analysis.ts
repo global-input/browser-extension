@@ -7,7 +7,7 @@ export type AnalysisState =
   // No content script answered: a browser page, or a tab opened before the extension updated.
   | { status: 'unreachable' }
   // The tab now shows another site than the one Page control was opened on.
-  | { status: 'other-site' }
+  | { status: 'other-site'; host?: string }
   | { status: 'done'; model: PageModel; at: number };
 
 export const analysisStateOf = (reply: AnalyseReply | null, now: number): AnalysisState => {

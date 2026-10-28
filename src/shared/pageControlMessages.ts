@@ -11,6 +11,11 @@ export const PAGE_CONTROL_MESSAGE = {
   ACT: 'pagecontrol/act',
   // panel -> page: scroll or go back, on any page.
   PAGE_ACTION: 'pagecontrol/page-action',
+  // panel -> page: Page control closed; stop watching the page.
+  STOP: 'pagecontrol/stop',
+  // page -> panel: the page changed since it was analysed; carries the new PageModel. Sent
+  // from an analysis until the panel stops it or doesn't answer { status: 'ok' }.
+  CHANGED: 'pagecontrol/changed',
 } as const;
 
 export const isPageControlMessage = (messageType: unknown) => typeof messageType === 'string' && messageType.startsWith('pagecontrol/');
@@ -102,3 +107,7 @@ export interface PageActionRequest {
 }
 
 export type PageActionReply = { status: 'success' } | { status: 'error'; reason: 'host-mismatch' };
+
+export interface ChangedReport {
+  model: PageModel;
+}
