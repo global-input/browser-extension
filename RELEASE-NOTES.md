@@ -1,5 +1,25 @@
 # Release Notes
 
+## 5.2.0
+
+Private pairing for people who need more than the default protection, connection settings in the panel, and a way to connect a Global Input App on the same device.
+
+### New
+
+- **Copy the connection code.** Right-click the QR code and choose **Copy into Clipboard**, or press **Copy code for an app on this device**. A Global Input App on the same device can then connect from the clipboard instead of scanning.
+- **Advanced settings.** Settings now ends with a collapsed **Advanced** section. Most people never need it.
+  - **Relay server:** the WebSocket server URL and API key, for people who run their own server. The server only forwards end-to-end encrypted messages, so these values aren't secret. Leave them blank for the default server.
+  - **Private pairing:** **Pair a phone** makes two new random keys (a Security Group Key and a Code Key) and shows a pairing code for your phone to scan. After that, only phones paired with this browser can read its QR codes and connect. The keys and the pairing code stay hidden until you press **Show**, and hide again by themselves. You can also pair another phone, make new keys, enter keys made elsewhere, or go back to the default keys.
+- **Pairing at a glance.** With private keys, the Connect screen says so, and what to do if a phone can't connect.
+
+### Changed
+
+- Connection settings are stored in a new format. Anything unreadable falls back to the default settings, so the extension always connects. Settings saved by older versions are not carried over.
+
+### Permissions
+
+- No new permissions.
+
 ## 5.1.0
 
 All the tools are redesigned for the panel, and new features help keep your content away from people and cameras around you. This is also the first release of the new extension for Firefox, where the panel is Firefox's sidebar.
