@@ -2,10 +2,18 @@
 
 ## 5.2.0
 
-Private pairing for people who need more than the default protection, connection settings in the panel, and a way to connect a Global Input App on the same device.
+A new Page control that works on any site: it analyses the page and lets your phone operate it. Also private pairing for people who need more than the default protection, connection settings in the panel, and a way to connect a Global Input App on the same device.
 
 ### New
 
+- **Page control, rebuilt.** Instead of rules written for a few sites, Page control analyses the page you're on and finds what can be operated: fields, drop-downs, checkboxes, buttons, links, sliders, video and audio.
+  - **In the panel:** the controls are grouped as the page groups them (forms, search, dialogs, menus), with the page's own names. **Locate** outlines one on the page. When a dialog is open, such as a cookie banner, only its controls are listed.
+  - **On your phone:** the same controls, ready to use. Typing goes into the page as you type, choices and checkboxes are set, and buttons and links are pressed. Fields show what's already filled in. **Password and card fields always start empty: their values are never read from the page.** **Up**, **Down** and **Go back** work on any page.
+  - **Keeps up with the page:** a dialog that opens, the next step of a form, a field the page fills in, or a new page on the same site reaches your phone by itself. Your own typing is never interrupted.
+  - **Video and audio:** **Play**, **Pause**, **Position** and **Volume** from your phone, even when the site hides its own player controls.
+  - **Also handled:** sliders and text editors that sites build themselves, and forms inside frames from the same site.
+  - **Show more:** pages with many links show the most useful controls first; **Show more** adds the rest, 30 at a time.
+  - **Pin, Hide and Rename:** under **Change**, pin the controls you use to the top, hide the ones you don't need on the phone, and give controls your own names. They're remembered for the site. **Reset this site**, or Settings → Sites, clears them.
 - **Copy the connection code.** Right-click the QR code and choose **Copy into Clipboard**, or press **Copy code for an app on this device**. A Global Input App on the same device can then connect from the clipboard instead of scanning.
 - **Advanced settings.** Settings now ends with a collapsed **Advanced** section. Most people never need it.
   - **Relay server:** the WebSocket server URL and API key, for people who run their own server. The server only forwards end-to-end encrypted messages, so these values aren't secret. Leave them blank for the default server.
@@ -14,6 +22,7 @@ Private pairing for people who need more than the default protection, connection
 
 ### Changed
 
+- **No built-in page rules in the panel.** Page control no longer uses presets or the JSON rule editor. Sign-in uses a form you saved for the site (**Save as page rule**), otherwise it finds sign-in forms automatically, as it already did on most sites. **Settings → Sites** now lists saved sign-in forms, with **Forget**, and sites with remembered Page control choices. The popup is unchanged.
 - Connection settings are stored in a new format. Anything unreadable falls back to the default settings, so the extension always connects. Settings saved by older versions are not carried over.
 
 ### Permissions
