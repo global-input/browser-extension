@@ -11,6 +11,7 @@ import type { IsVisible } from './collect';
 import { MAX_CONTROLS, MAX_CONTROLS_LIMIT, PAGE_CONTROL_MESSAGE } from '../../shared/pageControlMessages';
 import type {
   PageModel,
+  SiteCustom,
   ActReply,
   ActRequest,
   AnalyseReply,
@@ -38,13 +39,16 @@ export const createPageControlAgent = (
 ) => {
   const registry = createRegistry();
   // The panel's limit ("Show more") also applies when the page is analysed again by itself.
+  // What is remembered for the site, too.
   let maxControls = MAX_CONTROLS;
-  const watcher = createWatcher({ doc, analyse: () => analysePage(doc, { visible, registry, maxControls }), report });
+  let custom: SiteCustom | undefined;
+  const watcher = createWatcher({ doc, analyse: () => analysePage(doc, { visible, registry, maxControls, custom }), report });
 
-  const analyse = ({ expectedHost, limit }: AnalyseRequest): AnalyseReply => {
+  const analyse = ({ expectedHost, limit, custom: siteCustom }: AnalyseRequest): AnalyseReply => {
     if (doc.location.host !== expectedHost) return { status: 'error', reason: 'host-mismatch' };
     maxControls = Number.isInteger(limit) ? Math.max(1, Math.min(MAX_CONTROLS_LIMIT, limit as number)) : MAX_CONTROLS;
-    const model = analysePage(doc, { visible, registry, maxControls });
+    custom = siteCustom && Array.isArray(siteCustom.pinned) && Array.isArray(siteCustom.hidden) ? siteCustom : undefined;
+    const model = analysePage(doc, { visible, registry, maxControls, custom });
     watcher.start(model);
     return { status: 'success', model };
   };

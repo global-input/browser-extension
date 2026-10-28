@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { siteSettingsStore } from '../adapters/siteSettings';
+import { forgetRule, savedRuleHosts } from '../adapters/rules';
+import { siteControlsStore } from '../adapters/siteControls';
 import type { SiteSettings } from '../core/signInController';
 import { Button, Field, SectionLabel, Text } from './components';
 import { color, radius } from './theme';
@@ -68,7 +70,7 @@ export const SiteControls: React.FC<SiteControlsProps> = ({ host, canSaveRule, o
             <Button type="button" onClick={onSaveRule}>
               Save as page rule
             </Button>
-            <Text style={{ fontSize: 12 }}>Remembers exactly where this form's fields are. You can edit it in Tools, then Page control.</Text>
+            <Text style={{ fontSize: 12 }}>Remembers exactly where this form's fields are. You can forget it in Settings, under Sites.</Text>
           </>
         )}
       </div>
@@ -133,9 +135,53 @@ export const SiteSettingsList: React.FC<{ onChanged: () => void }> = ({ onChange
   );
 };
 
+// Sites with something remembered elsewhere: a saved sign-in rule, or Page control's pinned,
+// hidden and renamed controls. Each can be forgotten.
+const RememberedList: React.FC<{ hosts: string[]; detail: string; action: string; forget: (host: string) => void; onChanged?: () => void }> = ({
+  hosts: initial,
+  detail,
+  action,
+  forget,
+  onChanged,
+}) => {
+  const [hosts, setHosts] = useState(initial);
+  if (!hosts.length) return null;
+  return (
+    <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+      {hosts.map(host => (
+        <SiteRow key={host}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ wordBreak: 'break-all' }}>{host}</div>
+            <div style={{ fontSize: 12, color: color.muted }}>{detail}</div>
+          </div>
+          <Button
+            type="button"
+            style={{ borderRadius: radius.control, flex: 'none' }}
+            onClick={() => {
+              forget(host);
+              setHosts(hosts.filter(other => other !== host));
+              onChanged?.();
+            }}
+          >
+            {action}
+          </Button>
+        </SiteRow>
+      ))}
+    </ul>
+  );
+};
+
 export const SitesSection: React.FC<{ onChanged: () => void }> = ({ onChanged }) => (
   <>
     <SectionLabel>Sites</SectionLabel>
     <SiteSettingsList onChanged={onChanged} />
+    <RememberedList
+      hosts={savedRuleHosts()}
+      detail="Saved sign-in form (page rule)"
+      action="Forget"
+      forget={forgetRule}
+      onChanged={onChanged}
+    />
+    <RememberedList hosts={siteControlsStore.list()} detail="Page control: pinned, hidden or renamed controls" action="Reset" forget={siteControlsStore.reset} />
   </>
 );

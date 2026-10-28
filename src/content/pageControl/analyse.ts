@@ -7,7 +7,7 @@ import type { RegionType } from './group';
 import { formatOf, isPrimaryButton, mediaStateOf, nameOf, normalise, optionsOf, rangeOf, valueOf } from './describe';
 import type { ControlRegistry } from './registry';
 import { MAX_CONTROLS } from '../../shared/pageControlMessages';
-import type { ControlGroup, ControlKind, PageControl, PageModel } from '../../shared/pageControlMessages';
+import type { ControlGroup, ControlKind, PageControl, PageModel, SiteCustom } from '../../shared/pageControlMessages';
 
 
 const FALLBACK_NAMES: Partial<Record<ControlKind, string>> = {
@@ -68,9 +68,15 @@ export interface AnalyseOptions {
   visible: IsVisible;
   registry: ControlRegistry;
   maxControls?: number;
+  custom?: SiteCustom;
 }
 
-export const analysePage = (doc: Document, { visible, registry, maxControls = MAX_CONTROLS }: AnalyseOptions): PageModel => {
+// Matching what is remembered for the site: kind and name, without the "(2)" of repeated names.
+const refKeyOf = (kind: ControlKind, label: string) => `${kind}|${label.replace(/\s\(\d+\)$/, '')}`;
+
+const PINNED_SCORE = 1000;
+
+export const analysePage = (doc: Document, { visible, registry, maxControls = MAX_CONTROLS, custom }: AnalyseOptions): PageModel => {
   const modal = findModal(doc, visible);
   let candidates: Candidate[] = collectCandidates(doc, visible);
   if (modal) candidates = candidates.filter(candidate => modal.contains(candidate.element));
@@ -127,7 +133,16 @@ export const analysePage = (doc: Document, { visible, registry, maxControls = MA
     }
   }
 
-  const ranked = [...found].sort((a, b) => b.score - a.score || a.order - b.order);
+  // Hidden controls are left out (not even counted); pinned ones rank first, in their order.
+  const hidden = new Set((custom ? custom.hidden : []).map(ref => refKeyOf(ref.kind, ref.label)));
+  const pinned = (custom ? custom.pinned : []).map(ref => refKeyOf(ref.kind, ref.label));
+  const shown = found.filter(item => !hidden.has(refKeyOf(item.control.kind, item.control.label)));
+  for (const item of shown) {
+    const order = pinned.indexOf(refKeyOf(item.control.kind, item.control.label));
+    if (order >= 0) item.score += PINNED_SCORE - order;
+  }
+
+  const ranked = [...shown].sort((a, b) => b.score - a.score || a.order - b.order);
   const kept = ranked.slice(0, maxControls);
   const left = ranked.slice(maxControls);
   registry.keepOnly(new Set(kept.map(item => item.control.id)));

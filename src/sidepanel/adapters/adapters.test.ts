@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { siteSettingsStore } from './siteSettings';
-import { pageRulesPort } from './rules';
+import { forgetRule, pageRulesPort, savedRuleHosts } from './rules';
 
 beforeEach(() => localStorage.clear());
 
@@ -27,5 +27,18 @@ describe('saving page rules', () => {
     const saved = JSON.parse(localStorage.getItem('extension.control.sso.example')!);
     expect(saved).toEqual({ forms: [usernameForm, passwordForm] });
     expect(pageRulesPort.find('sso.example')).toEqual(saved);
+  });
+
+  it('uses no built-in rules, lists saved ones, forgets them, and ignores anything that is not a rule', () => {
+    expect(pageRulesPort.find('github.com')).toBeNull();
+    pageRulesPort.save('b.example', { forms: [usernameForm] });
+    pageRulesPort.save('a.example', { forms: [passwordForm] });
+    localStorage.setItem('extension.control.broken.example', '{not json');
+    localStorage.setItem('extension.control.empty.example', '{"forms": []}');
+    expect(pageRulesPort.find('broken.example')).toBeNull();
+    expect(savedRuleHosts()).toEqual(['a.example', 'b.example']);
+    forgetRule('a.example');
+    expect(savedRuleHosts()).toEqual(['b.example']);
+    expect(pageRulesPort.find('a.example')).toBeNull();
   });
 });

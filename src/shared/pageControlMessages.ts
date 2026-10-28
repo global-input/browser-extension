@@ -88,10 +88,24 @@ export interface PageModel {
   more: { links: number; buttons: number; fields: number };
 }
 
+// A control as remembered for a site: by kind and the page's name, not by where it is.
+export interface ControlRef {
+  kind: ControlKind;
+  label: string;
+}
+
+// What the page needs of what is remembered for the site: pinned controls rank first (so they
+// are never left out), hidden ones are left out.
+export interface SiteCustom {
+  pinned: ControlRef[];
+  hidden: ControlRef[];
+}
+
 export interface AnalyseRequest {
   expectedHost: string;
   // How many controls to include ("Show more" raises it); MAX_CONTROLS when missing.
   limit?: number;
+  custom?: SiteCustom;
 }
 
 export type AnalyseReply = { status: 'success'; model: PageModel } | { status: 'error'; reason: 'host-mismatch' };

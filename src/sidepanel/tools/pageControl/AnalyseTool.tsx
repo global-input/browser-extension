@@ -1,8 +1,9 @@
 // Page control without presets or rules: the page is analysed when the tool opens (and again
 // on request). The panel lists what can be operated, grouped as the page groups it, with Locate
 // to outline a control on the page; the phone gets the same controls and operates them, and
-// keeps up as the page changes. Values are never shown in the panel.
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+// keeps up as the page changes. Controls can be pinned, hidden and renamed for the site.
+// Values are never shown in the panel.
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useMobile } from 'global-input-mobile';
 import type { InitData } from 'global-input-react';
@@ -17,7 +18,8 @@ import {
   watchPageStates,
 } from '../../adapters/chromePage';
 import { Card, Notice, SectionLabel, Site, Text } from '../../ui/components';
-import { Caption, PrimaryButton, Row, SmallButton } from '../../ui/controls';
+import { Caption, PrimaryButton, Row, SmallButton, TextInput } from '../../ui/controls';
+import { siteControlsStore } from '../../adapters/siteControls';
 import { color } from '../../ui/theme';
 import type { ToolProps } from '../registry';
 import { useActiveHost } from '../shared/useActiveHost';
@@ -37,7 +39,9 @@ import {
 } from './phoneForm';
 import type { PhoneInput } from './phoneForm';
 import { MAX_CONTROLS, MAX_CONTROLS_LIMIT } from '../../../shared/pageControlMessages';
-import type { PageModel } from '../../../shared/pageControlMessages';
+import type { PageControl, PageModel } from '../../../shared/pageControlMessages';
+import { EMPTY_SITE_CONTROLS, applySiteControls, hide, isCustomised, isPinned, pageNameOf, pin, rename, show, unpin } from './siteControls';
+import type { SiteControls } from './siteControls';
 
 const ControlList = styled.ul`
   margin: 0;
@@ -69,8 +73,66 @@ const ControlName = styled.span`
 
 const formatTime = (time: number) => new Date(time).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-const Groups: React.FC<{ model: PageModel; host: string; onShowMore?: () => void }> = ({ model, host, onShowMore }) => {
+const ControlEditor = styled.li`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0 10px;
+  border-bottom: 1px solid ${color.lineSoft};
+`;
+
+interface GroupsProps {
+  model: PageModel;
+  host: string;
+  site: SiteControls;
+  onSiteChange: (site: SiteControls) => void;
+  onShowMore?: () => void;
+}
+
+// Pin, hide and rename one control; remembered for the site straight away.
+const EditControl: React.FC<{ control: PageControl; site: SiteControls; onSiteChange: (site: SiteControls) => void; done: () => void }> = ({
+  control,
+  site,
+  onSiteChange,
+  done,
+}) => {
+  const [name, setName] = useState(control.label.replace(/\s\(\d+\)$/, ''));
+  const pinned = isPinned(site, control);
+  return (
+    <ControlEditor>
+      <Row>
+        <SmallButton type="button" onClick={() => onSiteChange(pinned ? unpin(site, control) : pin(site, control))}>
+          {pinned ? 'Unpin' : 'Pin to the top'}
+        </SmallButton>
+        <SmallButton
+          type="button"
+          onClick={() => {
+            onSiteChange(hide(site, control));
+            done();
+          }}
+        >
+          Hide from the phone
+        </SmallButton>
+      </Row>
+      <form
+        style={{ display: 'flex', gap: 8 }}
+        onSubmit={event => {
+          event.preventDefault();
+          onSiteChange(rename(site, control, name));
+          done();
+        }}
+      >
+        <TextInput aria-label={`Your name for ${pageNameOf(control)}`} value={name} onChange={event => setName(event.target.value)} style={{ flex: 1, minWidth: 0 }} />
+        <SmallButton type="submit">Rename</SmallButton>
+      </form>
+      <Caption>The page calls it “{pageNameOf(control)}”. An empty name uses the page’s name again.</Caption>
+    </ControlEditor>
+  );
+};
+
+const Groups: React.FC<GroupsProps> = ({ model, host, site, onSiteChange, onShowMore }) => {
   const [message, setMessage] = useState('');
+  const [editing, setEditing] = useState<string | null>(null);
   const locate = async (id: string) => {
     const reply = await highlightOnActivePage(host, id);
     setMessage(reply && reply.status === 'success' ? '' : 'That control has changed on the page. Press Analyse again.');
@@ -84,15 +146,26 @@ const Groups: React.FC<{ model: PageModel; host: string; onShowMore?: () => void
           <SectionLabel as="h3">{group.title}</SectionLabel>
           <ControlList>
             {group.controls.map(control => (
-              <ControlItem key={control.id}>
-                <ControlName title={control.label}>{control.label}</ControlName>
-                <span style={{ color: color.muted, fontSize: 12, whiteSpace: 'nowrap' }}>
-                  {control.primary ? 'Main button' : KIND_TEXT[control.kind]}
-                </span>
-                <SmallButton type="button" onClick={() => locate(control.id)} aria-label={`Locate ${control.label} on the page`}>
-                  Locate
-                </SmallButton>
-              </ControlItem>
+              <React.Fragment key={control.id}>
+                <ControlItem>
+                  <ControlName title={control.label}>{control.label}</ControlName>
+                  <span style={{ color: color.muted, fontSize: 12, whiteSpace: 'nowrap' }}>
+                    {control.primary ? 'Main button' : KIND_TEXT[control.kind]}
+                  </span>
+                  <SmallButton type="button" onClick={() => locate(control.id)} aria-label={`Locate ${control.label} on the page`}>
+                    Locate
+                  </SmallButton>
+                  <SmallButton
+                    type="button"
+                    aria-expanded={editing === control.id}
+                    aria-label={`Change how ${control.label} shows on the phone`}
+                    onClick={() => setEditing(current => (current === control.id ? null : control.id))}
+                  >
+                    {editing === control.id ? 'Done' : 'Change'}
+                  </SmallButton>
+                </ControlItem>
+                {editing === control.id && <EditControl control={control} site={site} onSiteChange={onSiteChange} done={() => setEditing(null)} />}
+              </React.Fragment>
             ))}
           </ControlList>
         </Card>
@@ -105,6 +178,30 @@ const Groups: React.FC<{ model: PageModel; host: string; onShowMore?: () => void
               Show more
             </SmallButton>
           )}
+        </Row>
+      )}
+      {site.hidden.length > 0 && (
+        <Card style={{ padding: 12 }}>
+          <SectionLabel as="h3">Hidden from the phone</SectionLabel>
+          <ControlList>
+            {site.hidden.map(ref => (
+              <ControlItem key={`${ref.kind}|${ref.label}`}>
+                <ControlName title={ref.label}>{ref.label}</ControlName>
+                <span style={{ color: color.muted, fontSize: 12, whiteSpace: 'nowrap' }}>{KIND_TEXT[ref.kind]}</span>
+                <SmallButton type="button" onClick={() => onSiteChange(show(site, ref))}>
+                  Show
+                </SmallButton>
+              </ControlItem>
+            ))}
+          </ControlList>
+        </Card>
+      )}
+      {isCustomised(site) && (
+        <Row>
+          <Caption>Pinned, hidden and renamed controls are remembered for {host}.</Caption>
+          <SmallButton type="button" onClick={() => onSiteChange(EMPTY_SITE_CONTROLS)}>
+            Reset this site
+          </SmallButton>
         </Row>
       )}
       {message && <Notice $tone="warn">{message}</Notice>}
@@ -146,7 +243,14 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
   const [state, setState] = useState<AnalysisState>({ status: 'analysing' });
   const [lastInput, setLastInput] = useState('');
   // Raised by "Show more", for as long as Page control is open.
-  const [limit, setLimit] = useState(MAX_CONTROLS);
+  const limit = useRef(MAX_CONTROLS);
+  // What is remembered for the site; the page gets it with each analysis.
+  const [site, setSite] = useState<SiteControls>(() => siteControlsStore.get(host));
+  const siteRef = useRef(site);
+  useEffect(() => {
+    siteRef.current = siteControlsStore.get(host);
+    setSite(siteRef.current);
+  }, [host]);
   const retry = useRef<number | null>(null);
   const status = useRef('');
   const sent = useRef('');
@@ -165,12 +269,26 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
         return;
       }
       if (!quiet) setState({ status: 'analysing' });
-      setState(keepOtherSite(analysisStateOf(await analyseActivePage(host, limit), Date.now())));
+      const custom = { pinned: siteRef.current.pinned, hidden: siteRef.current.hidden };
+      setState(keepOtherSite(analysisStateOf(await analyseActivePage(host, limit.current, custom), Date.now())));
     },
-    [host, limit]
+    [host]
   );
 
-  const showMore = () => setLimit(current => Math.min(MAX_CONTROLS_LIMIT, current + MORE_STEP));
+  const showMore = () => {
+    limit.current = Math.min(MAX_CONTROLS_LIMIT, limit.current + MORE_STEP);
+    analyse(true);
+  };
+
+  const changeSite = (next: SiteControls) => {
+    siteRef.current = next;
+    setSite(next);
+    siteControlsStore.set(host, next);
+    analyse(true);
+  };
+
+  // The analysis as shown: your names, pinned controls first.
+  const view = useMemo<AnalysisState>(() => (state.status === 'done' ? { ...state, model: applySiteControls(state.model, site) } : state), [state, site]);
 
   useEffect(() => {
     if (asked) analyse();
@@ -219,21 +337,21 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
   // The phone gets a new form when the controls change; otherwise only the values the page
   // changed by itself.
   useEffect(() => {
-    const dialogNote = state.status === 'done' && state.model.scope === 'dialog' ? 'A dialog is open on the page, so only its controls are shown.' : '';
-    const next = phoneScreenOf(state, host, status.current || dialogNote);
+    const dialogNote = view.status === 'done' && view.model.scope === 'dialog' ? 'A dialog is open on the page, so only its controls are shown.' : '';
+    const next = phoneScreenOf(view, host, status.current || dialogNote);
     screen.current = next.screen;
     if (next.key !== sent.current) {
       sent.current = next.key;
-      shown.current = state.status === 'done' ? phoneValuesOf(state.model) : new Map();
+      shown.current = view.status === 'done' ? phoneValuesOf(view.model) : new Map();
       mobile.sendInitData(next.screen as unknown as InitData);
-    } else if (state.status === 'done') {
-      for (const change of phoneValueChangesOf(state.model, shown.current)) {
+    } else if (view.status === 'done') {
+      for (const change of phoneValueChangesOf(view.model, shown.current)) {
         shown.current.set(change.id, change.key);
         mobile.sendValue(change.id, change.value);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state, host]);
+  }, [view, host]);
 
   const run = async (input: PhoneInput) => {
     if (input.type === 'close') {
@@ -271,13 +389,13 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
   };
 
   mobile.setOnchange(({ field }) => {
-    const input = phoneInputOf(state.status === 'done' ? state.model : null, field.id as string, field.value);
+    const input = phoneInputOf(view.status === 'done' ? view.model : null, field.id as string, field.value);
     if (!input) return;
     if (input.type === 'control' || input.type === 'media') shown.current.set(field.id as string, valueKeyOf(field.value));
     run(input);
   });
 
-  const count = state.status === 'done' ? controlCount(state.model) : 0;
+  const count = view.status === 'done' ? controlCount(view.model) : 0;
 
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -304,7 +422,12 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
           </Row>
         </>
       )}
-      {state.status === 'done' && count === 0 && <Text>Nothing on this page can be operated.</Text>}
+      {state.status === 'done' && count === 0 && (
+        <>
+          <Text>Nothing on this page can be operated.</Text>
+          {site.hidden.length > 0 && <Groups model={state.model} host={host} site={site} onSiteChange={changeSite} />}
+        </>
+      )}
       {state.status === 'done' && count > 0 && (
         <>
           <Text>
@@ -313,7 +436,13 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
             page.
           </Text>
           {lastInput && <Caption>From the phone: {lastInput}.</Caption>}
-          <Groups model={state.model} host={host} onShowMore={limit < MAX_CONTROLS_LIMIT ? showMore : undefined} />
+          <Groups
+            model={view.status === 'done' ? view.model : state.model}
+            host={host}
+            site={site}
+            onSiteChange={changeSite}
+            onShowMore={limit.current < MAX_CONTROLS_LIMIT ? showMore : undefined}
+          />
         </>
       )}
     </div>

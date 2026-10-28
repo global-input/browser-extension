@@ -7,7 +7,7 @@ import { SIGN_IN_MESSAGE } from '../../shared/signInMessages';
 import type { DetectReply, FillFocusedReply, FillReply, PageState, ReadFocusedReply } from '../../shared/signInMessages';
 import type { Ports } from '../core/signInController';
 import { PAGE_CONTROL_MESSAGE } from '../../shared/pageControlMessages';
-import type { ActReply, AnalyseReply, ChangedReport, ControlValue, HighlightReply, MediaOperation, PageAction, PageActionReply, PageModel } from '../../shared/pageControlMessages';
+import type { ActReply, AnalyseReply, ChangedReport, ControlValue, HighlightReply, MediaOperation, PageAction, PageActionReply, PageModel, SiteCustom } from '../../shared/pageControlMessages';
 
 const sendToTab = async <T>(tabId: number, messageType: string, content?: unknown): Promise<T | null> => {
   try {
@@ -84,9 +84,9 @@ export const readFocused = (tabId: number, expectedHost: string) =>
   sendToTab<ReadFocusedReply>(tabId, SIGN_IN_MESSAGE.READ_FOCUSED, { expectedHost });
 
 // Page control: what can be operated on the active tab, and outlining one control there.
-export const analyseActivePage = async (expectedHost: string, limit?: number) => {
+export const analyseActivePage = async (expectedHost: string, limit?: number, custom?: SiteCustom) => {
   const tabId = await activeTabId();
-  return tabId === null ? null : sendToTab<AnalyseReply>(tabId, PAGE_CONTROL_MESSAGE.ANALYSE, { expectedHost, limit });
+  return tabId === null ? null : sendToTab<AnalyseReply>(tabId, PAGE_CONTROL_MESSAGE.ANALYSE, { expectedHost, limit, custom });
 };
 
 export const highlightOnActivePage = async (expectedHost: string, id: string) => {

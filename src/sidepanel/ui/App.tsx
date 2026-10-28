@@ -286,7 +286,10 @@ const SettingsView: React.FC<{
     </Field>
     <SitesSection onChanged={onSitesChanged} />
     <SectionLabel>Page rules</SectionLabel>
-    <Text>Your own rules (Tools, then Page control) and the built-in ones are used first; other sign-in forms are found automatically.</Text>
+    <Text>
+      Sign-in uses a form you saved for the site (Save as page rule, under Site settings on the sign-in card); otherwise it finds sign-in forms
+      automatically. Saved forms are listed under Sites, where you can forget them.
+    </Text>
     <AdvancedSettings />
     <Button onClick={onClose}>Done</Button>
   </>

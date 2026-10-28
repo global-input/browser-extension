@@ -154,6 +154,23 @@ describe('page analysis', () => {
     agent.stop();
   });
 
+  it('ranks pinned controls first, so they are never left out, and leaves out hidden ones', () => {
+    const links = Array.from({ length: 10 }, (_, i) => `<a href="/p${i}">Page ${i}</a>`).join('');
+    document.body.innerHTML = `<nav aria-label="Menu">${links}</nav><form aria-label="Search"><input aria-label="Terms"><button>Go</button></form>`;
+    const model = analysePage(document, {
+      visible,
+      registry: createRegistry(),
+      maxControls: 3,
+      custom: { pinned: [{ kind: 'link', label: 'Page 9' }], hidden: [{ kind: 'button', label: 'Go' }] },
+    });
+    // Page 9 would be left out without the pin; its group comes first. Go is hidden.
+    expect(labels(model)).toEqual([
+      ['Menu', ['Page 0:link', 'Page 9:link']],
+      ['Search', ['Terms:text']],
+    ]);
+    expect(model.more).toEqual({ links: 8, buttons: 0, fields: 0 });
+  });
+
   it('keeps the same id for the same element across analyses', () => {
     document.body.innerHTML = '<button>One</button>';
     const registry = createRegistry();
