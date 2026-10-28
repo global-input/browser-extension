@@ -10,6 +10,7 @@ import { homeScreen } from '../core/phoneForms';
 import { TOOLS, findTool } from '../tools/registry';
 import { Tabs, ToolFrame, ToolList } from './tools';
 import { ConnectCode } from './connectCode';
+import { AdvancedSettings } from './advancedSettings';
 import { SiteControls, SitesSection, TurnDetectionOn } from './siteSettings';
 import type { PanelTab } from './tools';
 import type { SignInView } from '../core/signInController';
@@ -276,6 +277,7 @@ const SettingsView: React.FC<{
     <SitesSection onChanged={onSitesChanged} />
     <SectionLabel>Page rules</SectionLabel>
     <Text>Your own rules (Tools, then Page control) and the built-in ones are used first; other sign-in forms are found automatically.</Text>
+    <AdvancedSettings />
     <Button onClick={onClose}>Done</Button>
   </>
 );
