@@ -1,10 +1,12 @@
 // Settings → Advanced: connection settings most people never change. Collapsed by default.
 // Relay server: where messages are routed. Not secret, since the relay only forwards
 // end-to-end encrypted messages; saving starts a new session through the new server.
+// Private pairing (privatePairing.tsx): the keys shared with paired phones.
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { isPrivatelyPaired, loadConnectionRecord, onConnectionRecordChange, saveConnectionRecord } from 'global-input-mobile';
 import type { ConnectionRecord, RelaySettings } from 'global-input-mobile';
+import { PrivatePairingSection } from './privatePairing';
 import { checkRelayDraft, describeRelay, relayDraftOf, sameRelay } from '../core/relay';
 import type { RelayDraft } from '../core/relay';
 import type { ToolMessage } from '../tools/shared/pageInsert';
@@ -49,6 +51,7 @@ export const AdvancedSettings: React.FC = () => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <Text>For your own relay server or private pairing. Most people never need to change these.</Text>
         <RelayServerSection relay={record.relay} onSave={relay => saveConnectionRecord({ ...record, relay })} />
+        <PrivatePairingSection record={record} onSave={saveConnectionRecord} />
       </div>
     </Details>
   );

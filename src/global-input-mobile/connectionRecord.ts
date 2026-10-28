@@ -54,7 +54,7 @@ export const cleanUrl = (value: unknown): string | undefined => {
   }
 };
 
-const cleanName = (value: unknown): string | undefined => {
+export const cleanName = (value: unknown): string | undefined => {
   if (typeof value !== 'string') return undefined;
   const name = value.replace(/[\x00-\x1F\x7F]/g, '').trim();
   return name ? name.slice(0, MAX_NAME_LENGTH) : undefined;

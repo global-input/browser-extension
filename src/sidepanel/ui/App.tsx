@@ -10,7 +10,8 @@ import { homeScreen } from '../core/phoneForms';
 import { TOOLS, findTool } from '../tools/registry';
 import { Tabs, ToolFrame, ToolList } from './tools';
 import { ConnectCode } from './connectCode';
-import { AdvancedSettings } from './advancedSettings';
+import { AdvancedSettings, useConnectionRecord } from './advancedSettings';
+import { isPrivatelyPaired } from 'global-input-mobile';
 import { SiteControls, SitesSection, TurnDetectionOn } from './siteSettings';
 import type { PanelTab } from './tools';
 import type { SignInView } from '../core/signInController';
@@ -129,7 +130,9 @@ export const App: React.FC = () => {
   );
 };
 
-const ConnectView: React.FC<{ connection: ReturnType<typeof usePhoneConnection>; notice: string | null }> = ({ connection, notice }) => (
+const ConnectView: React.FC<{ connection: ReturnType<typeof usePhoneConnection>; notice: string | null }> = ({ connection, notice }) => {
+  const paired = isPrivatelyPaired(useConnectionRecord());
+  return (
   <>
     {notice && <Notice $tone="warn">{notice}</Notice>}
     {connection.canRejoin && <Notice $tone="warn">Your phone dropped the connection. Rejoin from the app's history, or scan again.</Notice>}
@@ -142,8 +145,15 @@ const ConnectView: React.FC<{ connection: ReturnType<typeof usePhoneConnection>;
       <li>Tap Scan and point at the code</li>
       <li>Sites you open ask your phone for the saved account</li>
     </ol>
+    {paired && (
+      <Text style={{ fontSize: 12 }}>
+        <strong>Private pairing:</strong> only phones paired with this browser can read this code. If your phone shows
+        "QR Code Content" or a Security Group Key mismatch, pair it again in Settings, Advanced.
+      </Text>
+    )}
   </>
-);
+  );
+};
 
 interface SiteActions {
   onSkip: () => void;

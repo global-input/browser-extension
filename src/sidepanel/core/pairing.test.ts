@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { KEY_LENGTH, defaultPairingName, newPairing, withDefaultKeys, withPairing } from './pairing';
+import { KEY_LENGTH, checkKeysDraft, defaultPairingName, newPairing, withDefaultKeys, withPairing } from './pairing';
 
 const relay = { url: 'https://relay.example.com', apikey: 'api-1' };
 
@@ -24,5 +24,21 @@ describe('pairing', () => {
     const paired = withPairing({ relay, pairing: {} }, { securityGroup: 'g', codeKey: 'c' });
     expect(paired).toEqual({ relay, pairing: { securityGroup: 'g', codeKey: 'c' } });
     expect(withDefaultKeys(paired)).toEqual({ relay, pairing: {} });
+  });
+});
+
+describe('keys typed in', () => {
+  const draft = { securityGroup: '', codeKey: '', name: '' };
+
+  it('keeps the keys given, tidied, with the name and time', () => {
+    expect(checkKeysDraft({ securityGroup: ' g-1 ', codeKey: 'c-1', name: ' Work laptop ' }, 5)).toEqual({
+      pairing: { securityGroup: 'g-1', codeKey: 'c-1', name: 'Work laptop', pairedAt: 5 },
+    });
+    expect(checkKeysDraft({ ...draft, codeKey: 'c-1' }, 5)).toEqual({ pairing: { codeKey: 'c-1', pairedAt: 5 } });
+  });
+
+  it('refuses no keys or keys it cannot use', () => {
+    expect(checkKeysDraft(draft, 5)).toHaveProperty('error');
+    expect(checkKeysDraft({ ...draft, securityGroup: 'has space' }, 5)).toHaveProperty('error');
   });
 });
