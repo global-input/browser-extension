@@ -82,4 +82,59 @@ describe('carrying out phone input', () => {
     expect(scrollBy.mock.calls[0][0].top).toBeGreaterThan(0);
     expect(agent.pageAction({ expectedHost: 'other.example', action: 'up' })).toEqual({ status: 'error', reason: 'host-mismatch' });
   });
+
+  it('plays, pauses, moves and turns up video', () => {
+    document.body.innerHTML = '<video aria-label="Tour"></video>';
+    const video = document.querySelector('video')!;
+    let paused = true;
+    Object.defineProperty(video, 'paused', { get: () => paused });
+    Object.defineProperty(video, 'duration', { value: 90 });
+    video.play = vi.fn(() => {
+      paused = false;
+      return Promise.resolve();
+    });
+    video.pause = vi.fn(() => {
+      paused = true;
+    });
+    agent = createPageControlAgent(document, visible);
+    const reply = agent.analyse({ expectedHost: host() });
+    const tour = reply.status === 'success' ? reply.model.groups[0].controls[0] : ({} as PageControl);
+    expect(tour.media).toMatchObject({ playing: false, duration: 90 });
+    agent.act({ expectedHost: host(), id: tour.id, media: { type: 'toggle' } });
+    expect(video.play).toHaveBeenCalled();
+    agent.act({ expectedHost: host(), id: tour.id, media: { type: 'toggle' } });
+    expect(video.pause).toHaveBeenCalled();
+    agent.act({ expectedHost: host(), id: tour.id, media: { type: 'seek', seconds: 500 } });
+    expect(video.currentTime).toBe(90);
+    agent.act({ expectedHost: host(), id: tour.id, media: { type: 'volume', percent: 0 } });
+    expect(video.muted).toBe(true);
+    agent.act({ expectedHost: host(), id: tour.id, media: { type: 'volume', percent: 40 } });
+    expect([video.muted, video.volume]).toEqual([false, 0.4]);
+  });
+
+  it('moves a slider built from ARIA with the keys, as a keyboard user would', () => {
+    const find = analyse('<div role="slider" tabindex="0" aria-label="Zoom" aria-valuemin="0" aria-valuemax="10" aria-valuenow="2"></div>');
+    const slider = document.querySelector('[role=slider]')!;
+    slider.addEventListener('keydown', event => {
+      const now = Number(slider.getAttribute('aria-valuenow'));
+      const next = { ArrowRight: now + 1, ArrowLeft: now - 1, Home: 0, End: 10 }[(event as KeyboardEvent).key];
+      if (next !== undefined) slider.setAttribute('aria-valuenow', String(Math.max(0, Math.min(10, next))));
+    });
+    expect(act(find('Zoom'), 7)).toEqual({ status: 'success' });
+    expect(slider.getAttribute('aria-valuenow')).toBe('7');
+    act(find('Zoom'), 0);
+    expect(slider.getAttribute('aria-valuenow')).toBe('0');
+    const stuck = analyse('<div role="slider" aria-label="Fixed" aria-valuenow="3"></div>');
+    expect(act(stuck('Fixed'), 5)).toEqual({ status: 'error', reason: 'unsupported' });
+  });
+
+  it('types into an editor marked role="textbox"', () => {
+    const find = analyse('<div role="textbox" aria-multiline="true" aria-label="Message"><div contenteditable="true"></div></div>');
+    const message = find('Message');
+    expect(message.kind).toBe('multiline');
+    // The editable area inside is part of the editor, not a second control.
+    expect(find('Text')).toBeUndefined();
+    expect(act(message, 'Hello')).toEqual({ status: 'success' });
+    expect(document.querySelector('[contenteditable]')!.textContent).toBe('Hello');
+  });
 });

@@ -19,10 +19,10 @@ const model: PageModel = {
         { id: 'c6', kind: 'button', label: 'Place order', primary: true },
       ],
     },
-    { id: 'g2', title: 'Video', controls: [{ id: 'c7', kind: 'media', label: 'Tour' }] },
+    { id: 'g2', title: 'Video', controls: [{ id: 'c7', kind: 'media', label: 'Tour', media: { playing: false, position: 12, duration: 90, volume: 0 } }] },
     { id: 'g3', title: 'Menu', controls: [{ id: 'c8', kind: 'link', label: 'Help' }, { id: 'c9', kind: 'range', label: 'Zoom', value: 3, min: 1, max: 5 }] },
   ],
-  more: { links: 0, buttons: 0, fields: 0 },
+  more: { links: 40, buttons: 2, fields: 0 },
 };
 
 describe('the phone form', () => {
@@ -38,9 +38,14 @@ describe('the phone form', () => {
       ['c4', 'list'],
       ['c5', 'text'],
       ['c6', 'button'],
+      ['g2', 'info'],
+      ['c7:play', 'button'],
+      ['c7:position', 'range'],
+      ['c7:volume', 'range'],
       ['g3', 'info'],
       ['c8', 'button'],
       ['c9', 'range'],
+      [PHONE_IDS.more, 'button'],
       [PHONE_IDS.up, 'button'],
       [PHONE_IDS.down, 'button'],
       [PHONE_IDS.back, 'button'],
@@ -56,6 +61,27 @@ describe('the phone form', () => {
     expect(field('c5').label).toBe('Delivery day (YYYY-MM-DD)');
     expect(field('c8').label).toBe('Help →');
     expect(field('c9')).toMatchObject({ value: 3, minimumValue: 1, maximumValue: 5 });
+    expect(field('c7:play').label).toBe('▶ Play – Tour');
+    expect(field('c7:position')).toMatchObject({ value: 12, minimumValue: 0, maximumValue: 90 });
+    expect(field('c7:volume')).toMatchObject({ value: 0, maximumValue: 100 });
+    expect(field(PHONE_IDS.more).label).toBe('Show 30 more');
+  });
+
+  it('operates video and audio, and leaves out a position for live streams', () => {
+    expect(phoneInputOf(model, 'c7:play', undefined)).toMatchObject({ type: 'media', operation: { type: 'toggle' } });
+    expect(phoneInputOf(model, 'c7:position', 45)).toMatchObject({ type: 'media', operation: { type: 'seek', seconds: 45 } });
+    expect(phoneInputOf(model, 'c7:volume', 60)).toMatchObject({ type: 'media', operation: { type: 'volume', percent: 60 } });
+    expect(phoneInputOf(model, 'c1:play', undefined)).toBeNull();
+    expect(phoneInputOf(model, PHONE_IDS.more, undefined)).toEqual({ type: 'more' });
+    expect(describeInput(phoneInputOf(model, 'c7:play', undefined)!)).toBe('Played “Tour”');
+    const live = { ...model, groups: [{ id: 'g1', title: 'Video', controls: [{ id: 'c1', kind: 'media' as const, label: 'Live', media: { playing: true, position: 5, volume: 50 } }] }] };
+    expect(phoneFormOf(live).form.fields.map(item => item.id)).toContain('c1:volume');
+    expect(phoneFormOf(live).form.fields.map(item => item.id)).not.toContain('c1:position');
+    // Playing or pausing changes the button, so the phone gets a new form; the position doesn't.
+    const paused = { ...live, groups: [{ ...live.groups[0], controls: [{ ...live.groups[0].controls[0], media: { playing: false, position: 5, volume: 50 } }] }] };
+    const later = { ...live, groups: [{ ...live.groups[0], controls: [{ ...live.groups[0].controls[0], media: { playing: true, position: 60, volume: 50 } }] }] };
+    expect(phoneSignatureOf(paused)).not.toBe(phoneSignatureOf(live));
+    expect(phoneSignatureOf(later)).toBe(phoneSignatureOf(live));
   });
 
   it('turns phone input into page actions with values the page understands', () => {
@@ -95,6 +121,7 @@ describe('the phone form', () => {
       groups: model.groups.map(group => ({ ...group, controls: group.controls.map(control => (control.id in changes ? { ...control, value: changes[control.id] as any } : control)) })),
     });
     expect(phoneValueChangesOf(page({ c1: 'Grace', c3: 'uk' }), shown)).toEqual([]);
+    expect(shown.get('c7:position')).toBe('12');
     expect(phoneValueChangesOf(page({ c1: 'Grace', c3: 'uk', c4: false, c5: '2026-11-01' }), shown)).toEqual([
       { id: 'c4', value: [], key: '' },
       { id: 'c5', value: '2026-11-01', key: '2026-11-01' },

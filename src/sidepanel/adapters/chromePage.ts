@@ -7,7 +7,7 @@ import { SIGN_IN_MESSAGE } from '../../shared/signInMessages';
 import type { DetectReply, FillFocusedReply, FillReply, PageState, ReadFocusedReply } from '../../shared/signInMessages';
 import type { Ports } from '../core/signInController';
 import { PAGE_CONTROL_MESSAGE } from '../../shared/pageControlMessages';
-import type { ActReply, AnalyseReply, ChangedReport, ControlValue, HighlightReply, PageAction, PageActionReply, PageModel } from '../../shared/pageControlMessages';
+import type { ActReply, AnalyseReply, ChangedReport, ControlValue, HighlightReply, MediaOperation, PageAction, PageActionReply, PageModel } from '../../shared/pageControlMessages';
 
 const sendToTab = async <T>(tabId: number, messageType: string, content?: unknown): Promise<T | null> => {
   try {
@@ -84,9 +84,9 @@ export const readFocused = (tabId: number, expectedHost: string) =>
   sendToTab<ReadFocusedReply>(tabId, SIGN_IN_MESSAGE.READ_FOCUSED, { expectedHost });
 
 // Page control: what can be operated on the active tab, and outlining one control there.
-export const analyseActivePage = async (expectedHost: string) => {
+export const analyseActivePage = async (expectedHost: string, limit?: number) => {
   const tabId = await activeTabId();
-  return tabId === null ? null : sendToTab<AnalyseReply>(tabId, PAGE_CONTROL_MESSAGE.ANALYSE, { expectedHost });
+  return tabId === null ? null : sendToTab<AnalyseReply>(tabId, PAGE_CONTROL_MESSAGE.ANALYSE, { expectedHost, limit });
 };
 
 export const highlightOnActivePage = async (expectedHost: string, id: string) => {
@@ -96,9 +96,9 @@ export const highlightOnActivePage = async (expectedHost: string, id: string) =>
 
 // Carries out the phone's input on one control of the active tab. A link meant for a new tab
 // comes back as newTab, and is opened here next to the active tab.
-export const actOnActivePage = async (expectedHost: string, id: string, value?: ControlValue) => {
+export const actOnActivePage = async (expectedHost: string, id: string, value?: ControlValue, media?: MediaOperation) => {
   const tabId = await activeTabId();
-  const reply = tabId === null ? null : await sendToTab<ActReply>(tabId, PAGE_CONTROL_MESSAGE.ACT, { expectedHost, id, value });
+  const reply = tabId === null ? null : await sendToTab<ActReply>(tabId, PAGE_CONTROL_MESSAGE.ACT, { expectedHost, id, value, media });
   if (reply && reply.status === 'success' && reply.newTab && /^https?:/i.test(reply.newTab)) {
     await chrome.tabs.create({ url: reply.newTab, active: true });
   }

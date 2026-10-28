@@ -1,6 +1,6 @@
 // What a control is (its kind), what it is called (its accessible name, as the page shows or
 // announces it), and its current value. Secret values are never read.
-import type { ControlKind, ControlOption } from '../../shared/pageControlMessages';
+import type { ControlKind, ControlOption, MediaState } from '../../shared/pageControlMessages';
 
 const MAX_LABEL = 60;
 const MAX_VALUE = 500;
@@ -20,6 +20,7 @@ const isSecretInput = (input: HTMLInputElement) =>
   SECRET_NAME.test(`${input.name} ${input.id}`);
 
 const ROLE_KINDS: Record<string, ControlKind> = {
+  searchbox: 'text',
   button: 'button',
   tab: 'button',
   menuitem: 'button',
@@ -79,6 +80,7 @@ export const kindOf = (element: Element): ControlKind | null => {
   if (tag === 'button') return 'button';
   if (tag === 'a' && element.hasAttribute('href')) return isScriptLink(element as HTMLAnchorElement) ? 'button' : 'link';
   const role = (element.getAttribute('role') || '').toLowerCase();
+  if (role === 'textbox' && element.getAttribute('aria-multiline') === 'true') return 'multiline';
   if (role in ROLE_KINDS) return ROLE_KINDS[role];
   if (isEditable(element)) return 'multiline';
   return null;
@@ -151,7 +153,8 @@ export const valueOf = (element: Element, kind: ControlKind): string | number | 
     case 'media':
       return undefined;
     default: {
-      const raw = isEditable(element) ? element.textContent : (element as HTMLInputElement).value;
+      // Fields have a value; editors (contenteditable, role="textbox") have text.
+      const raw = ['INPUT', 'TEXTAREA', 'SELECT'].includes(element.tagName) ? (element as HTMLInputElement).value : element.textContent;
       const value = normalise(raw);
       return value ? shorten(value, MAX_VALUE) : undefined;
     }
@@ -164,6 +167,18 @@ export const rangeOf = (element: Element) => {
     return Number.isFinite(value) && (element.hasAttribute(attribute) || element.hasAttribute(aria)) ? value : undefined;
   };
   return { min: read('min', 'aria-valuemin'), max: read('max', 'aria-valuemax'), step: read('step', 'aria-valuestep') };
+};
+
+// Whole seconds, and volume as a percentage, so the phone isn't updated on every frame.
+export const mediaStateOf = (element: Element): MediaState => {
+  const media = element as HTMLMediaElement;
+  const duration = Number.isFinite(media.duration) && media.duration > 0 ? Math.round(media.duration) : undefined;
+  return {
+    playing: !media.paused && !media.ended,
+    position: Math.round(media.currentTime || 0),
+    ...(duration !== undefined && { duration }),
+    volume: media.muted ? 0 : Math.round((media.volume ?? 1) * 100),
+  };
 };
 
 const DATE_FORMATS: Record<string, string> = {

@@ -30,11 +30,13 @@ import {
   phoneInputOf,
   phoneMessageForm,
   phoneSignatureOf,
+  MORE_STEP,
   phoneValueChangesOf,
   phoneValuesOf,
   valueKeyOf,
 } from './phoneForm';
 import type { PhoneInput } from './phoneForm';
+import { MAX_CONTROLS, MAX_CONTROLS_LIMIT } from '../../../shared/pageControlMessages';
 import type { PageModel } from '../../../shared/pageControlMessages';
 
 const ControlList = styled.ul`
@@ -67,7 +69,7 @@ const ControlName = styled.span`
 
 const formatTime = (time: number) => new Date(time).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-const Groups: React.FC<{ model: PageModel; host: string }> = ({ model, host }) => {
+const Groups: React.FC<{ model: PageModel; host: string; onShowMore?: () => void }> = ({ model, host, onShowMore }) => {
   const [message, setMessage] = useState('');
   const locate = async (id: string) => {
     const reply = await highlightOnActivePage(host, id);
@@ -95,7 +97,16 @@ const Groups: React.FC<{ model: PageModel; host: string }> = ({ model, host }) =
           </ControlList>
         </Card>
       ))}
-      {more && <Caption>Also on the page, not listed: {more}.</Caption>}
+      {more && (
+        <Row>
+          <Caption>Also on the page, not listed: {more}.</Caption>
+          {onShowMore && (
+            <SmallButton type="button" onClick={onShowMore}>
+              Show more
+            </SmallButton>
+          )}
+        </Row>
+      )}
       {message && <Notice $tone="warn">{message}</Notice>}
     </>
   );
@@ -134,6 +145,8 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
   const { host, asked, ask } = useActiveHost(openedOn);
   const [state, setState] = useState<AnalysisState>({ status: 'analysing' });
   const [lastInput, setLastInput] = useState('');
+  // Raised by "Show more", for as long as Page control is open.
+  const [limit, setLimit] = useState(MAX_CONTROLS);
   const retry = useRef<number | null>(null);
   const status = useRef('');
   const sent = useRef('');
@@ -152,10 +165,12 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
         return;
       }
       if (!quiet) setState({ status: 'analysing' });
-      setState(keepOtherSite(analysisStateOf(await analyseActivePage(host), Date.now())));
+      setState(keepOtherSite(analysisStateOf(await analyseActivePage(host, limit), Date.now())));
     },
-    [host]
+    [host, limit]
   );
+
+  const showMore = () => setLimit(current => Math.min(MAX_CONTROLS_LIMIT, current + MORE_STEP));
 
   useEffect(() => {
     if (asked) analyse();
@@ -231,15 +246,23 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
       else analyse();
       return;
     }
+    if (input.type === 'more') {
+      showMore();
+      return;
+    }
     setLastInput(describeInput(input));
     const reply =
-      input.type === 'page' ? await pageActionOnActivePage(host, input.action) : await actOnActivePage(host, input.control.id, input.value);
+      input.type === 'page'
+        ? await pageActionOnActivePage(host, input.action)
+        : input.type === 'media'
+          ? await actOnActivePage(host, input.control.id, undefined, input.operation)
+          : await actOnActivePage(host, input.control.id, input.value);
     if (!reply) {
       // The page is loading after a press; it reports itself once loaded.
       if (!retry.current) retry.current = window.setTimeout(() => analyse(true), NO_ANSWER_RETRY_MS);
     } else if (reply.status === 'error' && reply.reason === 'host-mismatch') {
       setState(keepOtherSite({ status: 'other-site' }));
-    } else if (reply.status === 'error' && input.type === 'control') {
+    } else if (reply.status === 'error' && input.type !== 'page') {
       tellPhone(ACT_PROBLEMS[reply.reason](input.control.label));
       if (reply.reason === 'gone') analyse(true);
     } else if (status.current) {
@@ -250,7 +273,7 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
   mobile.setOnchange(({ field }) => {
     const input = phoneInputOf(state.status === 'done' ? state.model : null, field.id as string, field.value);
     if (!input) return;
-    if (input.type === 'control') shown.current.set(input.control.id, valueKeyOf(field.value));
+    if (input.type === 'control' || input.type === 'media') shown.current.set(field.id as string, valueKeyOf(field.value));
     run(input);
   });
 
@@ -290,7 +313,7 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
             page.
           </Text>
           {lastInput && <Caption>From the phone: {lastInput}.</Caption>}
-          <Groups model={state.model} host={host} />
+          <Groups model={state.model} host={host} onShowMore={limit < MAX_CONTROLS_LIMIT ? showMore : undefined} />
         </>
       )}
     </div>

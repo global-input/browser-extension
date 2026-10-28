@@ -4,12 +4,11 @@ import { collectCandidates } from './collect';
 import type { Candidate, IsVisible } from './collect';
 import { containerOf, findModal, regionTypeOf, titleOf } from './group';
 import type { RegionType } from './group';
-import { formatOf, isPrimaryButton, nameOf, normalise, optionsOf, rangeOf, valueOf } from './describe';
+import { formatOf, isPrimaryButton, mediaStateOf, nameOf, normalise, optionsOf, rangeOf, valueOf } from './describe';
 import type { ControlRegistry } from './registry';
+import { MAX_CONTROLS } from '../../shared/pageControlMessages';
 import type { ControlGroup, ControlKind, PageControl, PageModel } from '../../shared/pageControlMessages';
 
-// How many controls the phone gets.
-export const MAX_CONTROLS = 30;
 
 const FALLBACK_NAMES: Partial<Record<ControlKind, string>> = {
   text: 'Text',
@@ -106,6 +105,7 @@ export const analysePage = (doc: Document, { visible, registry, maxControls = MA
     const value = valueOf(element, kind);
     if (value !== undefined) control.value = value;
     if (kind === 'choice' || kind === 'multi-choice') control.options = optionsOf(element);
+    if (kind === 'media') control.media = mediaStateOf(element);
     if (kind === 'date') {
       const format = formatOf(element);
       if (format) control.format = format;

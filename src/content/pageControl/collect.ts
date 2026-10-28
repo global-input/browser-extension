@@ -1,5 +1,6 @@
 // The elements a person could operate: form fields, buttons, links, media and their ARIA
-// equivalents, including inside open shadow roots. Hidden, disabled and inert ones are left out.
+// equivalents, including inside open shadow roots and frames from the same site. Hidden,
+// disabled and inert ones are left out.
 import { kindOf } from './describe';
 import type { ControlKind } from '../../shared/pageControlMessages';
 
@@ -21,8 +22,10 @@ const isDisabled = (element: Element) =>
 
 const isHiddenFromPeople = (element: Element) => !!element.closest('[aria-hidden="true"], [inert]');
 
-// Text inside a button or link is part of that button or link.
+// Text inside a button or link is part of that button or link, and the editable area inside an
+// editor marked role="textbox" is part of that editor.
 const isInsideClickable = (element: Element) => !!element.parentElement?.closest(CLICKABLE);
+const isInsideTextbox = (element: Element) => !!element.parentElement?.closest('[role="textbox"], [role="searchbox"]');
 
 // Visually hidden elements (skip links, screen-reader-only text) are moved off the page or
 // shrunk to a pixel. Without layout (width and height 0) the visibility check alone decides.
@@ -40,7 +43,19 @@ const usable = (element: Element, kind: ControlKind, visible: IsVisible) =>
   !isHiddenFromPeople(element) &&
   visible(element) &&
   !isOffPage(element) &&
-  (kind === 'media' || !isInsideClickable(element));
+  (kind === 'media' || !isInsideClickable(element)) &&
+  !isInsideTextbox(element);
+
+// Frames whose document this page may read: the same origin. Others (ads, embedded players
+// from other sites) throw or give null, and are left out.
+export const sameSiteFrames = (scope: Document | ShadowRoot): HTMLIFrameElement[] =>
+  Array.from(scope.querySelectorAll<HTMLIFrameElement>('iframe, frame')).filter(frame => {
+    try {
+      return !!frame.contentDocument && !!frame.contentDocument.documentElement;
+    } catch (error) {
+      return false;
+    }
+  });
 
 export const collectCandidates = (root: Document, visible: IsVisible): Candidate[] => {
   const found: Candidate[] = [];
@@ -54,6 +69,9 @@ export const collectCandidates = (root: Document, visible: IsVisible): Candidate
     }
     for (const host of Array.from(scope.querySelectorAll('*'))) {
       if (host.shadowRoot) walk(host.shadowRoot);
+    }
+    for (const frame of sameSiteFrames(scope)) {
+      if (visible(frame) && !isHiddenFromPeople(frame)) walk(frame.contentDocument!);
     }
   };
   walk(root);

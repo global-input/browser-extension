@@ -3,10 +3,25 @@
 const DURATION_MS = 3000;
 const OVERLAY_ID = 'global-input-page-control-highlight';
 
+// The element's box in the top page: a control inside a frame is offset by its frames.
+const boxInPage = (element: Element, doc: Document) => {
+  const box = element.getBoundingClientRect();
+  let left = box.left;
+  let top = box.top;
+  let view: Window | null = element.ownerDocument.defaultView;
+  while (view && view.document !== doc && view.frameElement) {
+    const frame = view.frameElement.getBoundingClientRect();
+    left += frame.left + (view.frameElement as HTMLElement).clientLeft;
+    top += frame.top + (view.frameElement as HTMLElement).clientTop;
+    view = view.parent;
+  }
+  return { left, top, width: box.width, height: box.height };
+};
+
 export const highlightElement = (element: Element, doc: Document = document) => {
   doc.getElementById(OVERLAY_ID)?.remove();
   element.scrollIntoView({ block: 'center', inline: 'nearest' });
-  const box = element.getBoundingClientRect();
+  const box = boxInPage(element, doc);
   const overlay = doc.createElement('div');
   overlay.id = OVERLAY_ID;
   overlay.setAttribute('aria-hidden', 'true');

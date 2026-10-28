@@ -1,9 +1,10 @@
 // The phone's side of Page control, as pure functions: the page model becomes a phone form in
 // the page's own words, and the phone's input becomes an action on the page.
 // Phone field types are the Global Input App's (text, secret, list, range, button, info).
+// Video and audio get Play or Pause, Position (when the length is known) and Volume.
 // Fields with a viewId are shown after all the others, so only the page actions use rows.
 import type { FormField } from 'global-input-react';
-import type { ControlValue, PageAction, PageControl, PageModel } from '../../../shared/pageControlMessages';
+import type { ControlValue, MediaOperation, PageAction, PageControl, PageModel } from '../../../shared/pageControlMessages';
 
 export const PHONE_IDS = {
   status: 'pc-status',
@@ -12,7 +13,16 @@ export const PHONE_IDS = {
   back: 'pc-back',
   analyse: 'pc-analyse',
   close: 'pc-close',
+  more: 'pc-more',
 } as const;
+
+// Video and audio take several phone fields, with ids made from the control's id.
+const MEDIA_PARTS = { play: 'play', position: 'position', volume: 'volume' } as const;
+type MediaPart = (typeof MEDIA_PARTS)[keyof typeof MEDIA_PARTS];
+const mediaFieldId = (control: PageControl, part: MediaPart) => `${control.id}:${part}`;
+
+// How many more controls "Show more" asks for.
+export const MORE_STEP = 30;
 
 const TOGGLE_ON = 'on';
 
@@ -52,8 +62,37 @@ const textField = (control: PageControl, nLines: number): FormField => ({
   value: phoneValueOf(control),
 });
 
-// One phone field for a control, or null for what the phone can't operate yet (video and audio).
-export const phoneFieldOf = (control: PageControl): FormField | null => {
+const mediaFields = (control: PageControl): FormField[] => {
+  const media = control.media || { playing: false, position: 0, volume: 100 };
+  return [
+    { id: mediaFieldId(control, MEDIA_PARTS.play), type: 'button', label: `${media.playing ? '⏸ Pause' : '▶ Play'} – ${control.label}` },
+    ...(media.duration
+      ? [{ id: mediaFieldId(control, MEDIA_PARTS.position), type: 'range', label: 'Position (seconds)', value: media.position, minimumValue: 0, maximumValue: media.duration, step: 1 }]
+      : []),
+    { id: mediaFieldId(control, MEDIA_PARTS.volume), type: 'range', label: 'Volume', value: media.volume, minimumValue: 0, maximumValue: 100, step: 5 },
+  ];
+};
+
+// The values the phone shows for a control, by phone field id; none for secrets and buttons.
+export const phoneValueEntriesOf = (control: PageControl): [string, FormField['value']][] => {
+  if (control.kind === 'media') {
+    return mediaFields(control)
+      .filter(field => field.type === 'range')
+      .map(field => [field.id as string, field.value]);
+  }
+  const value = phoneValueOf(control);
+  return value === undefined ? [] : [[control.id, value]];
+};
+
+// The phone fields for a control: one, several for video and audio, or none when the phone
+// can't show it.
+export const phoneFieldsOf = (control: PageControl): FormField[] => {
+  if (control.kind === 'media') return mediaFields(control);
+  const field = phoneFieldOf(control);
+  return field ? [field] : [];
+};
+
+const phoneFieldOf = (control: PageControl): FormField | null => {
   switch (control.kind) {
     case 'text':
     case 'number':
@@ -103,13 +142,17 @@ export const phoneFieldOf = (control: PageControl): FormField | null => {
   }
 };
 
+export const moreCountOf = (model: PageModel) => model.more.links + model.more.buttons + model.more.fields;
+
 export const phoneFormOf = (model: PageModel, status = '') => {
   const fields: FormField[] = [{ id: PHONE_IDS.status, type: 'info', value: status }];
   for (const group of model.groups) {
-    const controls = group.controls.map(phoneFieldOf).filter((field): field is FormField => !!field);
+    const controls = group.controls.flatMap(phoneFieldsOf);
     if (!controls.length) continue;
     fields.push({ id: group.id, type: 'info', value: `— ${group.title} —` }, ...controls);
   }
+  const more = moreCountOf(model);
+  if (more) fields.push({ id: PHONE_IDS.more, type: 'button', label: `Show ${Math.min(more, MORE_STEP)} more` });
   fields.push(...PAGE_ACTIONS);
   return { id: `page-control@${model.host}`, form: { title: model.host, fields } };
 };
@@ -126,12 +169,19 @@ export const phoneMessageForm = (title: string, message: string) => ({
 // What the phone shows depends on the controls, not on their values, so typing on the phone
 // doesn't resend the form.
 export const phoneSignatureOf = (model: PageModel) =>
-  JSON.stringify(
+  JSON.stringify([
+    moreCountOf(model) > 0,
     model.groups.map(group => [
       group.title,
-      group.controls.map(control => [control.id, control.kind, control.label, (control.options || []).map(option => option.value)]),
-    ])
-  );
+      group.controls.map(control => [
+        control.id,
+        control.kind,
+        control.label,
+        (control.options || []).map(option => option.value),
+        control.media ? [control.media.playing, !!control.media.duration] : null,
+      ]),
+    ]),
+  ]);
 
 // Values compared the way the page reports them: spaces collapsed, choices in any order.
 export const valueKeyOf = (value: unknown) => {
@@ -145,10 +195,7 @@ const controlsOf = (model: PageModel) => model.groups.flatMap(group => group.con
 // What the phone shows for each control, by id, right after it got the form.
 export const phoneValuesOf = (model: PageModel) => {
   const values = new Map<string, string>();
-  for (const control of controlsOf(model)) {
-    const value = phoneValueOf(control);
-    if (value !== undefined) values.set(control.id, valueKeyOf(value));
-  }
+  for (const [id, value] of controlsOf(model).flatMap(phoneValueEntriesOf)) values.set(id, valueKeyOf(value));
   return values;
 };
 
@@ -157,20 +204,20 @@ export const phoneValuesOf = (model: PageModel) => {
 // reports shortened (ending in "…") is not sent back either.
 export const phoneValueChangesOf = (model: PageModel, shown: Map<string, string>) => {
   const changes: { id: string; value: FormField['value']; key: string }[] = [];
-  for (const control of controlsOf(model)) {
-    const value = phoneValueOf(control);
-    if (value === undefined) continue;
+  for (const [id, value] of controlsOf(model).flatMap(phoneValueEntriesOf)) {
     const key = valueKeyOf(value);
-    const before = shown.get(control.id) ?? '';
+    const before = shown.get(id) ?? '';
     if (key === before || (key.endsWith('…') && before.startsWith(key.slice(0, -1)))) continue;
-    changes.push({ id: control.id, value, key });
+    changes.push({ id, value, key });
   }
   return changes;
 };
 
 export type PhoneInput =
   | { type: 'control'; control: PageControl; value?: ControlValue }
+  | { type: 'media'; control: PageControl; operation: MediaOperation }
   | { type: 'page'; action: PageAction }
+  | { type: 'more' }
   | { type: 'analyse' }
   | { type: 'close' };
 
@@ -203,6 +250,20 @@ const valueFor = (control: PageControl, value: unknown): ControlValue | undefine
   }
 };
 
+const mediaInputOf = (control: PageControl, part: string, value: unknown): PhoneInput | null => {
+  const number = Number(value);
+  switch (part) {
+    case MEDIA_PARTS.play:
+      return { type: 'media', control, operation: { type: 'toggle' } };
+    case MEDIA_PARTS.position:
+      return Number.isFinite(number) ? { type: 'media', control, operation: { type: 'seek', seconds: number } } : null;
+    case MEDIA_PARTS.volume:
+      return Number.isFinite(number) ? { type: 'media', control, operation: { type: 'volume', percent: number } } : null;
+    default:
+      return null;
+  }
+};
+
 export const phoneInputOf = (model: PageModel | null, fieldId: string, value: unknown): PhoneInput | null => {
   switch (fieldId) {
     case PHONE_IDS.up:
@@ -215,7 +276,14 @@ export const phoneInputOf = (model: PageModel | null, fieldId: string, value: un
       return { type: 'analyse' };
     case PHONE_IDS.close:
       return { type: 'close' };
+    case PHONE_IDS.more:
+      return { type: 'more' };
     default: {
+      const [controlId, part] = fieldId.split(':');
+      if (part) {
+        const media = findControl(model, controlId);
+        return media && media.kind === 'media' ? mediaInputOf(media, part, value) : null;
+      }
       const control = findControl(model, fieldId);
       return control ? { type: 'control', control, value: valueFor(control, value) } : null;
     }
@@ -225,8 +293,13 @@ export const phoneInputOf = (model: PageModel | null, fieldId: string, value: un
 // What the panel says the phone did, without any value.
 export const describeInput = (input: PhoneInput) => {
   if (input.type === 'page') return { up: 'Scrolled up', down: 'Scrolled down', back: 'Went back' }[input.action];
-  if (input.type !== 'control') return '';
+  if (input.type === 'more') return 'Asked for more controls';
+  if (input.type !== 'control' && input.type !== 'media') return '';
   const name = `“${input.control.label}”`;
+  if (input.type === 'media') {
+    const playing = input.control.media && input.control.media.playing;
+    return { toggle: `${playing ? 'Paused' : 'Played'} ${name}`, seek: `Moved the position of ${name}`, volume: `Changed the volume of ${name}` }[input.operation.type];
+  }
   switch (input.control.kind) {
     case 'button':
       return `Pressed ${name}`;

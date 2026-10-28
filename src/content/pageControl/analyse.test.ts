@@ -129,6 +129,31 @@ describe('page analysis', () => {
     expect(model.groups[0].controls[0].label).toBe('Inside the component');
   });
 
+  it('finds controls inside frames from the same site', () => {
+    document.body.innerHTML = '<button>Outside</button><iframe></iframe>';
+    const frame = document.querySelector('iframe')!.contentDocument!;
+    frame.body.innerHTML = '<form aria-label="Comment"><textarea aria-label="Your comment"></textarea><button>Post</button></form>';
+    const model = analysePage(document, { visible, registry: createRegistry() });
+    expect(labels(model)).toEqual([
+      ['Comment', ['Your comment:multiline', 'Post:button']],
+      ['Page', ['Outside:button']],
+    ]);
+  });
+
+  it('includes more controls when asked to show more', () => {
+    const links = Array.from({ length: 40 }, (_, i) => `<a href="/p${i}">Page ${i}</a>`).join('');
+    document.body.innerHTML = links;
+    const agent = createPageControlAgent(document, visible, async () => true);
+    const count = (limit?: number) => {
+      const reply = agent.analyse({ expectedHost: document.location.host, limit });
+      return reply.status === 'success' ? [reply.model.groups[0].controls.length, reply.model.more.links] : [];
+    };
+    expect(count()).toEqual([30, 10]);
+    expect(count(60)).toEqual([40, 0]);
+    expect(count(-5)).toEqual([1, 39]);
+    agent.stop();
+  });
+
   it('keeps the same id for the same element across analyses', () => {
     document.body.innerHTML = '<button>One</button>';
     const registry = createRegistry();

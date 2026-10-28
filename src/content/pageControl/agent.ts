@@ -8,7 +8,7 @@ import { createWatcher } from './watch';
 import { createRegistry } from './registry';
 import { isVisible } from '../autoDetect';
 import type { IsVisible } from './collect';
-import { PAGE_CONTROL_MESSAGE } from '../../shared/pageControlMessages';
+import { MAX_CONTROLS, MAX_CONTROLS_LIMIT, PAGE_CONTROL_MESSAGE } from '../../shared/pageControlMessages';
 import type {
   PageModel,
   ActReply,
@@ -37,11 +37,14 @@ export const createPageControlAgent = (
   report: (model: PageModel) => Promise<boolean> = reportToPanel
 ) => {
   const registry = createRegistry();
-  const watcher = createWatcher({ doc, analyse: () => analysePage(doc, { visible, registry }), report });
+  // The panel's limit ("Show more") also applies when the page is analysed again by itself.
+  let maxControls = MAX_CONTROLS;
+  const watcher = createWatcher({ doc, analyse: () => analysePage(doc, { visible, registry, maxControls }), report });
 
-  const analyse = ({ expectedHost }: AnalyseRequest): AnalyseReply => {
+  const analyse = ({ expectedHost, limit }: AnalyseRequest): AnalyseReply => {
     if (doc.location.host !== expectedHost) return { status: 'error', reason: 'host-mismatch' };
-    const model = analysePage(doc, { visible, registry });
+    maxControls = Number.isInteger(limit) ? Math.max(1, Math.min(MAX_CONTROLS_LIMIT, limit as number)) : MAX_CONTROLS;
+    const model = analysePage(doc, { visible, registry, maxControls });
     watcher.start(model);
     return { status: 'success', model };
   };
@@ -55,13 +58,13 @@ export const createPageControlAgent = (
   };
 
   // Only controls of the latest analysis can be operated, and only while still on the page.
-  const act = ({ expectedHost, id, value }: ActRequest): ActReply => {
+  const act = ({ expectedHost, id, value, media }: ActRequest): ActReply => {
     if (doc.location.host !== expectedHost) return { status: 'error', reason: 'host-mismatch' };
     const element = registry.find(id);
     if (!element) return { status: 'error', reason: 'gone' };
     // The page may react to the input (fill in other fields, show the next step).
     watcher.poke();
-    return actOn(element, value);
+    return actOn(element, value, media);
   };
 
   const pageAction = ({ expectedHost, action }: PageActionRequest): PageActionReply => {

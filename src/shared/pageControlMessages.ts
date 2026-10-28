@@ -18,6 +18,11 @@ export const PAGE_CONTROL_MESSAGE = {
   CHANGED: 'pagecontrol/changed',
 } as const;
 
+// How many controls an analysis includes, and how far "Show more" can raise it while keeping
+// the phone's form usable.
+export const MAX_CONTROLS = 30;
+export const MAX_CONTROLS_LIMIT = 150;
+
 export const isPageControlMessage = (messageType: unknown) => typeof messageType === 'string' && messageType.startsWith('pagecontrol/');
 
 export type ControlKind =
@@ -53,7 +58,19 @@ export interface PageControl {
   primary?: boolean;
   // How a date or time is typed, for example 'YYYY-MM-DD'.
   format?: string;
+  // Video and audio: what is playing, in whole seconds, and the volume (0 when muted).
+  media?: MediaState;
 }
+
+export interface MediaState {
+  playing: boolean;
+  position: number;
+  // Missing for live streams and media not loaded yet.
+  duration?: number;
+  volume: number;
+}
+
+export type MediaOperation = { type: 'toggle' } | { type: 'seek'; seconds: number } | { type: 'volume'; percent: number };
 
 export interface ControlGroup {
   id: string;
@@ -73,6 +90,8 @@ export interface PageModel {
 
 export interface AnalyseRequest {
   expectedHost: string;
+  // How many controls to include ("Show more" raises it); MAX_CONTROLS when missing.
+  limit?: number;
 }
 
 export type AnalyseReply = { status: 'success'; model: PageModel } | { status: 'error'; reason: 'host-mismatch' };
@@ -92,6 +111,8 @@ export interface ActRequest {
   // Text for fields, the chosen value(s) for choices, on or off for toggles, a number for
   // sliders; nothing for buttons and links.
   value?: ControlValue;
+  // For video and audio.
+  media?: MediaOperation;
 }
 
 export type ActReply =
