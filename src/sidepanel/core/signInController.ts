@@ -54,7 +54,8 @@ export interface SignInView {
 export interface Ports {
   phone: {
     show: (screen: PhoneScreen) => void;
-    disconnect: () => void;
+    // Ends the session (End session on the phone): a new session, so a new QR code.
+    reset: () => void;
   };
   page: {
     queryState: (tabId: number) => Promise<PageState | null>;
@@ -189,8 +190,8 @@ export class SignInController {
         this.ports.phone.show(this.home());
         this.update({ phase: 'ready', notice: undefined });
         return;
-      case PHONE_FIELD.DISCONNECT:
-        this.ports.phone.disconnect();
+      case PHONE_FIELD.END_SESSION:
+        this.ports.phone.reset();
         return;
       case PHONE_FIELD.SEND_TEXT:
         this.enterTextMode();

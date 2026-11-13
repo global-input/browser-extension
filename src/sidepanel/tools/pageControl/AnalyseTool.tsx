@@ -42,6 +42,7 @@ import { MAX_CONTROLS, MAX_CONTROLS_LIMIT } from '../../../shared/pageControlMes
 import type { PageControl, PageModel } from '../../../shared/pageControlMessages';
 import { EMPTY_SITE_CONTROLS, applySiteControls, hide, isCustomised, isPinned, pageNameOf, pin, rename, show, unpin } from './siteControls';
 import type { SiteControls } from './siteControls';
+import { phoneHint } from '../shared/phoneHint';
 
 const ControlList = styled.ul`
   margin: 0;
@@ -432,7 +433,7 @@ export const PageAnalyseTool: React.FC<ToolProps> = ({ domain: openedOn, exit })
         <>
           <Text>
             {count} control{count === 1 ? '' : 's'} on this page.{' '}
-            {mobile.isConnected ? 'Operate them from your phone.' : 'Connect your phone in the Sign in tab to operate them from it.'} Locate outlines one on the
+            {mobile.isConnected ? 'Operate them from your phone.' : `${phoneHint(mobile)} to operate them from it.`} Locate outlines one on the
             page.
           </Text>
           {lastInput && <Caption>From the phone: {lastInput}.</Caption>}

@@ -21,7 +21,7 @@ const setup = () => {
   const timers: { callback: () => void; ms: number; cancelled: boolean }[] = [];
   const page: Record<number, PageState | null> = {};
   const ports = {
-    phone: { show: vi.fn(), disconnect: vi.fn() },
+    phone: { show: vi.fn(), reset: vi.fn() },
     page: {
       queryState: vi.fn(async (tabId: number) => page[tabId] ?? null),
       detect: vi.fn(async (tabId: number) => {
@@ -218,13 +218,13 @@ describe('SignInController', () => {
     expect(t.view().phase).toBe('no-form');
   });
 
-  it('passes Disconnect on the phone to the connection, and resets on disconnect', async () => {
+  it('passes End session on the phone to the connection, and resets when the phone leaves', async () => {
     const t = setup();
     t.page[1] = signInPage();
     t.controller.phoneConnected();
     await t.controller.activeTabChanged(1);
-    await t.controller.phoneInput(PHONE_FIELD.DISCONNECT, null);
-    expect(t.ports.phone.disconnect).toHaveBeenCalled();
+    await t.controller.phoneInput(PHONE_FIELD.END_SESSION, null);
+    expect(t.ports.phone.reset).toHaveBeenCalled();
     t.controller.phoneDisconnected();
     expect(t.view().phase).toBe('not-connected');
   });
@@ -233,7 +233,7 @@ describe('SignInController', () => {
     const t = setup();
     t.controller.phoneConnected();
     const ids = t.lastScreen().form.fields.map((f: { id: string }) => f.id);
-    expect(ids).toEqual([PHONE_FIELD.STATUS, PHONE_FIELD.SEND_TEXT, 'gi-tool-encryption', PHONE_FIELD.DISCONNECT]);
+    expect(ids).toEqual([PHONE_FIELD.STATUS, PHONE_FIELD.SEND_TEXT, 'gi-tool-encryption', PHONE_FIELD.END_SESSION]);
     await t.controller.phoneInput('gi-tool-encryption', null);
     expect(t.ports.tools.open).toHaveBeenCalledWith('encryption');
   });

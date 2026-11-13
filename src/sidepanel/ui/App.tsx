@@ -1,15 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { usePhoneConnection } from '../adapters/usePhoneConnection';
-import { watchIdle } from '../adapters/idle';
-import type { IdleReason } from '../adapters/idle';
-import { IDLE_CHOICES, loadSettings, saveSettings } from '../adapters/settings';
-import type { PanelSettings } from '../adapters/settings';
+import { usePhoneConnection, useServiceRetry } from '../adapters/usePhoneConnection';
+import type { PhoneConnection } from '../adapters/usePhoneConnection';
+import type { SessionStore } from '../adapters/sessionStore';
 import { useSignIn } from '../useSignIn';
 import { useSiteAccess } from '../adapters/siteAccess';
 import { homeScreen } from '../core/phoneForms';
 import { TOOLS, findTool } from '../tools/registry';
 import { Tabs, ToolFrame, ToolList } from './tools';
 import { ConnectCode } from './connectCode';
+import { WaitingView } from './waitingView';
 import { AdvancedSettings, useConnectionRecord } from './advancedSettings';
 import { isPrivatelyPaired } from 'global-input-mobile';
 import { SiteControls, SitesSection, TurnDetectionOn } from './siteSettings';
@@ -17,21 +16,17 @@ import type { PanelTab } from './tools';
 import type { SignInView } from '../core/signInController';
 import { formatSeconds, formatTime, progressSteps, ruleSourceLabel } from './progress';
 import {
-  Body, Button, Card, Field, FooterBar, GearIcon, Header, IconButton, Notice, Progress, Recent, SectionLabel, Shell, Site, Text, Title,
+  Body, Button, Card, FooterBar, GearIcon, Header, IconButton, Notice, Progress, Recent, SectionLabel, Shell, Site, Text, Title,
 } from './components';
 import { color } from './theme';
 
-const DISCONNECT_REASON: Record<IdleReason | 'manual', string> = {
-  idle: 'Disconnected after a period of inactivity. Scan again to reconnect.',
-  locked: 'Disconnected because the screen was locked. Scan again to reconnect.',
-  manual: 'Disconnected. Scan again to reconnect.',
-};
+const RESET_NOTICE = 'New connection. The previous session can no longer be used. Scan this code to connect.';
 
 const TOOL_ENTRIES = TOOLS.map(({ id, label }) => ({ id, label }));
 
-export const App: React.FC = () => {
+export const App: React.FC<{ sessionStore: SessionStore }> = ({ sessionStore }) => {
   const initialScreen = useMemo(() => homeScreen(TOOL_ENTRIES), []);
-  const connection = usePhoneConnection(initialScreen);
+  const connection = usePhoneConnection(initialScreen, sessionStore);
   const [tab, setTab] = useState<PanelTab>('sign-in');
   const [openTool, setOpenTool] = useState<{ id: string; domain: string } | null>(null);
   const openToolRef = useRef<(toolId: string) => void>(() => undefined);
@@ -60,67 +55,69 @@ export const App: React.FC = () => {
       setTab('sign-in');
     }
   }, [view.phase]);
-  const [settings, setSettings] = useState<PanelSettings>(loadSettings);
   const [showSettings, setShowSettings] = useState(false);
-  const [disconnectReason, setDisconnectReason] = useState<string | null>(null);
-  const connected = connection.status === 'connected';
+  const { phase } = connection;
+  const connected = phase === 'connected';
 
-  const joinable = useRef(false);
-  joinable.current = connected || connection.canRejoin;
-  const disconnectRef = useRef(connection.disconnect);
-  disconnectRef.current = connection.disconnect;
+  // Keep the same session through network failures; paused while a tool owns the connection.
+  useServiceRetry(connection.service, !openTool, connection.reclaim);
 
-  useEffect(
-    () =>
-      watchIdle(settings.idleMinutes, settings.disconnectOnLock, reason => {
-        if (joinable.current) {
-          setDisconnectReason(DISCONNECT_REASON[reason]);
-        }
-        disconnectRef.current();
-      }),
-    [settings.idleMinutes, settings.disconnectOnLock]
-  );
-
-  useEffect(() => {
-    if (connected) {
-      setDisconnectReason(null);
-    }
-  }, [connected]);
-
-  const disconnect = () => {
-    setDisconnectReason(DISCONNECT_REASON.manual);
-    connection.disconnect();
+  // Reset while connected asks once; on the waiting screen it acts at once (the line under the
+  // button explains it). Pressing End session on the phone resets without asking.
+  const [confirmingReset, setConfirmingReset] = useState(false);
+  const [resetNotice, setResetNotice] = useState<string | null>(null);
+  const reset = () => {
+    setConfirmingReset(false);
+    setResetNotice(RESET_NOTICE);
+    connection.reset();
   };
+  useEffect(() => {
+    if (phase !== 'connected') setConfirmingReset(false);
+    if (phase !== 'fresh') setResetNotice(null);
+  }, [phase]);
 
   const siteAccess = useSiteAccess();
 
-  const updateSettings = (next: PanelSettings) => {
-    setSettings(next);
-    saveSettings(next);
-  };
-
   return (
     <Shell>
-      <Header connected={connected} />
+      <Header phase={phase} />
       {!showSettings && !tool && <Tabs selected={tab} onSelect={setTab} />}
       <Body>
         {siteAccess.granted === false && !showSettings && <SiteAccessNotice onAllow={siteAccess.request} />}
         {showSettings ? (
-          <SettingsView settings={settings} onChange={updateSettings} onClose={() => setShowSettings(false)} onSitesChanged={detectionChanged} />
+          <SettingsView onClose={() => setShowSettings(false)} onSitesChanged={detectionChanged} />
         ) : tool && openTool ? (
           <ToolFrame tool={tool} domain={openTool.domain} onExit={exitTool} />
         ) : tab === 'tools' ? (
           <ToolList tools={TOOLS} onOpen={toolId => openToolRef.current(toolId)} />
         ) : connected ? (
           <ConnectedView view={view} actions={{ onSkip: skip, onSaveRule: saveAutoRule, onDetectionChanged: detectionChanged }} />
+        ) : phase === 'waiting' ? (
+          <WaitingView connection={connection} onReset={reset} keptWhileClosed={sessionStore.owner} />
         ) : (
-          <ConnectView connection={connection} notice={disconnectReason} />
+          <ConnectView connection={connection} notice={resetNotice} keptWhileClosed={sessionStore.owner} />
         )}
       </Body>
+      {confirmingReset && (
+        <Notice $tone="warn" role="alertdialog" aria-label="End this session" style={{ margin: '0 16px 8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
+            <span>End this session? Your phone will need to scan again.</span>
+            <span style={{ display: 'flex', gap: 8 }}>
+              <Button type="button" onClick={reset}>
+                End session
+              </Button>
+              <Button type="button" onClick={() => setConfirmingReset(false)}>
+                Cancel
+              </Button>
+            </span>
+          </div>
+        </Notice>
+      )}
       <FooterBar>
-        <span>Disconnects after {settings.idleMinutes} min idle{settings.disconnectOnLock ? ' or on lock' : ''}</span>
+        <span />
         <span style={{ display: 'flex', gap: 8 }}>
-          {connected && <Button onClick={disconnect}>Disconnect</Button>}
+          {connected && !confirmingReset && <Button onClick={() => setConfirmingReset(true)}>Reset</Button>}
+          {phase === 'waiting' && (showSettings || tool || tab === 'tools') && <Button onClick={reset}>Reset</Button>}
           <IconButton aria-label="Settings" aria-pressed={showSettings} onClick={() => setShowSettings(!showSettings)}>
             <GearIcon />
           </IconButton>
@@ -130,16 +127,24 @@ export const App: React.FC = () => {
   );
 };
 
-const ConnectView: React.FC<{ connection: ReturnType<typeof usePhoneConnection>; notice: string | null }> = ({ connection, notice }) => {
+const ConnectView: React.FC<{ connection: PhoneConnection; notice: string | null; keptWhileClosed: boolean }> = ({
+  connection,
+  notice,
+  keptWhileClosed,
+}) => {
   const paired = isPrivatelyPaired(useConnectionRecord());
   return (
   <>
-    {notice && <Notice $tone="warn">{notice}</Notice>}
-    {connection.canRejoin && <Notice $tone="warn">Your phone dropped the connection. Rejoin from the app's history, or scan again.</Notice>}
+    {notice && <Notice $tone="info">{notice}</Notice>}
     <Title>Connect your phone</Title>
-    <Text>Scan once with the Global Input App. You stay connected while this panel is open.</Text>
+    <Text>
+      Scan once with the Global Input App. If your phone drops the connection, it can come back from the app's History without
+      scanning, until you press Reset{keptWhileClosed ? ' or quit the browser' : ' or close this panel'}.
+    </Text>
     <ConnectCode mobile={connection.mobile} />
-    {connection.status === 'error' && <Notice $tone="warn">Could not reach the Global Input service. {connection.errorMessage}</Notice>}
+    {connection.service === 'error' && (
+      <Notice $tone="warn">Could not reach the Global Input service. Trying again… {connection.errorMessage}</Notice>
+    )}
     <ol style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6, color: color.inkSoft }}>
       <li>Open the Global Input App on your phone</li>
       <li>Tap Scan and point at the code</li>
@@ -259,31 +264,11 @@ const SiteAccessNotice: React.FC<{ onAllow: () => void }> = ({ onAllow }) => (
 );
 
 const SettingsView: React.FC<{
-  settings: PanelSettings;
-  onChange: (settings: PanelSettings) => void;
   onClose: () => void;
   onSitesChanged: () => void;
-}> = ({ settings, onChange, onClose, onSitesChanged }) => (
+}> = ({ onClose, onSitesChanged }) => (
   <>
     <Title>Settings</Title>
-    <Field>
-      Disconnect after idle
-      <select value={settings.idleMinutes} onChange={event => onChange({ ...settings, idleMinutes: Number(event.target.value) })}>
-        {IDLE_CHOICES.map(minutes => (
-          <option key={minutes} value={minutes}>
-            {minutes < 60 ? `${minutes} minutes` : `${minutes / 60} hour${minutes > 60 ? 's' : ''}`}
-          </option>
-        ))}
-      </select>
-    </Field>
-    <Field>
-      Disconnect when the screen locks
-      <input
-        type="checkbox"
-        checked={settings.disconnectOnLock}
-        onChange={event => onChange({ ...settings, disconnectOnLock: event.target.checked })}
-      />
-    </Field>
     <SitesSection onChanged={onSitesChanged} />
     <SectionLabel>Page rules</SectionLabel>
     <Text>

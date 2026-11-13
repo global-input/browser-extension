@@ -18,11 +18,12 @@ import { useProcessOnPhone } from './processOnPhone';
 import { useActiveHost } from '../shared/useActiveHost';
 import showIcon from '../../../app/mobile-encryption/encrypt-content/images/show-icon.png';
 import sendIcon from '../../../app/mobile-encryption/encrypt-content/images/send-icon.png';
+import { phoneHint } from '../shared/phoneHint';
 
 type Dispatch = (event: CryptoEvent) => void;
 
 const NotConnected: React.FC<{ mobile: MobileData }> = ({ mobile }) =>
-  mobile.isConnected ? null : <Notice $tone="info">Connect your phone in the Sign in tab first. The key stays on your phone.</Notice>;
+  mobile.isConnected ? null : <Notice $tone="info">{phoneHint(mobile)} first. The key stays on your phone.</Notice>;
 
 const PhoneIcon: React.FC<{ src: string; alt: string }> = ({ src, alt }) => (
   <img src={src} alt={alt} width={18} height={18} style={{ verticalAlign: 'middle', margin: '0 2px' }} />

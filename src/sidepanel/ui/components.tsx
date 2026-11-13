@@ -42,35 +42,44 @@ const Logo = () => (
   </svg>
 );
 
-const Pill = styled.span<{ $on: boolean }>`
+// The three connection phases (see core/connectionPhase).
+export type HeaderPhase = 'connected' | 'waiting' | 'fresh';
+
+const PILL = {
+  connected: { label: 'Connected', background: color.successBg, ink: color.successInk, dot: color.success },
+  waiting: { label: 'Waiting for phone', background: color.warnBg, ink: color.warnInk, dot: color.warnInk },
+  fresh: { label: 'Not connected', background: color.neutralBg, ink: color.inkSoft, dot: color.neutralDot },
+};
+
+const Pill = styled.span<{ $phase: HeaderPhase }>`
   display: inline-flex;
   align-items: center;
   gap: 6px;
   height: 26px;
   padding: 0 10px;
   border-radius: ${radius.pill};
-  background: ${p => (p.$on ? color.successBg : color.neutralBg)};
-  color: ${p => (p.$on ? color.successInk : color.inkSoft)};
+  background: ${p => PILL[p.$phase].background};
+  color: ${p => PILL[p.$phase].ink};
   font-size: 12px;
   font-weight: 600;
 `;
 
-const Dot = styled.span<{ $on: boolean }>`
+const Dot = styled.span<{ $phase: HeaderPhase }>`
   width: 8px;
   height: 8px;
   border-radius: 4px;
-  background: ${p => (p.$on ? color.success : color.neutralDot)};
+  background: ${p => PILL[p.$phase].dot};
 `;
 
-export const Header: React.FC<{ connected: boolean }> = ({ connected }) => (
+export const Header: React.FC<{ phase: HeaderPhase }> = ({ phase }) => (
   <HeaderBar>
     <Brand>
       <Logo />
       Global Input
     </Brand>
-    <Pill $on={connected} role="status">
-      <Dot $on={connected} />
-      {connected ? 'Connected' : 'Not connected'}
+    <Pill $phase={phase} role="status">
+      <Dot $phase={phase} />
+      {PILL[phase].label}
     </Pill>
   </HeaderBar>
 );

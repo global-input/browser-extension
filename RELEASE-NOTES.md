@@ -1,5 +1,29 @@
 # Release Notes
 
+## 5.3.0
+
+Scan once. After that your phone comes back from the app's History, even after you close the panel, and the QR code appears again only when you press **Reset**.
+
+### New
+
+- **Waiting for your phone.** When your phone leaves (the app goes to the background, the phone locks, the network changes), the panel no longer shows the QR code. It shows **Waiting for your phone**, when the phone last connected, and how to come back: open the Global Input App, tap **History**, then tap the session. Only the phone that connected before can come back; if another phone tries, the panel says so.
+- **The session survives a closed panel.** Close the panel and open it again: the panel is still waiting for your phone, and History reconnects it. The session lasts until you press **Reset** or quit the browser. It is kept in memory only, never on disk.
+- **Reset.** **Reset** starts a new connection with a new QR code; the previous session can no longer be used. It is in the footer and on the waiting screen. While your phone is connected, Reset asks once before ending the session.
+- **End session on the phone.** The phone's home screen has **End session** instead of **Disconnect**. It does the same as Reset in the panel.
+- **Keeps trying.** If the Global Input service can't be reached, the panel keeps trying with the same session, and at once when the computer is back online. The QR code doesn't come back.
+- **Header.** The header shows **Connected**, **Waiting for phone** or **Not connected**.
+
+### Changed
+
+- **No automatic disconnect.** The panel no longer disconnects after a period of inactivity or when the screen locks, and the two settings for it are gone. Your phone is always the one that acts, and only the phone that connected can come back. To end the connection, press **Reset** in the panel or **End session** on the phone.
+- When the panel is waiting for your phone, the tools say "Reconnect your phone from the Global Input App's History" instead of asking you to connect in the Sign in tab.
+- Updated to global-input-react 4.7.0.
+
+### Permissions
+
+- **Added `storage`**: keeps the phone connection while the panel is closed, in memory-only storage that is cleared when the browser quits. It shows no warning.
+- **Removed `idle`**: no longer needed, because there is no automatic disconnect.
+
 ## 5.2.0
 
 A new Page control that works on any site: it analyses the page and lets your phone operate it. Also private pairing for people who need more than the default protection, connection settings in the panel, and a way to connect a Global Input App on the same device.

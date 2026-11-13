@@ -5,9 +5,9 @@ import type { Ports, SignInView } from './core/signInController';
 import { chromePagePort, watchActiveTab, watchPageStates } from './adapters/chromePage';
 import { pageRulesPort } from './adapters/rules';
 import { siteSettingsStore } from './adapters/siteSettings';
-import type { usePhoneConnection } from './adapters/usePhoneConnection';
+import type { PhoneConnection } from './adapters/usePhoneConnection';
 
-type Connection = ReturnType<typeof usePhoneConnection>;
+type Connection = PhoneConnection;
 
 export const useSignIn = (connection: Connection, tools: Ports['tools']) => {
   const connectionRef = useRef(connection);
@@ -20,7 +20,7 @@ export const useSignIn = (connection: Connection, tools: Ports['tools']) => {
     const ports: Ports = {
       phone: {
         show: screen => connectionRef.current.show(screen),
-        disconnect: () => connectionRef.current.disconnect(),
+        reset: () => connectionRef.current.reset(),
       },
       page: chromePagePort,
       rules: pageRulesPort,
@@ -48,7 +48,7 @@ export const useSignIn = (connection: Connection, tools: Ports['tools']) => {
     };
   }, [controller]);
 
-  const connected = connection.status === 'connected';
+  const connected = connection.phase === 'connected';
   useEffect(() => {
     if (connected) {
       controller.phoneConnected();

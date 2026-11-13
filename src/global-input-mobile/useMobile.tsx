@@ -1,13 +1,15 @@
 import { useState, useCallback } from "react";
 import { useGlobalInputApp } from 'global-input-react';
-import type { InitData, ConnectOptions } from 'global-input-react';
+import type { InitData, ConnectOptions, SessionData } from 'global-input-react';
 import * as storage from "./storage";
 import { WidgetState, MobileData } from "./commons";
 
 export const useMobile = (
   initData: InitData | (() => InitData),
   showWidgetOnStart = false,
-  configId: string | number = "default"
+  configId: string | number = "default",
+  // A session saved earlier to resume (used by the first connect only), or none for a new one.
+  session: SessionData | null = null
 ): MobileData => {
   const [isShowWidget, setShowWidget] = useState<boolean>(showWidgetOnStart);
   const [settingsConfig, setSettingsConfigId] = useState<number>(1);
@@ -26,6 +28,7 @@ export const useMobile = (
       initData,
       options: connectOptions,
       codeAES: connectionSettings.codeKey,
+      session,
     },
     isShowWidget,
     `${settingsConfig}-${configId}`

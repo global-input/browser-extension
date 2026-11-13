@@ -15,6 +15,7 @@ import { copyToClipboard, insertIntoPage } from '../shared/pageInsert';
 import type { ToolMessage } from '../shared/pageInsert';
 import { FIELD_KINDS, addField, isMultiLine, removeField, setFieldValue } from './fields';
 import type { FieldKind } from './fields';
+import { phoneHint } from '../shared/phoneHint';
 
 export const FormTransferTool: React.FC<ToolProps> = ({ domain, exit }) => {
   const [site, setSite] = useState(domain);
@@ -90,7 +91,7 @@ export const FormTransferTool: React.FC<ToolProps> = ({ domain, exit }) => {
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
       {!mobile.isConnected && (
-        <Notice $tone="info">Connect your phone in the Sign in tab to send these values to and from your phone.</Notice>
+        <Notice $tone="info">{phoneHint(mobile)} to send these values to and from your phone.</Notice>
       )}
       <Label>
         Site

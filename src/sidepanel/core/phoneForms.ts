@@ -7,7 +7,7 @@ export const PHONE_FIELD = {
   STATUS: 'gi-status',
   SKIP: 'gi-skip',
   DONE: 'gi-done',
-  DISCONNECT: 'gi-disconnect',
+  END_SESSION: 'gi-end-session',
   SEND_TEXT: 'gi-send-text',
   TEXT: 'gi-text',
   TEXT_SEND: 'gi-text-send',
@@ -45,7 +45,7 @@ export const homeScreen = (tools: ToolEntry[] = []): PhoneScreen => ({
       info('Waiting for a sign-in page. Open a site on your computer.'),
       button(PHONE_FIELD.SEND_TEXT, 'Send text'),
       ...tools.map(tool => button(toolFieldId(tool.id), tool.label)),
-      button(PHONE_FIELD.DISCONNECT, 'Disconnect'),
+      button(PHONE_FIELD.END_SESSION, 'End session'),
     ],
   },
 });
